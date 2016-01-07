@@ -5,7 +5,8 @@ date:  2016-01-08 00:30:29 +0900
 image: 
 categories: jekyll update
 ---
-サポートベクトルマシンを読んでいます．
+<a rel="nofollow" href="http://www.amazon.co.jp/gp/product/4061529064/ref=as_li_ss_tl?ie=UTF8&camp=247&creative=7399&creativeASIN=4061529064&linkCode=as2&tag=nettodesyuu00-22" target="_blank">サポートベクトルマシン (機械学習プロフェッショナルシリーズ)</a><img src="http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&l=as2&o=9&a=4061529064" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+を読んでいます．
 SVMについて，わかっている気になっていましたが，わかっていませんでした．
 意外と奥が深いですね．というわけでその整理の意味も込めてのポスト．
 
@@ -16,7 +17,7 @@ SVMについて，わかっている気になっていましたが，わかっ�
 SVMでは，「マージンを最大化する超平面を求める」，というのはよくある説明ですね．
 
 ではまず，マージンの定義から入りましょう．
-今，訓練データ$$\{(\boldsymbol{x}_i,y_i)\}_{i=1}^n$$が与えられているとします．
+今，訓練データ$$\{(\boldsymbol{x}_i,y_i)\}_{i=1}^n, \boldsymbol{x}_i \in \mathbb{R}^d, y_i \in \{-1,1\} \ \forall i=1, \ldots, n$$が与えられているとします．
 マージンを，
 超平面$$f(\boldsymbol{x})=\boldsymbol{w}^T \boldsymbol{x} + b$$からもっとも近いサンプルまでの距離と定義します．
 つまり，
@@ -143,3 +144,7 @@ s.t. &\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots ,
 \end{align*}
 $$
 
+ここで，与えられたデータに対して，制約$$y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots ,n $$を満たす$$ \boldsymbol{w}$$と$$b$$が存在しないかもしれません．
+というより，現実問題ではそのような場合がほとんどだと考えられます．
+そこで，ソフトマージンの考え方が出てきます．
+これについてはまた後日書けたらと思います．

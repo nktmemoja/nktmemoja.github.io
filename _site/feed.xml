@@ -6,13 +6,14 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 08 Jan 2016 02:49:50 +0900</pubDate>
-    <lastBuildDate>Fri, 08 Jan 2016 02:49:50 +0900</lastBuildDate>
+    <pubDate>Fri, 08 Jan 2016 04:50:25 +0900</pubDate>
+    <lastBuildDate>Fri, 08 Jan 2016 04:50:25 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
         <title>Hard-Margin Support Vector Machine (SVM)の定式化</title>
-        <description>&lt;p&gt;サポートベクトルマシンを読んでいます．
+        <description>&lt;p&gt;&lt;a rel=&quot;nofollow&quot; href=&quot;http://www.amazon.co.jp/gp/product/4061529064/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=7399&amp;amp;creativeASIN=4061529064&amp;amp;linkCode=as2&amp;amp;tag=nettodesyuu00-22&quot; target=&quot;_blank&quot;&gt;サポートベクトルマシン (機械学習プロフェッショナルシリーズ)&lt;/a&gt;&lt;img src=&quot;http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&amp;amp;l=as2&amp;amp;o=9&amp;amp;a=4061529064&quot; width=&quot;1&quot; height=&quot;1&quot; border=&quot;0&quot; alt=&quot;&quot; style=&quot;border:none !important; margin:0px !important;&quot; /&gt;
+を読んでいます．
 SVMについて，わかっている気になっていましたが，わかっていませんでした．
 意外と奥が深いですね．というわけでその整理の意味も込めてのポスト．&lt;/p&gt;
 
@@ -23,7 +24,7 @@ SVMについて，わかっている気になっていましたが，わかっ�
 SVMでは，「マージンを最大化する超平面を求める」，というのはよくある説明ですね．&lt;/p&gt;
 
 &lt;p&gt;ではまず，マージンの定義から入りましょう．
-今，訓練データ&lt;script type=&quot;math/tex&quot;&gt;\{(\boldsymbol{x}_i,y_i)\}_{i=1}^n&lt;/script&gt;が与えられているとします．
+今，訓練データ&lt;script type=&quot;math/tex&quot;&gt;\{(\boldsymbol{x}_i,y_i)\}_{i=1}^n, \boldsymbol{x}_i \in \mathbb{R}^d, y_i \in \{-1,1\} \ \forall i=1, \ldots, n&lt;/script&gt;が与えられているとします．
 マージンを，
 超平面&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{x})=\boldsymbol{w}^T \boldsymbol{x} + b&lt;/script&gt;からもっとも近いサンプルまでの距離と定義します．
 つまり，&lt;/p&gt;
@@ -136,6 +137,10 @@ y_i=-1 \Leftrightarrow \boldsymbol{w}^T \boldsymbol{x}_i + b &lt; 0 %]]&gt;&lt;/
 s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots ,n 
 \end{align*} %]]&gt;&lt;/script&gt;
 
+&lt;p&gt;ここで，与えられたデータに対して，制約&lt;script type=&quot;math/tex&quot;&gt;y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots ,n&lt;/script&gt;を満たす&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt;が存在しないかもしれません．
+というより，現実問題ではそのような場合がほとんどだと考えられます．
+そこで，ソフトマージンの考え方が出てきます．
+これについてはまた後日書けたらと思います．&lt;/p&gt;
 </description>
         <pubDate>Fri, 08 Jan 2016 00:30:29 +0900</pubDate>
         <link>http://nktmemoja.github.io/jekyll/update/2016/01/08/hardmarginsvmformulation.html</link>
