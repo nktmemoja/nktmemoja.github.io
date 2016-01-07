@@ -1,0 +1,72 @@
+---
+layout: post
+title: 'Word2Vec+教師あり次元削減で文書分類+単語分類'
+image: http://nktmemo.files.wordpress.com/2015/10/wpid-girls.png
+published: true
+date: 2015-10-06 20:46
+comments: true
+categories:
+- Machine Learning
+tags:
+- Machine Learning
+- NLP
+- python
+keywords:
+- Machine Learning
+- Machine Learning
+- NLP
+- python
+---
+ 前回: 
+
+- [文書分類器で単語分類をしてみる](https://nktmemo.wordpress.com/2015/09/29/%E6%96%87%E6%9B%B8%E5%88%86%E9%A1%9E%E5%99%A8%E3%81%A7%E5%8D%98%E8%AA%9E%E5%88%86%E9%A1%9E%E3%82%92%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B/ "https://nktmemo.wordpress.com/2015/09/29/%E6%96%87%E6%9B%B8%E5%88%86%E9%A1%9E%E5%99%A8%E3%81%A7%E5%8D%98%E8%AA%9E%E5%88%86%E9%A1%9E%E3%82%92%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B/")
+
+
+ の続きです． 
+
+ まずは，前回のおさらい． 前回は，文書に対してはラベル付きデータが与えられており，単語についてはラベルなしデータが与えられているという設定を考えました． そして，文書と単語が同じ空間に存在すれば，半教師付き学習に帰着することを示しました． 詳しくは前回の記事を見ていただくとして，これからは半教師付き学習の設定で話を進めます． 
+
+ 今回は，前回の記事でいう単語ベクトル集合$$ \{x_i\}_{i=n_d}^{n}$$をWord2Vecで学習させます． 食わせるコーパスは分類対象の文書集合です． 
+
+ その後，教師あり次元削減手法であるFisher Discriminant Analysis (FDA)を使って$$ B:\mathbb{R}^d\rightarrow\mathbb{R}^m$$を学習させます． これによって，Word2Vecで学習した単語ベクトルたちは，より低次元の空間に落とし込まれます． つまり，$$ z=Bx$$として，$$ \{(z_i,y_i)\}_{i=1}^{n_d}$$と$$ \{z_i\}_{i=n_d}^{n}$$を得ます． 今回は，$$ m=c-1$$としました，ただし，$$ c$$はクラス数です． 
+
+ なぜこのような処理をするかというと，Word2Vecのような教師なし学習では，必ずしも「望ましい結果」が得られるとは限りません． なぜなら，「望ましい結果」についての情報を一切与えていないからです． 今回の目的は文書分類+単語分類です． この目的に対して，Word2Vecが必ずしも望ましい結果を返すとは限らないのです． 
+
+ そこで，教師あり次元削減を使います． FDAは，簡単にいうと，同じクラスに属するサンプルは近く，異なるクラスに属するサンプルは遠くなるよう，射影行列を学習します． ここでは，「望ましい結果」教師データとして与えるので，学習後の空間は分類という目的に対して望ましい空間になっていると期待できます． 
+
+ さて，あとは対して面白いことはしていません． $$ \{(z_i,y_i)\}_{i=1}^{n_d}$$で確率的分類器を学習させ，$$ \{z_i\}_{i=n_d}^{n}$$に対して予測をします． 
+
+ 前回と同じデータを使って実験をしました． 結果の出力には同様にwordcloudを使わせてもらいました． 
+
+ ガールズ: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-girls.png" alt="girls.png" /> 
+
+ ニュース・ゴシップ: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-news1.png" alt="news.png" /> 
+
+ エンタメ・カルチャー: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-entertainment1.png" alt="entertainment.png" /> 
+
+ おでかけ・グルメ: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-spot1.png" alt="spot.png" /> 
+
+ 暮らし・アイデア: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-life1.png" alt="life.png" /> 
+
+ レシピ: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-recipe1.png" alt="recipe.png" /> 
+
+ カラダ: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-wellness1.png" alt="wellness.png" /> 
+
+ ビジネススキル: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-business1.png" alt="business.png" /> 
+
+ IT・ガジェット: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-tech1.png" alt="tech.png" /> 
+
+ デザイン・アート: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-design1.png" alt="design.png" /> 
+
+ 雑学: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-trivia1.png" alt="trivia.png" /> 
+
+ おもしろ: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-humor1.png" alt="humor.png" /> 
+
+ 定番: <img src="http://nktmemo.files.wordpress.com/2015/10/wpid-popular1.png" alt="popular.png" /> 
+
+ 評価データがなくて定性的に評価するしかないのですが，前回と比べて，かなり改善されている気がします． 雑学とかおもしろ，定番なんかは定義がよくわからなくて判断しにくいですが，それ以外はうまく単語分類ができていると思います． 
+
+ 今回は，Word2Vec+教師あり次元削減 (FDA) を使って文書分類器を作成し，それを使って単語分類をしてみました． 結果として，このアプローチはなかなか良いと感じました． 文書分類，単語分類については，これでひと段落した感じがします． 本当は単語分類なんかはマルチラベル分類問題として解くべくなのかもしれませんが，あまりこの問題に執着してもあれなので． 次は要約や，トレンド抽出なんかをやっていきたいなあなんて思っています． 
+
+ 前回と今回はコードを載せていません． これはコードがなかなか複雑なためです． もし，見てみたいという方がいたら，コメントからでも，Twitterからでもなんでも良いので言ってください！ 読んでいただき，ありがとうございました． 
+

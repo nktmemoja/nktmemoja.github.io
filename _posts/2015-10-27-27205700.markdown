@@ -1,0 +1,93 @@
+---
+layout: post
+title: 'Word2Vecを使った単語間関係分類'
+published: true
+date: 2015-10-27 20:57
+comments: true
+categories:
+- Machine Learning
+tags:
+- Machine Learning
+- NLP
+- python
+keywords:
+- Machine Learning
+- NLP
+- python
+---
+ 単語間には様々な関係があります． 今回は，単語間の関係をWord2Vecで学習させようと思います． Word2Vecにはアナロジーを捉えられるという話があります． あの有名な，king - man + woman = queen というやつですね． これは，king - man = queen - womanとも書けます． つまり，2語間の差が関係を表しており， この例だと，kingとmanの関係とqueenとwomanの関係が同じであると捉えることができます． 
+
+ さて，Word2Vecで学習したベクトル表現を使うと，差ベクトルがうまいこと関係を表すと書きましたが， 必ずしもそうなっているとは限りません． 加えて，ユーザが扱いたい関係とWord2Vecで学習した関係が一致しているとも限りません． そこで，今回も例のごとく教師あり学習を使います． ユーザは教師データを通して，扱いたい関係をアルゴリズムに伝えることができます． 
+
+ 最初からあまり多くの関係を対象にするのはしんどいので，今回はis-a, has-a関係のみに着目します． これは，僕の理解では，柔道 is-a スポーツ，スポーツ has-a 柔道みたいなものだと思っています． まずは[training data](https://gist.github.com/nkt1546789/a3b3a4c166fc1c0486a1 "training data")を用意します． is-aとhas-aは反対の関係になっていると思うので，has-aのデータだけ用意します． この中には (スポーツ，野球)というhas-a関係を表す順序対がリストで格納されています． リスト内の順序対に対して差ベクトルを計算し，一つのデータとして扱います． 
+
+コードは以下のようになりました． 
+
+{% highlight python %}
+import training
+from gensim.models import Word2Vec
+import numpy as np
+from sklearn.linear_model import LogisticRegressionCV
+np.random.seed(1)
+
+model=Word2Vec.load("/path/to/your/w2v_model")
+
+data=[]
+X=[]
+y=[]
+for w1,w2 in training.data:
+    if w1 in model and w2 in model:
+	data.append([w1,w2])
+	data.append([w2,w1])
+	X.append(model[w1]-model[w2])
+	X.append(model[w2]-model[w1])
+	y.append(1)
+	y.append(-1)
+
+X=np.array(X)
+y=np.array(y)
+
+idx=np.random.permutation(len(y))
+ntr=int(len(y)*0.7)
+itr=idx[:ntr]
+ite=idx[ntr:]
+
+Xtr=X[itr]
+ytr=y[itr]
+Xte=X[ite]
+yte=y[ite]
+
+clf=LogisticRegressionCV().fit(Xtr,ytr)
+
+ypred=clf.predict(Xte)
+
+from sklearn import metrics
+print metrics.accuracy_score(yte,ypred) # &gt;&gt;&gt; 0.99502487562189057
+{% endhighlight %}
+
+今回は厳密な実験はせずに，簡単に性能を見てみました． テストデータに対して，99%の精度を出すことができました． 以下簡単なテストデータへの予測例です． 
+
+{% highlight python %}
+for j,i in enumerate(ite):
+    w1,w2=data[i]
+    if ypred[j]==1:
+	print w1,"has-a",w2
+    else:
+	print w1,"is-a",w2
+
+# results:
+ブルーベリー is-a 果物
+動物 has-a モルモット
+動物 has-a ワタボウシタマリン
+スポーツ is-a スポーツ
+登山 is-a スポーツ
+ロデオ is-a スポーツ
+動物 has-a ユーラシアカワウソ
+スポーツ has-a フリーダイビング
+競馬 is-a スポーツ
+スポーツ has-a ゴルフ
+...
+{% endhighlight %}
+
+いかがでしょうか？うまく狙った関係が分類できていると思います． とりあえずはうまくいきました！これで成功です！ これがどこまで実用に耐えられるかはやってみないとわかりませんが． 
+

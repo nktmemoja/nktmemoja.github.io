@@ -1,0 +1,177 @@
+---
+layout: post
+title: '文書分類器で単語分類をしてみる'
+image: http://nktmemo.files.wordpress.com/2015/09/wpid-girls.png
+published: true
+date: 2015-09-29 20:33
+comments: true
+categories:
+- Machine Learning
+tags:
+- Machine Learning
+- python
+keywords:
+- Machine Learning
+- Machine Learning
+- python
+---
+ keywords: 文書分類 (document classification）， 単語分類（word classification）， Pointwise mutual information 
+
+<h2 id="sec-1">はじめに</h2>
+ 文書へのラベリングと単語へのラベリングはどちらが簡単だろう？ 例えば多くのニュースサイトではすでに文書は分類されている． しかし，単語が分類されているのは見たことがない． というより，そんなものを表に出してもあまり意味がないので表に出ていないのだろう． この状況を踏まえると，データをクロールする側からすると，ラベル付き文書データを入手するのは容易で， ラベル付き単語データを入手するのは困難だと言える． 
+
+ いま，文書データをクロールして，検索エンジンを作ることを考えよう． 各文書にはラベルが付いている． このラベル情報を活かせないか？ 例えばクエリにラベルが付いていれば，クエリと文書のラベルを見て，一致するものを出せばよい，あるいはそういう場合にスコアが高くなるように，検索エンジンのスコアを設計すれば良い． このように，単語へのラベリングはある程度需要があると推測される． 
+
+<h2 id="sec-2">定式化</h2>
+
+ さて，今回やるのは，ラベル付き文書データを使って，単語分類をしようというもの． つまり，持っているものは，$$ \{(d_i,y_i)\}_{i=1}^{n_d}$$と$$ \{w_i\}_{i=1}^{n_w}$$， ただし，$$ d_i \in \mathcal{D}$$は文書，$$ y_i \in \mathcal{Y}$$は文書に対するラベル, $$ w_i \in \mathcal{W}$$は単語を意味する． 
+
+ ここで，もし単語と文書が同じ空間に存在すれば，文書分類器を使って単語分類ができると思われる． つまり，$$ \mathcal{S}=\mathcal{D}=\mathcal{W}$$とし，なんらかの変換$$ \phi:\mathcal{S} \rightarrow \mathcal{X}$$を定義すればよい． ここまで来れば，$$ x_i=\phi(d_i) \ \forall i=1,\ldots,n_d, \ x_{n_w+j}=\phi(w_j) \ \forall j=1,\ldots,n_w$$とし， $$ \{(x_i,y_i)\}_{i=1}^{n_d}$$と$$ \{x_i\}_{i=n_d}^{n}$$を得る．ただし$$ n=n_d+n_w$$． こうして見てみると，単語と文書を同じ空間に写像すれば，これは半教師付き分類問題に帰着することがわかる． 
+
+ 簡単のために，$$ \mathcal{X}=\mathbb{R}^d, \ \mathcal{Y}=\{1,\ldots,c\}$$とする． 今回は，「文書は単語の線形結合で表される」という仮定を置いてみる．つまり， $$ d=\sum_{i=1}^{n_w} \alpha^{(d)}_i w_i, \ \alpha^{(d)}_i \in \mathbb{R} \ \forall_i=1,\ldots,n_w $$  となる．さらに，「$$ \phi$$は線形写像である」という仮定を置くと，
+ $$ \phi(d)=\sum_{i=1}^{n_w} \alpha^{(d)}_i \phi(w_i) $$
+ となる．というわけで，$$ \phi$$ではなくて，コーパスから$$ \{\phi(w_i)\}_{i=1}^{n_w}$$を学習することにする． 
+
+ さて，やらなければならないのは， 
+
+- コーパスから$$ \{\phi(w_i)\}_{i=1}^{n_w}$$を学習する
+
+- $$ \alpha$$の決定
+
+
+ である．だいぶシンプルになったな．1に関しては死ぬほど研究されているので，その中から適用な手法を使うことにする． ここでは，PPMIを使って単語ベクトルを決定してみる．この辺は特に珍しくもないので，例えば以下を参照してください． 
+
+- [http://www.cl.ecei.tohoku.ac.jp/nlp100/](http://www.cl.ecei.tohoku.ac.jp/nlp100/ "http://www.cl.ecei.tohoku.ac.jp/nlp100/")
+
+
+
+ 残る問題は２だ．とりあえずシンプルさを追求して，単語の出現回数を使うことにする．つまり，$$ \alpha^{(d)}_i=c(w_i,d)$$とする． ただし，$$ c(w_i,d)$$は，文書$$ d$$における単語$$ w_i$$の出現回数である． これで全ての問題が一応解決した．さあ，あとは実装するだけ． 
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3">実装</h2>
+<div class="outline-text-2" id="text-3">
+ コードは後日載せます． やっていることは，PPMIを要素とした単語-文脈行列を作り，その各行を単語ベクトルとします． あとは↑の定式化通りに文書ベクトルを生成し，文書分類器を作ります． その後，単語ベクトルたちを分類器にかけます． 文書分類器には，ロジスティック回帰（sklearn.linear_model.LogisticRegressionCV）を用います． デフォルト設定です（アプローチの可能性を見たいだけなので）． 
+</div>
+</div>
+
+<h2 id="sec-4">実験</h2>
+データはnaverまとめからクロールしたものを使う． カテゴリとそれに対応するクロールした文書数を以下の表に示す． これが今回の訓練データ． 
+
+
+| カテゴリ | 文書数 | 
+|:-----------|:------------|
+|ガールズ	          | 600|
+|ニュース・ゴシップ	  | 976|
+|エンタメ・カルチャー |	480|
+|おでかけ・グルメ	  | 867|
+|暮らし・アイデア	  |  737|
+|レシピ	              |  702|
+|カラダ	              |  708|
+|ビジネススキル	      |  558|
+|IT・ガジェット	      |  231|
+|デザイン・アート	  |  479|
+|雑学	              |  667|
+|おもしろ	          |  584|
+|定番	              |  257|
+
+ 総異なり語数は14767件で，これが今回の分類対象となる． さて，結果はただ単語を羅列してもおもしろくないので，wordcloudを使おうと思う． これについては以下を参考にしました，ありがとうございます． 
+
+- [http://qiita.com/kenmatsu4/items/9b6ac74f831443d29074](http://qiita.com/kenmatsu4/items/9b6ac74f831443d29074 "http://qiita.com/kenmatsu4/items/9b6ac74f831443d29074")
+
+
+<div id="outline-container-sec-4-1" class="outline-3">
+<h3 id="sec-4-1">ガールズ</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-girls.png" alt="girls.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-2" class="outline-3">
+<h3 id="sec-4-2">ニュース・ゴシップ</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-news.png" alt="news.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-3" class="outline-3">
+<h3 id="sec-4-3">エンタメ・カルチャー</h3>
+<div class="outline-text-3" id="text-4-3">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-entertainment.png" alt="entertainment.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-4" class="outline-3">
+<h3 id="sec-4-4">おでかけ・グルメ</h3>
+<div class="outline-text-3" id="text-4-4">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-spot.png" alt="spot.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-5" class="outline-3">
+<h3 id="sec-4-5">暮らし・アイデア</h3>
+<div class="outline-text-3" id="text-4-5">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-life.png" alt="life.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-6" class="outline-3">
+<h3 id="sec-4-6">レシピ</h3>
+<div class="outline-text-3" id="text-4-6">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-recipe.png" alt="recipe.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-7" class="outline-3">
+<h3 id="sec-4-7">カラダ</h3>
+<div class="outline-text-3" id="text-4-7">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-wellness.png" alt="wellness.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-8" class="outline-3">
+<h3 id="sec-4-8">ビジネススキル</h3>
+<div class="outline-text-3" id="text-4-8">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-business.png" alt="business.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-9" class="outline-3">
+<h3 id="sec-4-9">IT・ガジェット</h3>
+<div class="outline-text-3" id="text-4-9">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-tech.png" alt="tech.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-10" class="outline-3">
+<h3 id="sec-4-10">デザイン・アート</h3>
+<div class="outline-text-3" id="text-4-10">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-design.png" alt="design.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-11" class="outline-3">
+<h3 id="sec-4-11">雑学</h3>
+<div class="outline-text-3" id="text-4-11">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-trivia.png" alt="trivia.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-12" class="outline-3">
+<h3 id="sec-4-12">おもしろ</h3>
+<div class="outline-text-3" id="text-4-12">
+<div class="figure"> <img src="http://nktmemo.files.wordpress.com/2015/09/wpid-humor.png" alt="humor.png" />  </div>
+</div>
+</div>
+
+<div id="outline-container-sec-4-13" class="outline-3">
+<h3 id="sec-4-13">定番</h3>
+<div class="outline-text-3" id="text-4-13">
+ 該当単語なし 
+</div>
+</div>
+
+<h2 id="sec-5">おわりに</h2>
+ 今回はラベル付き文書データから文書分類器を学習し，それを単語分類に使用してみた． 結果は定性的に測るしかないが，うまくいっているところはあるのでアプローチは悪くないのかなと思う． 定番に該当がないのは定番だからなのだろうか？笑 ただ，もっと分類器をチューニングしたほうが良い気がする． いまはただロジスティック回帰にぶん投げているだけなので． 
+
+ 次回は，教師あり次元削減，具体的にはFisher Discriminant Analysis (FDA)をかけてみます． いまは生の単語-文脈行列を使っているので，情報をもっと圧縮させて次元を削減しようと思います． さらに，教師ありデータを使うことで，同じラベルを持つものは近くなり，異なるラベルを持つものは遠くなるよう次元削減後の空間を学習します（正確には射影行列）． まぁとりあえずいいんではなかろうか． 
+
