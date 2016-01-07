@@ -1,0 +1,98 @@
+---
+layout: post
+title: 'word2vecでニュース記事分類'
+published: true
+date: 2015-07-19 22:56
+comments: true
+categories:
+- Machine Learning
+- python
+tags: []
+keywords:
+- Machine Learning
+- python
+---
+
+ word2vecの応用として文書分類，ここではニュース分類をやってみました． データはlivedoorニュースコーパスを使いました． あと，wikipediaのデータで学習させたモデルを使いました． 
+
+- [http://www.rondhuit.com/download.html#ldcc](http://www.rondhuit.com/download.html#ldcc "http://www.rondhuit.com/download.html#ldcc")
+
+bag-of-wordsを用いた場合は以下で議論されています． 
+
+- [http://qiita.com/yasunori/items/31a23eb259482e4824e2](http://qiita.com/yasunori/items/31a23eb259482e4824e2 "http://qiita.com/yasunori/items/31a23eb259482e4824e2")
+
+
+
+さて，今回はword2vecを使って文書分類に挑戦してみます． word2vecにより，単語空間は有限次元ベクトル空間で表現されています． 単語$$ x$$のベクトル表現を$$ v(x)$$とし長さ1に正規化されているとします （正規化すると内積がcos類似度になる．特に正規化しなくてもよいと思うが念のため）． さらに，文書$$ d$$のベクトル表現を$$ v(d)$$とします． ここで，文書$$ d$$は単語を元に持つ集合（順序は考慮しない）とします． 
+
+さて，最もシンプルな文書ベクトルは以下のようになるだろう．
+
+$$
+\begin{align*}
+v(d) = \frac{1}{|d|} \sum_{x \in d} v(x) 
+\end{align*}
+$$
+
+これをモデル１とする． 
+次に，以下のような重み付きバージョンを考える． 
+
+$$
+\begin{align*}
+v(d) = \frac{1}{|d|} \sum_{x \in d} w(x) v(x) , \ \sum_{w \in d} \ w(x)=1
+\end{align*}
+$$
+
+この重み$$ w(x)$$には，例えばTFIDFやPMIなんかが使えると思う． ちなみに重みは足して1になるようにしておく．これをモデル２とする． 今回は，モデル１とモデル２を比較してみる． 
+
+ モデル１はすぐに構築できるが，モデル２の重みを何にしようか迷う． 今回のタスクは文書分類なのだから，クラス分類において重要な単語には大きな重みをつけるべきだろう． そう考えると，以下の重み関数はどうだろうか． 
+
+$$
+\begin{align*}
+w(x,d) = \frac{c(x,d)}{\sum_{x' \in d} c(x',d)}\log\frac{\#\mathcal{Y}}{\#\{y| x \in y\}}
+\end{align*}
+$$
+
+ここで$$ c(x,d)$$は，単語$$ x$$の文書$$ d$$における出現回数， $$ \mathcal{Y}=\{1,\ldots,c\}$$はクラスで，$$ \#$$は集合の要素数をさす． logの項はidfのクラス版で，その単語がいろんなクラスに出現するなら分母が大きくなり全体が小さくなる． 逆に，その単語があるクラスにしか出てこないならその単語の重みは大きくなる． これはあまりにもハードな重みな気がするが，とりあえずこれ（以下tficfと呼ぶ）を使ってみる． 
+
+さて，まずは文書を形態素解析するのだが（形態素解析を使わないバージョンは次に書こうと思う）， 辞書には最近流行りのneologdを使う． 
+
+- [https://github.com/neologd/mecab-ipadic-neologd](https://github.com/neologd/mecab-ipadic-neologd "https://github.com/neologd/mecab-ipadic-neologd")
+
+ライブドアニュースコーパスのディレクトリ構成は以下のようになっていることを想定． 
+
+{% highlight bash %}
+livedoor_corpus/
+  dokujo-tsushin/
+  it-life-hack/
+  kaden-channel/
+  livedoor-homme/
+  movie-enter/
+  peachy/
+  smax/
+  sports-watch/
+  topic-news/
+{% endhighlight %}
+
+なお，カテゴリ数は9で総文書数は7376であった． 分類器にはロジスティック回帰を用いた． 
+
+以下に実験結果を示す．
+
+|uniform|tficf|
+|:---:|:---:|
+|0.85 (0.01)| 0.52 (0.03)|
+
+ tficfが重み付けを行った結果だ．ものすごく悪い． 一方重み付けを行わないモデル (uniform) はかなりいい性能を発揮している． 重み付けによりここまで性能が落ちるとは思わなかった． 何かバグがないか追求してみるが，今のところword2vecで学習した単語空間をそのまま使っても特に問題はなさそうだ． それにしても上のqiitaの記事ではBOW+kNNというシンプルな組み合わせながら精度が89%と報告されている． これはおそらく文書分類というタスクでは，文書が多数の単語を含むのでBOWでも十分にそれを表現できているため，と解釈できる． 逆に，一つの文書が短かったり，単語そのものを分類しなければならないようなタスクでは，word2vecの真価が発揮されるのではないかと思う． 
+
+単語分類については以下に簡単な例がある． 
+
+- [https://nktmemo.wordpress.com/2015/06/27/word2vec%E3%81%A7%E5%AD%A6%E7%BF%92%E3%81%97%E3%81%9F%E3%83%99%E3%82%AF%E3%83%88%E3%83%AB%E8%A1%A8%E7%8F%BE%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E5%88%86%E9%A1%9E%E5%99%A8%E3%82%92%E4%BD%9C%E3%81%A3/](https://nktmemo.wordpress.com/2015/06/27/word2vec%E3%81%A7%E5%AD%A6%E7%BF%92%E3%81%97%E3%81%9F%E3%83%99%E3%82%AF%E3%83%88%E3%83%AB%E8%A1%A8%E7%8F%BE%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E5%88%86%E9%A1%9E%E5%99%A8%E3%82%92%E4%BD%9C%E3%81%A3/ "https://nktmemo.wordpress.com/2015/06/27/word2vec%E3%81%A7%E5%AD%A6%E7%BF%92%E3%81%97%E3%81%9F%E3%83%99%E3%82%AF%E3%83%88%E3%83%AB%E8%A1%A8%E7%8F%BE%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E5%88%86%E9%A1%9E%E5%99%A8%E3%82%92%E4%BD%9C%E3%81%A3/")
+
+
+
+実は，短い文書においては，TFICFの有効性を確認した．よって長い文書でも動くはずなのだが，今回は動かなかった． というわけでバグを探すのと，word2vecの他の応用も考えてみる． 実験に使ったコードはGistに置いておくので，気が向いたら試してみてください: 
+
+<script src="https://gist.github.com/nkt1546789/375b00280e8cea3da271.js"></script>
+
+追記（2016/01/08）：Word2Vecを使って文書分類器を構成するメリットは，単語と文書を同じ空間内で考えられること，だと後日思いました．
+
+- [Word2Vec+教師あり次元削減で文書分類+単語分類](http://nktmemoja.github.io/machine%20learning/2015/10/06/06204600.html)
