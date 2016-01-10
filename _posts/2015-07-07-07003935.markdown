@@ -1,0 +1,38 @@
+---
+layout: post
+title: 'グラム行列の固有値分解で特徴ベクトルを得るのはkernel PCAをするのと同じこと'
+published: true
+date: 2015-07-07 00:39
+comments: true
+categories:
+- Uncategorized
+tags: []
+keywords:
+- Uncategorized
+---
+前回：
+
+-&nbsp;[グラム（カーネル）行列の固有値分解で対応する特徴ベクトルを得る](https://nktmemo.wordpress.com/2015/06/30/%e3%82%b0%e3%83%a9%e3%83%a0%ef%bc%88%e3%82%ab%e3%83%bc%e3%83%8d%e3%83%ab%ef%bc%89%e8%a1%8c%e5%88%97%e3%81%ae%e5%9b%ba%e6%9c%89%e5%80%a4%e5%88%86%e8%a7%a3%e3%81%a7%e5%af%be%e5%bf%9c%e3%81%99%e3%82%8b/ "グラム（カーネル）行列の固有値分解で対応する特徴ベクトルを得る")
+
+の続き．前回はグラム行列$$ K$$の固有値分解を用いて$$ K=\Phi\Phi^T$$を満たす特徴ベクトル（を縦に並べた行列）$$ \Phi$$を求めてみました．いわゆるlow-rank近似というやつなんですかね．そして，新しい入力に対してその特徴ベクトルが計算できない，という問題がありました．
+
+実はこれ，Kernel PCAと同じことをしているということに気づきました．似ているなぁ，とは思っていたのですが．まず問題を整理しよう．
+
+Kernel PCAは，
+
+$$
+\begin{align*}
+\Phi\Phi^Tv_i=\lambda_i v_i, \ \Phi=[\phi(x_1)|\cdots|\phi(x_n)], \ \langle v_i, v_j \rangle=\delta_{ij}
+\end{align*}
+$$
+
+という問題を解く（$$ \Phi$$の定義が前回と変わっているのでご注意を）．
+ここで$$ v_i=\Phi \alpha_i$$と置くと，
+$$ K\alpha_i=\lambda_i \alpha_i, \ \langle \alpha_i, \alpha_j \rangle=\delta_{ij}$$
+となり，$$ A=[\alpha_1|\cdots|\alpha_k], \ \lambda_1 \geq \ldots \geq \lambda_k$$を得る．
+ここで，$$ \langle v_i,v_j \rangle=\delta_{ij}$$であるためには，$$ v_i=\frac{v_i}{\|v_i\|}=\frac{v_i}{\sqrt{\lambda_i}}$$としてやる必要がある．最終的に，$$ V=[v_1|\cdots|v_k]=\Phi A \Lambda^{-\frac{1}{2}}$$を得る．
+さて，元の空間の元
+$$ x \in \mathcal{X}$$は$$ z=V^T \phi(x)$$と変換される．これを現在持っているデータ$$ \Phi$$に適用すると，$$ V^T \Phi = \Lambda^{-\frac{1}{2}} A^T \Phi^T \Phi = \Lambda^{-\frac{1}{2}} A^T K = \Lambda^{-\frac{1}{2}} \Lambda A^T = \Lambda^{\frac{1}{2}} A^T$$となる．
+これは，前回と全く同じ結果である！驚きだ！
+ここで，新しい入力$$ x \in \mathcal{X}$$を考えると，これに対応する特徴ベクトルは$$ z = V^T \phi(x) = \Lambda^{-\frac{1}{2}} A^T \Phi^T \phi(x) = \Lambda^{-\frac{1}{2}} A^T k(x), \ k(x)=[k(x,x_1) \cdots k(x,x_n)]^T$$と表される．
+これで，out-of-sample問題も解決だ．素晴らしいじゃないか．次はLPPとかについて書きたい．

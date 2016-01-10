@@ -1,0 +1,70 @@
+---
+layout: post
+title: 'Gaussianに従う確率変数のエントロピーの推定'
+image: http://nktmemo.files.wordpress.com/2014/05/wpid-estimation_of_mi.png
+published: true
+date: 2014-05-11 18:42
+comments: true
+categories:
+- Uncategorized
+tags: []
+keywords:
+- Uncategorized
+---
+連続型確率変数のエントロピーの計算法を調べてもなかなか良いのが出てこなかったので苦労した。 というわけで、それに関連するポスト。確率変数$$ X$$のエントロピーは次式で定義される。
+
+$$
+\begin{align*}
+h(X) = - \int^{\infty}_{-\infty} p(x)\log p(x) dx
+\end{align*}
+$$
+
+今回の実験では、求めるエントロピーの真の値がわかっている必要があるので１変数正規分布を利用する。 １変数正規分布$$ N(\mu, \sigma^2)$$に従う連続型確率変数のエントロピーは次式で求められる。
+
+$$
+\begin{align*}
+ln\left(\sigma\sqrt{2\pi e}\right)
+\end{align*}
+$$
+
+今回は標準正規分布$$ N(0, 1)$$を用いる。 なおこの設定では当たり前だが、確率密度関数は既知だとする。   確率密度関数が既知なので、それに従う乱数をｎ個生成し、その確率密度を計算すると、ｎ個の確率密度によるサンプル$$ \{p(x_1), \ldots, p(x_n)\}$$を作ることができる。 つまりエントロピーを以下のようにサンプル近似する。
+
+$$
+\begin{align*}
+\hat{h}(X) := - \frac{1}{n} \sum^n_{i=1} \log p(x)
+\end{align*}
+$$
+
+実行結果は以下のようになった。
+
+<img src="http://nktmemo.files.wordpress.com/2014/05/wpid-estimation_of_mi.png" alt="file://c:/Users/Hiroyuki/Dropbox/nkt1546789.github.io/python_ml/estimation_of_MI.png" />
+
+ここから、サンプル数を増やしていけば、真の値に近づいていく、つまり、
+
+$$
+\begin{align*}
+\hat{h}(x) \rightarrow h(x) \ (n \rightarrow \infty)
+\end{align*}
+$$
+
+が言える。
+結論として、エントロピーはサンプル近似することができるということがわかった。 ただし、ここで疑問がある。 通常は、サンプル$$ \{x_1, \ldots, x_n\}$$のみが与えられていて、確率密度関数は未知である。 そこで、確率密度関数を推定して、$$ \hat{p}(x)$$が得られたとする。 次は確率密度のサンプルを生成したいわけだが、これは可能なのだろうか。 すなわち任意の関数に従う乱数を生成することは可能なのだろうか。 これが疑問で仕方ないので、また調べる。   なお、使ったコードは以下である。    
+
+{% highlight python %}
+# coding: utf-8
+import numpy as np
+import pylab as pl
+from scipy import stats
+
+th = np.log(np.sqrt(2*np.pi*np.e))
+print &quot;theoritical:&quot;, th
+ns = np.logspace(1, 6, 100)
+hs = [np.sum(-np.log(stats.norm.pdf(stats.norm.rvs(0, 1, n))))/n for n in ns]
+ths = np.repeat(th, 100)
+pl.semilogx(ns, hs)
+pl.semilogx(ns, ths, c=&quot;r&quot;)
+pl.title(&quot;estimation of entropy of Gaussian N(0, 1)&quot;)
+pl.xlabel(&quot;$$n$$&quot;)
+pl.ylabel(r&quot;$$\hat{H}(X)$$&quot;)
+pl.show()
+{% endhighlight %}

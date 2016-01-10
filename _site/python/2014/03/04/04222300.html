@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>平均値の差の検定の威力たるや...</title>
+  <meta name="description" content="Source and explanation">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <!--<link rel="stylesheet" href="/assets/css/pygments.css">-->
+  <link rel="canonical" href="http://nktmemoja.github.io/python/2014/03/04/04222300.html">
+  <link rel="alternate" type="application/rss+xml" title="nktmemo_ja" href="http://nktmemoja.github.io/feed.xml">
+  <script type="text/javascript"
+    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-47154979-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">nktmemo_ja</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">平均値の差の検定の威力たるや...</h1>
+    <p class="post-meta"><time datetime="2014-03-04T22:23:00+09:00" itemprop="datePublished">Mar 4, 2014</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h1 id="source-and-explanation">Source and explanation</h1>
+
+<div class="outline-text-2" id="text-1"> <div class="org-src-container">  <pre class="src src-python"><span style="color:#ff7f24;"># coding: utf-8</span>
+<span style="color:#ffa07a;">"""</span>
+<span style="color:#ffa07a;">&#26908;&#23450;&#12398;&#23041;&#21147;&#12434;&#26908;&#35388;&#12377;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">&#20170;&#22238;&#12399;&#32047;&#31309;&#20998;&#24067;&#38306;&#25968;&#12364;&#20154;&#12398;&#30446;&#12391;&#35211;&#12390;&#38750;&#24120;&#12395;&#20284;&#12390;&#12356;&#12427;&#12465;&#12540;&#12473;&#12434;&#24819;&#23450;&#12375;&#12383;&#12356;&#65294;</span>
+<span style="color:#ffa07a;">&#12394;&#12380;&#12394;&#12425;&#65292;&#32047;&#31309;&#20998;&#24067;&#38306;&#25968;&#12364;&#26126;&#12425;&#12363;&#12395;&#36949;&#12358;&#12394;&#12425;&#65292;&#26908;&#23450;&#12434;&#34892;&#12358;&#24517;&#35201;&#12418;&#12394;&#12356;&#12392;&#24605;&#12358;&#12363;&#12425;&#12384;&#65294;</span>
+<span style="color:#ffa07a;">&#20108;&#12388;&#12398;&#20998;&#24067;&#12363;&#12425;&#29983;&#25104;&#12373;&#12428;&#12383;&#27161;&#26412;x1, x2&#12364;&#12354;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">&#12381;&#12428;&#12382;&#12428;&#12398;&#24179;&#22343;&#20516;mmu1, mmu2&#12434;&#20351;&#12387;&#12390;&#65292;x1,x2&#12399;&#21029;&#12293;&#12398;&#20998;&#24067;&#12363;&#12425;&#29983;&#25104;&#12373;&#12428;&#12383;&#12371;&#12392;&#12434;&#26908;&#23450;&#12391;&#30906;&#12363;&#12417;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">&#24112;&#28961;&#20206;&#35500;&#65306;x1,x2&#12399;&#21516;&#12376;&#20998;&#24067;&#12363;&#12425;&#29983;&#25104;&#12373;&#12428;&#12383;&#65294;</span>
+<span style="color:#ffa07a;">&#12371;&#12398;&#20206;&#35500;&#12434;&#26820;&#21364;&#12391;&#12365;&#12427;&#12363;&#12393;&#12358;&#12363;&#12434;&#35519;&#12409;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">&#12394;&#12362;&#65292;&#20998;&#24067;&#12395;&#12399;&#27491;&#35215;&#20998;&#24067;&#12434;&#20351;&#12356;&#65292;&#30495;&#12398;&#12497;&#12521;&#12513;&#12540;&#12479;&#12399;&#12381;&#12428;&#12382;&#12428;(mu1, sigma1), (mu2, sigma2)&#12391;&#12354;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">"""</span>
+<span style="color:#00ffff;">import</span> numpy <span style="color:#00ffff;">as</span> np
+<span style="color:#00ffff;">import</span> random
+
+<span style="color:#00ffff;">class</span> <span style="color:#98fb98;">Cdf</span>(<span style="color:#b0c4de;">object</span>):
+    <span style="color:#00ffff;">def</span> <span style="color:#87cefa;">__init__</span>(<span style="color:#00ffff;">self</span>, t):
+        <span style="color:#00ffff;">self</span>.t = t
+        <span style="color:#00ffff;">self</span>.N = <span style="color:#b0c4de;">float</span>(<span style="color:#b0c4de;">len</span>(t))
+
+    <span style="color:#00ffff;">def</span> <span style="color:#87cefa;">prob</span>(<span style="color:#00ffff;">self</span>, x):
+        <span style="color:#00ffff;">return</span> <span style="color:#b0c4de;">len</span>([tt <span style="color:#00ffff;">for</span> tt <span style="color:#00ffff;">in</span> <span style="color:#00ffff;">self</span>.t <span style="color:#00ffff;">if</span> tt &lt;= x]) / <span style="color:#00ffff;">self</span>.N
+
+<span style="color:#ff7f24;"># &#35373;&#23450;</span>
+<span style="color:#ff7f24;"># &#22823;&#12365;&#12373;&#12399;1000&#12378;&#12388;</span>
+n, m = 1000, 1000 
+<span style="color:#ff7f24;"># &#30495;&#12398;&#12497;&#12521;&#12513;&#12540;&#12479;</span>
+mu1, mu2 = 0, 1
+sigma1, sigma2 = 1, 1
+<span style="color:#ff7f24;"># &#27161;&#26412;&#12398;&#29983;&#25104;</span>
+<span style="color:#eedd82;">x1</span> = np.random.normal(mu1, sigma1, n)
+<span style="color:#eedd82;">x2</span> = np.random.normal(mu2, sigma2, m)
+
+<span style="color:#ff7f24;"># &#24112;&#28961;&#20206;&#35500;&#29992;</span>
+<span style="color:#eedd82;">x</span> = x1 + x2
+<span style="color:#ff7f24;">#random.shuffle(x)</span>
+<span style="color:#ff7f24;"># &#27161;&#26412;&#24179;&#22343;</span>
+mmu1, mmu2 = x1.mean(), x2.mean()
+<span style="color:#ff7f24;"># &#24179;&#22343;&#24046;</span>
+<span style="color:#ff7f24;"># &#12371;&#12398;&#24179;&#22343;&#24046;&#12364;&#20598;&#28982;&#12394;&#12398;&#12363;&#12393;&#12358;&#12363;&#35519;&#12409;&#12427;&#65294;</span>
+<span style="color:#eedd82;">delta</span> = <span style="color:#b0c4de;">abs</span>(mmu1 - mmu2)
+
+<span style="color:#00ffff;">print</span>
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"n:"</span>, n
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"m:"</span>, m
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"mu1:"</span>, mmu1
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"mu2:"</span>, mmu2
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"delta:"</span>, delta
+
+<span style="color:#ff7f24;"># 1000&#22238;&#12522;&#12469;&#12531;&#12503;&#12522;&#12531;&#12464;&#12375;&#12390;1000&#20491;&#12398;&#24179;&#22343;&#24046;&#12434;&#24471;&#12427;&#65294;</span>
+<span style="color:#ff7f24;"># &#24112;&#28961;&#20206;&#35500;&#12395;&#22522;&#12389;&#12367;&#12418;&#12398;&#12394;&#12398;&#12391;&#65292;x1&#12392;x2&#12434;&#28151;&#12380;&#21512;&#12431;&#12379;&#12383;&#12418;&#12398;&#12434;&#20351;&#12358;&#65294;</span>
+<span style="color:#eedd82;">iters</span> = 1000
+<span style="color:#eedd82;">deltas</span> = np.array([np.mean([random.choice(x) <span style="color:#00ffff;">for</span> i <span style="color:#00ffff;">in</span> <span style="color:#b0c4de;">range</span>(n)]) - np.mean([random.choice(x) <span style="color:#00ffff;">for</span> i <span style="color:#00ffff;">in</span> <span style="color:#b0c4de;">range</span>(m)]) <span style="color:#00ffff;">for</span> i <span style="color:#00ffff;">in</span> <span style="color:#b0c4de;">range</span>(iters)])
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">'(Mean, Var) :'</span>, (deltas.mean(), deltas.var())
+
+<span style="color:#ff7f24;"># &#27161;&#26412;&#12398;&#24179;&#22343;&#24046;&#20197;&#19978;&#12398;&#24179;&#22343;&#24046;&#12364;&#29983;&#25104;&#12373;&#12428;&#12427;&#30906;&#29575;&#65288;p&#20516;&#65289;&#12434;&#35336;&#31639;&#65294;</span>
+<span style="color:#ff7f24;"># &#32047;&#31309;&#20998;&#24067;&#38306;&#25968;&#12434;&#20351;&#12387;&#12390;&#12356;&#12427;&#12364;&#65292;&#21029;&#12395;&#20351;&#12431;&#12394;&#12367;&#12390;&#12418;&#33391;&#12356;&#65294;</span>
+<span style="color:#eedd82;">cdf</span> = Cdf(deltas)
+<span style="color:#eedd82;">left</span> = cdf.prob(-delta)
+<span style="color:#eedd82;">right</span> = 1.0 - cdf.prob(delta)
+<span style="color:#eedd82;">pvalue</span> = left + right
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">'Tails (left, right, total):'</span>, left, right, left+right
+<span style="color:#ff7f24;"># p&#20516;&#12434;&#35211;&#12390;&#21028;&#26029;</span>
+
+<span style="color:#ff7f24;"># plot&#29992;&#12487;&#12540;&#12479;&#20316;&#25104;</span>
+<span style="color:#eedd82;">cdf1</span> = Cdf(x1)
+<span style="color:#eedd82;">cdf2</span> = Cdf(x2)
+<span style="color:#eedd82;">minimum</span> = np.min([x1.min(), x2.min()])
+<span style="color:#eedd82;">maximum</span> = np.max([x1.max(), x2.max()])
+<span style="color:#eedd82;">px</span> = np.linspace(minimum, maximum, 200)
+<span style="color:#eedd82;">py1</span> = np.array([cdf1.prob(xx) <span style="color:#00ffff;">for</span> xx <span style="color:#00ffff;">in</span> px], dtype=<span style="color:#b0c4de;">float</span>)
+<span style="color:#eedd82;">py2</span> = np.array([cdf2.prob(xx) <span style="color:#00ffff;">for</span> xx <span style="color:#00ffff;">in</span> px], dtype=<span style="color:#b0c4de;">float</span>)
+
+<span style="color:#00ffff;">import</span> matplotlib.pyplot <span style="color:#00ffff;">as</span> plt
+plt.plot(px, py1, <span style="color:#ffa07a;">"b-"</span>)
+plt.plot(px, py2, <span style="color:#ffa07a;">"b-"</span>)
+plt.show()
+</pre> </div> </div>
+
+<h1 id="results">Results</h1>
+
+<div class="outline-text-2" id="text-2"> </div>
+<div id="outline-container-sec-2-1" class="outline-3"> <h3 id="sec-2-1">Case 1: 全く同じ分布（パラメータ）</h3> <div class="outline-text-3" id="text-2-1"> <p> 平均0分散1の正規分布と平均0分散1の正規分布から生成されたデータ． 累積分布関数はこんな感じ．見た目はほとんど同じ． こいつのp値は0.468で帰無仮説は棄却できない． つまり，同じ分布から生成されたということ．理にかなう． <img src="http://nktmemo.files.wordpress.com/2014/03/wpid-same_dist.png" alt="wpid-same_dist.png" /> </p> </div> </div>
+<div id="outline-container-sec-2-2" class="outline-3"> <h3 id="sec-2-2">Case 2: ほぼ同じ分布（パラメータ）</h3> <div class="outline-text-3" id="text-2-2"> <p> 平均0分散1の正規分布と平均0.15分散1の正規分布から生成されたデータ． 累積分布関数はこんな感じ．さきほどまではいかないが見た目はほとんど同じ． p値は0.049で，有意水準5％でなら棄却できる．（使い方あってるのか&#x2026;） <img src="http://nktmemo.files.wordpress.com/2014/03/wpid-5_dist.png" alt="wpid-5_dist.png" /> </p> </div> </div>
+<div id="outline-container-sec-2-3" class="outline-3"> <h3 id="sec-2-3">Case 3: 異なる分布（パラメータ）</h3> <div class="outline-text-3" id="text-2-3"> <p> 平均0分散1の正規分布と平均1分散1の正規分布から生成されたデータ． 累積分布関数はこんな感じ．見た目から同じ分布（同じパラメータ）から生成されていないことがわかる． 是非棄却されてほしい． <img src="http://nktmemo.files.wordpress.com/2014/03/wpid-notsame.png" alt="wpid-notsame.png" />p値は0で期待通り棄却できる． </p>
+</div> </div>
+
+<h1 id="summary">Summary</h1>
+
+<div class="outline-text-2" id="text-3"> <p> 平均値の検定は，2つのデータがあり，それぞれ異なる分布（あるいはパラメータ）から生成されたかどうかを確かめることができる． 今回は同一分布（正規分布）で，パラメータだけを変えて実験をしてみた． 検定結果は理にかなっており，パラメータが全く同じなら，帰無仮説は棄却できず， パラメータを大きく変化（1程度）させると帰無仮説は棄却され，異なる分布と判断した． 問題は人間の目でみて，ほとんど同じだけどどうだろう？というケース（Case2）． このケースを実験することで，「判断は，有意水準に委ねる」という統計学の非常にスマートな態度を実感することができた． これからの研究活動に役立ちそうだ． </p> </div>
+
+
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css">
+
+  <a href="https://twitter.com/intent/tweet?text=平均値の差の検定の威力たるや...&url=http://nktmemoja.github.io/python/2014/03/04/04222300.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
+  <a href="https://facebook.com/sharer.php?u=http://nktmemoja.github.io/python/2014/03/04/04222300.html" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square"></i></a>
+  <a href="http://www.linkedin.com/shareArticle?mini=true&url=http://nktmemoja.github.io/python/2014/03/04/04222300.html" rel="nofollow" target="_blank" title="Share on Linkedlin"><i class="fa fa-linkedin-square"></i></a>
+  <a href="https://plus.google.com/share?url=http://nktmemoja.github.io/python/2014/03/04/04222300.html" rel="nofollow" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square"></i></a>
+
+
+
+    <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() {  // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        
+        s.src = '//nktmemo.disqus.com/embed.js';
+        
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">nktmemo_ja</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>nktmemo_ja</li>
+          <li><a href="mailto:h.tanaka36@gmail.com">h.tanaka36@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/nkt1546789"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">nkt1546789</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/nkt_dev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">nkt_dev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>nktmemo provides interesting articles about Machine Learning and NLP. 
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

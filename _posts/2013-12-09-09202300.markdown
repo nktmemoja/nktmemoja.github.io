@@ -1,0 +1,29 @@
+---
+layout: post
+title: '凸関数の便利な性質'
+published: true
+date: 2013-12-09 20:23
+comments: true
+categories:
+- Math
+tags:
+- cvxopt
+- Math
+keywords:
+- Math
+- cvxopt
+- Math
+---
+凸関数の便利な性質である以下の定理を証明しました．
+
+$$
+\begin{align*}
+f \ \text{is convex if and only if} \ g(t) = f(tx + (1-t)y) \ \text{is convex}
+\end{align*}
+$$
+
+$$f$$が凸関数であるための必要充分条件は上の$$g(t)$$が凸関数であることである．これは有用な性質であるように思われます．n変数関数を1変数関数で表現できてますからね． 事実Convex Optimizationでは，first-order conditionの証明にこれが出てきました． first-order conditionは最も重要な定理の一つだと考えていますので，これの証明に出て来るこの定理は有用に違いない！ ならば理解するしかない！というわけで証明を書いてみました． ちなみに初めて英語で書いたので，かなり怪しいですが．PDFで出してます．
+
+- [http://nktmemo.files.wordpress.com/2013/12/20131206_1_en.pdf](http://nktmemo.files.wordpress.com/2013/12/20131206_1_en.pdf "http://nktmemo.files.wordpress.com/2013/12/20131206_1_en.pdf")
+
+次はfirst-order condition の証明もしたいですね．というか誰かにチェックしてもらいたい．

@@ -1,0 +1,26 @@
+---
+layout: post
+title: '共起行列の作成 scipy.sparse.coo_matrix'
+published: true
+date: 2015-05-25 21:03
+comments: true
+categories:
+- NLP
+tags:
+- NLP
+- python
+keywords:
+- NLP
+- NLP
+- python
+---
+単語の共起行列をコーパスから作成する手順を紹介する．共起行列はスパースなので，scipy.sparse.coo_matrixを使って実装する．これにより大幅にメモリを削減できる．なお，英語以外のコーパスの使用を考えて文字列は全てUnicodeで処理する．
+
+<script src="https://gist.github.com/nkt1546789/e9fc84579b9c8356f1e5.js"></script>
+
+こんな感じになりました．一応，共起行列の行と列が何を指しているのか知りたいと思うのでvocaburaryも返しています．tokenizerは実装して渡してあげてください．generatorでかまわないです．window_sizeは普通乱数を足したり引いたりすると思うのでそれはお任せします．
+
+Gistで載せたコード，綺麗だ〜〜〜〜．
+
+---
+※この記事は WordPress に投稿した記事を変換したものです。一部不自然な表示があるかも知れません。ご了承ください。また、記事タイトル先頭の * は WordPress から移行した記事である印です。

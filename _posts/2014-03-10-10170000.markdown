@@ -1,0 +1,57 @@
+---
+layout: post
+title: '必要な標本サイズを求める（母分散が既知の場合）'
+published: true
+date: 2014-03-10 17:00
+comments: true
+categories:
+- Statistics
+tags: []
+keywords:
+- Statistics
+---
+以下の情報がわかっている（いくつかは必要に応じて適宜決める）とき，必要な標本サイズnを求めることができる． given: confidence level c, margin of Error E, population variance $$ \sigma^2$$， まず，上側確率がaとなる点を$$ Z_a$$と定義する．これの詳しい説明は以下に書いてます．
+
+- [上側，下側確率とquantile（確率点）の関係](http://nktmemo.wordpress.com/2014/03/09/%e4%b8%8a%e5%81%b4%ef%bc%8c%e4%b8%8b%e5%81%b4%e7%a2%ba%e7%8e%87%e3%81%a8quantile%ef%bc%88%e7%a2%ba%e7%8e%87%e7%82%b9%ef%bc%89%e3%81%ae%e9%96%a2%e4%bf%82%e3%81%a8r%e3%81%a7%e3%81%ae%e6%89%b1%e3%81%84/ "上側，下側確率とquantile（確率点）の関係")
+
+この定義は，以下を意味する．
+
+<p style="text-align:center;"> $$ \displaystyle  P(X &gt; Z_{a}) = a $$  </p>
+
+こう定義しておくと，以下の事実を得る．
+
+<p style="text-align:center;"> $$ \displaystyle  P(|X| &lt; Z_{a}) = 1-2a $$ </p>
+
+問題は，標本平均と母平均との絶対値差がE以下である確率をc以上になるよう保証する標本サイズnを求めなさいということなので，
+
+<p style="text-align:center;"> $$ \displaystyle  P(|\bar{X} - \mu| &lt; E) \geq c $$ </p>
+
+ちなみに，$$ 1-2a = c$$より，$$ a=\frac{1-c}{2}$$を得る． ここで，
+
+<p style="text-align:center;"> $$ \displaystyle  Y = \frac{\bar{X} - \mu}{\frac{\sigma}{\sqrt{n}}} $$ </p>
+
+と，標準化を施すと（この標準化はずーっと元をたどると，誤差が$$ N(0, \sigma)$$に従うとこから来てます．これについてはまた書きます，多分），
+
+<p style="text-align:center;"> $$ \displaystyle  P(|Y| &lt; \frac{\sqrt{n}}{\sigma} E) \geq c $$ </p>
+
+を得る．よって，
+
+<p style="text-align:center;"> $$ \displaystyle  n \geq \frac{Z^{2}_{a} \sigma^{2}}{E^{2}} $$ </p>
+
+を得る．    問題があるとわかりやすいので，以下のサイトの問題を使う．
+
+- [Sampling Size of Population Mean \| R Tutorial](http://www.r-tutor.com/elementary-statistics/interval-estimation/sampling-size-population-mean "Sampling Size of Population Mean \| R Tutorial")
+
+問題：$$ \sigma=9.48$$, がわかっている時，$$ E=1.2, c=0.95$$を達成する標本サイズnを求めよ．  
+このサイトでは，1-c=aとして説明している．僕が書いたaとは違います，混乱するかもしれませんね． よし，Rで求めてみよう．
+
+{% highlight R %}
+> E = 1.2
+> c = 0.95
+> a = (1-c) / 2
+> Za = qnorm(1-a) #前記事参照のこと
+> n = Za^2 * sigma^2 / E^2
+> n
+[1] 239.7454
+{% endhighlight %}
+よって，母分散が9.48のとき，E=1.2, c=0.95を達成には標本サイズを240以上にしなければならない．  

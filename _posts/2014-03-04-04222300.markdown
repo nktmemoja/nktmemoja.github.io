@@ -1,0 +1,105 @@
+---
+layout: post
+title: '平均値の差の検定の威力たるや...'
+published: true
+date: 2014-03-04 22:23
+comments: true
+categories:
+- python
+tags:
+- Math
+- statistics
+keywords:
+- python
+- Math
+- statistics
+---
+# Source and explanation
+
+<div class="outline-text-2" id="text-1"> <div class="org-src-container">  <pre class="src src-python"><span style="color:#ff7f24;"># coding: utf-8</span>
+<span style="color:#ffa07a;">"""</span>
+<span style="color:#ffa07a;">&#26908;&#23450;&#12398;&#23041;&#21147;&#12434;&#26908;&#35388;&#12377;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">&#20170;&#22238;&#12399;&#32047;&#31309;&#20998;&#24067;&#38306;&#25968;&#12364;&#20154;&#12398;&#30446;&#12391;&#35211;&#12390;&#38750;&#24120;&#12395;&#20284;&#12390;&#12356;&#12427;&#12465;&#12540;&#12473;&#12434;&#24819;&#23450;&#12375;&#12383;&#12356;&#65294;</span>
+<span style="color:#ffa07a;">&#12394;&#12380;&#12394;&#12425;&#65292;&#32047;&#31309;&#20998;&#24067;&#38306;&#25968;&#12364;&#26126;&#12425;&#12363;&#12395;&#36949;&#12358;&#12394;&#12425;&#65292;&#26908;&#23450;&#12434;&#34892;&#12358;&#24517;&#35201;&#12418;&#12394;&#12356;&#12392;&#24605;&#12358;&#12363;&#12425;&#12384;&#65294;</span>
+<span style="color:#ffa07a;">&#20108;&#12388;&#12398;&#20998;&#24067;&#12363;&#12425;&#29983;&#25104;&#12373;&#12428;&#12383;&#27161;&#26412;x1, x2&#12364;&#12354;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">&#12381;&#12428;&#12382;&#12428;&#12398;&#24179;&#22343;&#20516;mmu1, mmu2&#12434;&#20351;&#12387;&#12390;&#65292;x1,x2&#12399;&#21029;&#12293;&#12398;&#20998;&#24067;&#12363;&#12425;&#29983;&#25104;&#12373;&#12428;&#12383;&#12371;&#12392;&#12434;&#26908;&#23450;&#12391;&#30906;&#12363;&#12417;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">&#24112;&#28961;&#20206;&#35500;&#65306;x1,x2&#12399;&#21516;&#12376;&#20998;&#24067;&#12363;&#12425;&#29983;&#25104;&#12373;&#12428;&#12383;&#65294;</span>
+<span style="color:#ffa07a;">&#12371;&#12398;&#20206;&#35500;&#12434;&#26820;&#21364;&#12391;&#12365;&#12427;&#12363;&#12393;&#12358;&#12363;&#12434;&#35519;&#12409;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">&#12394;&#12362;&#65292;&#20998;&#24067;&#12395;&#12399;&#27491;&#35215;&#20998;&#24067;&#12434;&#20351;&#12356;&#65292;&#30495;&#12398;&#12497;&#12521;&#12513;&#12540;&#12479;&#12399;&#12381;&#12428;&#12382;&#12428;(mu1, sigma1), (mu2, sigma2)&#12391;&#12354;&#12427;&#65294;</span>
+<span style="color:#ffa07a;">"""</span>
+<span style="color:#00ffff;">import</span> numpy <span style="color:#00ffff;">as</span> np
+<span style="color:#00ffff;">import</span> random
+
+<span style="color:#00ffff;">class</span> <span style="color:#98fb98;">Cdf</span>(<span style="color:#b0c4de;">object</span>):
+    <span style="color:#00ffff;">def</span> <span style="color:#87cefa;">__init__</span>(<span style="color:#00ffff;">self</span>, t):
+        <span style="color:#00ffff;">self</span>.t = t
+        <span style="color:#00ffff;">self</span>.N = <span style="color:#b0c4de;">float</span>(<span style="color:#b0c4de;">len</span>(t))
+
+    <span style="color:#00ffff;">def</span> <span style="color:#87cefa;">prob</span>(<span style="color:#00ffff;">self</span>, x):
+        <span style="color:#00ffff;">return</span> <span style="color:#b0c4de;">len</span>([tt <span style="color:#00ffff;">for</span> tt <span style="color:#00ffff;">in</span> <span style="color:#00ffff;">self</span>.t <span style="color:#00ffff;">if</span> tt &lt;= x]) / <span style="color:#00ffff;">self</span>.N
+
+<span style="color:#ff7f24;"># &#35373;&#23450;</span>
+<span style="color:#ff7f24;"># &#22823;&#12365;&#12373;&#12399;1000&#12378;&#12388;</span>
+n, m = 1000, 1000 
+<span style="color:#ff7f24;"># &#30495;&#12398;&#12497;&#12521;&#12513;&#12540;&#12479;</span>
+mu1, mu2 = 0, 1
+sigma1, sigma2 = 1, 1
+<span style="color:#ff7f24;"># &#27161;&#26412;&#12398;&#29983;&#25104;</span>
+<span style="color:#eedd82;">x1</span> = np.random.normal(mu1, sigma1, n)
+<span style="color:#eedd82;">x2</span> = np.random.normal(mu2, sigma2, m)
+
+<span style="color:#ff7f24;"># &#24112;&#28961;&#20206;&#35500;&#29992;</span>
+<span style="color:#eedd82;">x</span> = x1 + x2
+<span style="color:#ff7f24;">#random.shuffle(x)</span>
+<span style="color:#ff7f24;"># &#27161;&#26412;&#24179;&#22343;</span>
+mmu1, mmu2 = x1.mean(), x2.mean()
+<span style="color:#ff7f24;"># &#24179;&#22343;&#24046;</span>
+<span style="color:#ff7f24;"># &#12371;&#12398;&#24179;&#22343;&#24046;&#12364;&#20598;&#28982;&#12394;&#12398;&#12363;&#12393;&#12358;&#12363;&#35519;&#12409;&#12427;&#65294;</span>
+<span style="color:#eedd82;">delta</span> = <span style="color:#b0c4de;">abs</span>(mmu1 - mmu2)
+
+<span style="color:#00ffff;">print</span>
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"n:"</span>, n
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"m:"</span>, m
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"mu1:"</span>, mmu1
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"mu2:"</span>, mmu2
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">"delta:"</span>, delta
+
+<span style="color:#ff7f24;"># 1000&#22238;&#12522;&#12469;&#12531;&#12503;&#12522;&#12531;&#12464;&#12375;&#12390;1000&#20491;&#12398;&#24179;&#22343;&#24046;&#12434;&#24471;&#12427;&#65294;</span>
+<span style="color:#ff7f24;"># &#24112;&#28961;&#20206;&#35500;&#12395;&#22522;&#12389;&#12367;&#12418;&#12398;&#12394;&#12398;&#12391;&#65292;x1&#12392;x2&#12434;&#28151;&#12380;&#21512;&#12431;&#12379;&#12383;&#12418;&#12398;&#12434;&#20351;&#12358;&#65294;</span>
+<span style="color:#eedd82;">iters</span> = 1000
+<span style="color:#eedd82;">deltas</span> = np.array([np.mean([random.choice(x) <span style="color:#00ffff;">for</span> i <span style="color:#00ffff;">in</span> <span style="color:#b0c4de;">range</span>(n)]) - np.mean([random.choice(x) <span style="color:#00ffff;">for</span> i <span style="color:#00ffff;">in</span> <span style="color:#b0c4de;">range</span>(m)]) <span style="color:#00ffff;">for</span> i <span style="color:#00ffff;">in</span> <span style="color:#b0c4de;">range</span>(iters)])
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">'(Mean, Var) :'</span>, (deltas.mean(), deltas.var())
+
+<span style="color:#ff7f24;"># &#27161;&#26412;&#12398;&#24179;&#22343;&#24046;&#20197;&#19978;&#12398;&#24179;&#22343;&#24046;&#12364;&#29983;&#25104;&#12373;&#12428;&#12427;&#30906;&#29575;&#65288;p&#20516;&#65289;&#12434;&#35336;&#31639;&#65294;</span>
+<span style="color:#ff7f24;"># &#32047;&#31309;&#20998;&#24067;&#38306;&#25968;&#12434;&#20351;&#12387;&#12390;&#12356;&#12427;&#12364;&#65292;&#21029;&#12395;&#20351;&#12431;&#12394;&#12367;&#12390;&#12418;&#33391;&#12356;&#65294;</span>
+<span style="color:#eedd82;">cdf</span> = Cdf(deltas)
+<span style="color:#eedd82;">left</span> = cdf.prob(-delta)
+<span style="color:#eedd82;">right</span> = 1.0 - cdf.prob(delta)
+<span style="color:#eedd82;">pvalue</span> = left + right
+<span style="color:#00ffff;">print</span> <span style="color:#ffa07a;">'Tails (left, right, total):'</span>, left, right, left+right
+<span style="color:#ff7f24;"># p&#20516;&#12434;&#35211;&#12390;&#21028;&#26029;</span>
+
+<span style="color:#ff7f24;"># plot&#29992;&#12487;&#12540;&#12479;&#20316;&#25104;</span>
+<span style="color:#eedd82;">cdf1</span> = Cdf(x1)
+<span style="color:#eedd82;">cdf2</span> = Cdf(x2)
+<span style="color:#eedd82;">minimum</span> = np.min([x1.min(), x2.min()])
+<span style="color:#eedd82;">maximum</span> = np.max([x1.max(), x2.max()])
+<span style="color:#eedd82;">px</span> = np.linspace(minimum, maximum, 200)
+<span style="color:#eedd82;">py1</span> = np.array([cdf1.prob(xx) <span style="color:#00ffff;">for</span> xx <span style="color:#00ffff;">in</span> px], dtype=<span style="color:#b0c4de;">float</span>)
+<span style="color:#eedd82;">py2</span> = np.array([cdf2.prob(xx) <span style="color:#00ffff;">for</span> xx <span style="color:#00ffff;">in</span> px], dtype=<span style="color:#b0c4de;">float</span>)
+
+<span style="color:#00ffff;">import</span> matplotlib.pyplot <span style="color:#00ffff;">as</span> plt
+plt.plot(px, py1, <span style="color:#ffa07a;">"b-"</span>)
+plt.plot(px, py2, <span style="color:#ffa07a;">"b-"</span>)
+plt.show()
+</pre> </div> </div> 
+
+# Results
+
+<div class="outline-text-2" id="text-2"> </div><div id="outline-container-sec-2-1" class="outline-3"> <h3 id="sec-2-1">Case 1: 全く同じ分布（パラメータ）</h3> <div class="outline-text-3" id="text-2-1"> <p> 平均0分散1の正規分布と平均0分散1の正規分布から生成されたデータ． 累積分布関数はこんな感じ．見た目はほとんど同じ． こいつのp値は0.468で帰無仮説は棄却できない． つまり，同じ分布から生成されたということ．理にかなう． <img src="http://nktmemo.files.wordpress.com/2014/03/wpid-same_dist.png" alt="wpid-same_dist.png" /> </p> </div> </div> <div id="outline-container-sec-2-2" class="outline-3"> <h3 id="sec-2-2">Case 2: ほぼ同じ分布（パラメータ）</h3> <div class="outline-text-3" id="text-2-2"> <p> 平均0分散1の正規分布と平均0.15分散1の正規分布から生成されたデータ． 累積分布関数はこんな感じ．さきほどまではいかないが見た目はほとんど同じ． p値は0.049で，有意水準5％でなら棄却できる．（使い方あってるのか&#x2026;） <img src="http://nktmemo.files.wordpress.com/2014/03/wpid-5_dist.png" alt="wpid-5_dist.png" /> </p> </div> </div> <div id="outline-container-sec-2-3" class="outline-3"> <h3 id="sec-2-3">Case 3: 異なる分布（パラメータ）</h3> <div class="outline-text-3" id="text-2-3"> <p> 平均0分散1の正規分布と平均1分散1の正規分布から生成されたデータ． 累積分布関数はこんな感じ．見た目から同じ分布（同じパラメータ）から生成されていないことがわかる． 是非棄却されてほしい． <img src="http://nktmemo.files.wordpress.com/2014/03/wpid-notsame.png" alt="wpid-notsame.png" />p値は0で期待通り棄却できる． </p>
+</div> </div>
+
+# Summary
+
+<div class="outline-text-2" id="text-3"> <p> 平均値の検定は，2つのデータがあり，それぞれ異なる分布（あるいはパラメータ）から生成されたかどうかを確かめることができる． 今回は同一分布（正規分布）で，パラメータだけを変えて実験をしてみた． 検定結果は理にかなっており，パラメータが全く同じなら，帰無仮説は棄却できず， パラメータを大きく変化（1程度）させると帰無仮説は棄却され，異なる分布と判断した． 問題は人間の目でみて，ほとんど同じだけどどうだろう？というケース（Case2）． このケースを実験することで，「判断は，有意水準に委ねる」という統計学の非常にスマートな態度を実感することができた． これからの研究活動に役立ちそうだ． </p> </div> 
+

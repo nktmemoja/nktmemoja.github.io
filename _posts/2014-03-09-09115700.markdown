@@ -1,0 +1,35 @@
+---
+layout: post
+title: '上側，下側確率とquantile（確率点）の関係'
+image: https://www.evernote.com/shard/s66/sh/8e54e407-6238-4637-a243-2706d57fec95/ce618a093d4a0c295f7f855afb1e2c74/deep/0/quantile.png
+published: true
+date: 2014-03-09 11:57
+comments: true
+categories:
+- Statistics
+tags:
+- quantile
+- R
+keywords:
+- Statistics
+- quantile
+- R
+---
+$$ P(X>x_0)$$を，点$$ x_0$$の上側確率と呼ぶ．    $$ P(X<x_0)$$を，点$$ x_0$$の下側確率と呼ぶ．    上側確率が$$ a$$である点を$$ Z_a$$と書く．    下側確率がaである点を$$ q(a)$$と書く    $$ q(a)$$を$$ a$$のquantileと呼ぶ（aが％表示ならpercentileと呼ぶ）．    これらの定義が普通みたいだ．aの上側確率をquantileと呼ぶなら上側quantileみたいに言わないと混乱するだろう． 本によって定義が違ったりするから，何をquantile（あるいはpercentile）と定義しているかしっかり確認する必要がある．    さて，用語の定義が済んだところで，本題に入ろう． 今回は$$ Z_a$$と$$ q(a)$$の関係を明記しておこうと思う． 多分，これだけわかっていたら定義の上側下側がころころ変わっても対応できると思う． 上側確率がaである点を$$ Z_a$$と書く．この定義は以下の図でイメージできる．
+
+<img src="https://www.evernote.com/shard/s66/sh/5dd7b5d4-2f1d-40ad-9e3d-a83d97b149f5/7f15ddf01937b0d0133b60b55c22ba63/res/45108f7e-652a-40fb-8002-21c2cc1e523c/skitch.png" alt="skitch.png" />
+
+さて，この定義を採用すると，quantileは以下の図のようなイメージになる．
+
+<img src="https://www.evernote.com/shard/s66/sh/8e54e407-6238-4637-a243-2706d57fec95/ce618a093d4a0c295f7f855afb1e2c74/deep/0/quantile.png" alt="quantile.png" />
+
+結局，
+
+<p style="text-align:center;"> $$ \displaystyle  Z_a = q(1-a) $$ </p>
+
+が成り立つ． これを理解しておくと後で役に立つ． ちなみに，Rを使うとq(a)は以下のようにして求めることができる．
+
+{% highlight R %}
+qnorm(a)
+{% endhighlight %}
+

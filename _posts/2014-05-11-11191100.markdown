@@ -1,0 +1,38 @@
+---
+layout: post
+title: '確率変数のエントロピーの推定 (2)'
+published: true
+date: 2014-05-11 19:11
+comments: true
+categories:
+- Uncategorized
+tags: []
+keywords:
+- Uncategorized
+---
+前回のポスト
+
+- [http://nktmemo.wordpress.com/2014/05/11/estimation-of-entropy-of-gaussian/](http://nktmemo.wordpress.com/2014/05/11/estimation-of-entropy-of-gaussian/ "http://nktmemo.wordpress.com/2014/05/11/estimation-of-entropy-of-gaussian/")
+
+で疑問にあげたシチュエーションを整理すると、   サンプル$$ \{x_1, \ldots, x_n\}$$が与えられ、確率密度関数は未知、   となる。ここで確率密度関数を推定して、その確率密度関数から乱数を生成（これを手法１と呼ぶ）できるのか？というのが前回の疑問。 よく考えてみると、これは前回の問題とは別の問題だ。   今回のシチュエーションでは以下のような手法（手法２と呼ぶ）を適用できるだろう。 確率密度関数を推定して、$$ \hat{p}(x)$$が得られたとする。 そして、すでに与えられているサンプルに対してこれを適用すれば、確率密度のサンプル$$ \{\hat{p}(x_1), \ldots, \hat{p}(x_n)\}$$が得られる。 これによりエントロピーをサンプル近似することができる。   手法１が、任意の確率変数のエントロピーを求めること（目的１）を目的としているのに対して、 手法２は、i.i.d.標本の従う確率変数のエントロピーを求めること（目的２）を目的としている。 これは似ているようで全く違う。 目的１は目的２よりも圧倒的に難しい。 というわけで通常は目的２へアプローチすることの方が実用的である。   標本が正規分布から生成されたということが既知だとすると、そのパラメータを最尤推定することにより、確率密度関数を推定できる。 そして推定した確率密度関数とサンプルを使って、確率密度のサンプルを作る。 それでもってエントロピーをサンプル近似する。 そして前回見たように、これはサンプル数を増やせば、真の値に収束していく。   コードで書くと以下のようになる。    
+
+{% highlight python %}
+import numpy as np
+import pylab as pl
+from scipy import stats
+
+# setting
+n = 1000
+mu = 0
+sigma = 2
+print np.log(sigma*np.sqrt(2*np.pi*np.e))
+
+# given
+x = stats.norm.rvs(mu, sigma, n)
+
+# estimate
+mu_hat = x.mean()
+sigma_hat = x.std()
+ds = stats.norm.pdf(x, mu_hat, sigma_hat)
+print - np.sum(np.log(ds)) / n
+{% endhighlight %}

@@ -1,0 +1,54 @@
+---
+layout: post
+title: '局所性保存射影 (Locality Preserving Projection, LPP)とラプラス固有写像 (Laplacian Eigenmap)'
+published: true
+date: 2015-07-08 00:22
+comments: true
+categories:
+- Uncategorized
+tags: []
+keywords:
+- Uncategorized
+---
+次元削減手法の局所性保存射影とラプラス固有写像について．これらは局所性を保存する，という特性がある．局所性とはデータの局所的な構造のことで，例えばクラスタ構造なんかがそれに当たる．PCAも含めて，これらは全て固有値問題を解くことで解を求める．この二つの手法は密接に関係している．整理のためのポスト．
+局所性保存射影$$ V \in \mathbb{R}^{d \times k}$$は，データ$$ \{x_i\}_{i=1}^n, \ x_i \in \mathcal{X} \subseteq \mathbb{R}^d, \ \forall i=1,\ldots,n$$とその類似度行列$$ W$$を入力とし，以下の一般化固有値問題の解である．
+
+$$
+\begin{align*}
+XLX^Tv=\lambda XDX^Tv
+\end{align*}
+$$
+
+ここで，
+$$ X=[x_1|\cdots|x_n], \ D=diag(\sum_{j=1}^n W_{1j}, \ldots, \sum_{j=1}^n W_{nj}), \ L=D-W$$
+である．これをカーネル化することを考える．$$ X$$を
+$$ \Phi=[\phi(x_1)|\cdots|\phi(x_n)]$$
+で置き換えて，
+
+$$
+\begin{align*}
+\Phi L \Phi^Tv=\lambda \Phi D \Phi^Tv
+\end{align*}
+$$
+
+を得る．例のごとく，$$ v=\Phi \alpha$$と置くと，
+
+$$
+\begin{align*}
+KLK\alpha=\lambda KDK\alpha
+\end{align*}
+$$
+
+を得て，これがカーネルLPP．さらに，$$ \beta=K\alpha$$とおくと，
+
+$$
+\begin{align*}
+L\beta=\lambda D\beta
+\end{align*}
+$$
+
+となり，これがラプラス固有写像．
+
+カーネルLPPで得られた射影行列$$ V=[v_1 | \cdots | v_k]=\Phi [\alpha_1|\cdots|\alpha_k]=\Phi A$$を用いて，データ$$ X$$は，$$ V^T \Phi = A^TK$$と埋め込まれる．ちなみに，ラプラス固有写像の解は$$ B=[\beta_1 | \cdots | \beta_k]=KA$$であり，$$ B^T$$はカーネルLPPでサンプルを射影した結果に一致する！つまり，データにカーネルLPPを施したもの＝ラプラス固有写像の解，である．
+カーネルLPPによって，元のデータはある特徴空間へ射影される．ラプラス固有写像はその結果をダイレクトに求める．ラプラス固有写像は局所性，例えばクラスタ構造を保存するので，クラスタリングの前処理に適しているとされている．ラプラス固有写像を施した後にK-Meansなどのクラスタリングをする手法はスペクトラルクラスタリングと呼ばれ，ものすごく研究されている．
+以上自分用メモ．

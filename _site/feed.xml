@@ -6,8 +6,8 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 08 Jan 2016 05:34:14 +0900</pubDate>
-    <lastBuildDate>Fri, 08 Jan 2016 05:34:14 +0900</lastBuildDate>
+    <pubDate>Mon, 11 Jan 2016 04:38:45 +0900</pubDate>
+    <lastBuildDate>Mon, 11 Jan 2016 04:38:45 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
@@ -862,6 +862,54 @@ w(x,d) = \frac{c(x,d)}{\sum_{x&#39; \in d} c(x&#39;,d)}\log\frac{\#\mathcal{Y}}{
         <pubDate>Sun, 19 Jul 2015 22:56:00 +0900</pubDate>
         <link>http://nktmemoja.github.io/machine%20learning/python/2015/07/19/19225600.html</link>
         <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/python/2015/07/19/19225600.html</guid>
+        
+        
+        <category>Machine Learning</category>
+        
+        <category>python</category>
+        
+      </item>
+    
+      <item>
+        <title>Pythonでscikit-multilearnを使ったマルチラベル分類 (multi-label classification)</title>
+        <description>&lt;p&gt;通常の分類問題は，各点がたった1つのクラスにしか属さないという仮定のもとで解かれる． しかし，現実には各点が複数のクラスに属するという場合がある． このような問題はマルチラベル分類問題 (multi-label classification) と呼ばれ，盛んに研究されている． マルチラベル分類問題を解くためのモジュールはいくつか存在するが，Pythonにはscikit-multilearnというモジュールがある．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;http://scikit-multilearn.github.io&quot; title=&quot;http://scikit-multilearn.github.io&quot;&gt;http://scikit-multilearn.github.io&lt;/a&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;http://scikit-multilearn.github.io/api/index.html&quot; title=&quot;http://scikit-multilearn.github.io/api/index.html&quot;&gt;http://scikit-multilearn.github.io/api/index.html&lt;/a&gt; (使い方)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;今回はこれを使ってマルチラベル分類問題を解いてみる． データには公式と同じくsceneを使う．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.rose-hulman.edu/~boutell/publications/boutell04PRmultilabel.pdf&quot; title=&quot;https://www.rose-hulman.edu/~boutell/publications/boutell04PRmultilabel.pdf&quot;&gt;https://www.rose-hulman.edu/~boutell/publications/boutell04PRmultilabel.pdf&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;まずはscikit-multilearnをダウンロードして移動する．&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;git clone https://github.com/scikit-multilearn/scikit-multilearn
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;scikit-multilearn&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;今回はここに以下のコードを置いて使ってみる．&lt;/p&gt;
+
+&lt;p&gt;https://gist.github.com/nkt1546789/294dda4bf5e6b1b390bf&lt;/p&gt;
+
+&lt;p&gt;実行結果：&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;0.113573021182&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;やっていることはとてもシンプル． まだソースを見ていないのでなんとも言えないが， 基本的な分類器を用意してそれをskmultilearn.meta_br.BinaryRelevanceがmulti-label用にラップしてくれると解釈している． 今回はlinear SVMを使ってみた． multi-label classificationの評価指標にはhamming lossが使われるようだ． これは[0-1]で，低ければ低いほど良い． 今回は0.11だったのでまぁまぁなのではないか．&lt;/p&gt;
+
+&lt;p&gt;以上scikit-multilearnの簡単な使い方を紹介してみた． 「multi-label classificationしないといけないけど詳しくない」 という方はとりあえずこれを使ってみるというのはどうでしょうか．&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 18 Jul 2015 12:09:00 +0900</pubDate>
+        <link>http://nktmemoja.github.io/machine%20learning/python/2015/07/18/18120900.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/python/2015/07/18/18120900.html</guid>
         
         
         <category>Machine Learning</category>
