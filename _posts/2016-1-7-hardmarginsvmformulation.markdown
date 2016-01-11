@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Hard-Margin Support Vector Machine (SVM)の定式化"
+title:  "ハードマージンSupport Vector Machine (SVM)の定式化"
 date:  2016-01-08 00:30:29 +0900
 image: 
 categories: jekyll update

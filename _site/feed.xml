@@ -6,9 +6,138 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 11 Jan 2016 06:20:46 +0900</pubDate>
-    <lastBuildDate>Mon, 11 Jan 2016 06:20:46 +0900</lastBuildDate>
+    <pubDate>Mon, 11 Jan 2016 12:45:34 +0900</pubDate>
+    <lastBuildDate>Mon, 11 Jan 2016 12:45:34 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
+    
+      <item>
+        <title>ソフトマージンSVMのヒンジ損失最小化学習としての解釈とその実装</title>
+        <description>&lt;p&gt;前回，&lt;a href=&quot;http://nktmemoja.github.io/jekyll/update/2016/01/07/hardmarginsvmformulation.html&quot;&gt;ハードマージンSVMの定式化&lt;/a&gt;について書いたので，
+今回はソフトマージンSVMの定式化をしようと思います．
+さらに，それをヒンジ損失最小化学習として解釈できることを示し，
+最後に確率的勾配法を使って実装したいと思います．&lt;/p&gt;
+
+&lt;p&gt;さて，ハードマージンSVMの最適化問題は以下で与えられます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\min_{\boldsymbol{w},b} &amp;\ \|\boldsymbol{w}\|^2 \\
+s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots,n
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;しかし，与えられたデータに対して，この制約を満たす超平面が存在しない場合，実行可能領域が空集合となり，この最適化問題が解を持たなくなってしまいます．
+そこで，制約を緩和するために，全てのサンプルに対して&lt;script type=&quot;math/tex&quot;&gt;\xi_i \geq 0&lt;/script&gt;を導入し，最適化問題を以下のように書き換えます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\min_{\boldsymbol{w},b,\{\xi_i\}_{i=1}^n} &amp;\ \|\boldsymbol{w}\|^2 + C \sum_{i=1}^n \xi_i\\
+s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1-\xi_i \ \forall i=1,\ldots,n\\
+&amp;\ \xi_i \geq 0 \ \forall i=1,\ldots,n
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;これは，訓練データでの誤識別をある程度許容することに相当します．
+我々のゴールは汎化能力の獲得，つまり，未知のデータに対する誤識別率を最小化することなので，訓練データを全て正しく識別する必要はありません．
+さらに，訓練データに完全にフィットさせることは，汎化能力の低下を引き起こす原因にもなります．そのような意味でも，制約の緩和は有用です．&lt;/p&gt;
+
+&lt;p&gt;この最適化問題では，&lt;script type=&quot;math/tex&quot;&gt;\xi_i&gt;0&lt;/script&gt;の時，&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{x}_i&lt;/script&gt;の誤識別を許容します．
+さらに，&lt;script type=&quot;math/tex&quot;&gt;\xi_i&lt;/script&gt;は小さい方が望ましいので，目的関数に加えて同時に最小化します．
+&lt;script type=&quot;math/tex&quot;&gt;C&lt;/script&gt;は識別率をコントロールするハイパーパラメータです．&lt;/p&gt;
+
+&lt;p&gt;さて，ここで，&lt;script type=&quot;math/tex&quot;&gt;\xi_i&lt;/script&gt;を以下のように定義すると，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\xi_i = \max\{0,1-y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b)\}
+\end{align*},&lt;/script&gt;
+
+&lt;p&gt;上の最適化問題は，以下のように書き換えられます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\min_{\boldsymbol{w},b} \ \sum_{i=1}^n \max\{0,1-y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b)\} + \lambda \|\boldsymbol{w}\|^2
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;ここで，&lt;script type=&quot;math/tex&quot;&gt;\max\{0,1-y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b)\}&lt;/script&gt;を損失関数とみると，経験リスク最小化学習になっていることがわかります．損失関数&lt;script type=&quot;math/tex&quot;&gt;\ell_{hinge}(t) = \max\{0,1-t\}&lt;/script&gt;はヒンジ損失と呼ばれています．&lt;/p&gt;
+
+&lt;p&gt;ここから実装について，書きたいと思います．
+&lt;a rel=&quot;nofollow&quot; href=&quot;http://www.amazon.co.jp/gp/product/406152903X/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=7399&amp;amp;creativeASIN=406152903X&amp;amp;linkCode=as2&amp;amp;tag=nettodesyuu00-22&quot; target=&quot;_blank&quot;&gt;オンライン機械学習 (機械学習プロフェッショナルシリーズ)&lt;/a&gt;&lt;img src=&quot;http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&amp;amp;l=as2&amp;amp;o=9&amp;amp;a=406152903X&quot; width=&quot;1&quot; height=&quot;1&quot; border=&quot;0&quot; alt=&quot;&quot; style=&quot;border:none !important; margin:0px !important;&quot; /&gt;を参考にしています．
+SVMは二次計画法で解くこともできますが，今回は確率的勾配法（正確にはIncremental Gradient Method）を使って解きたいと思います．
+&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{x} \in \mathbb{R}^{d+1}&lt;/script&gt; として，簡単のために &lt;script type=&quot;math/tex&quot;&gt;x_1 = 1&lt;/script&gt;とします．すると，切片&lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt;が&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}&lt;/script&gt;に吸収され，上の最適化問題は，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\min_{\boldsymbol{w},b} \ \sum_{i=1}^n \max\{0,1-y_i\boldsymbol{w}^T \boldsymbol{x}_i\} + \lambda \|\boldsymbol{w}\|^2
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;と書けます．
+確率的勾配法では，適当にサンプル&lt;script type=&quot;math/tex&quot;&gt;(\boldsymbol{x}_i,y_i)&lt;/script&gt;を一つ取り出して，それに対応する目的関数，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+J_i(\boldsymbol{w}) = \max\{0,1-y_i\boldsymbol{w}^T \boldsymbol{x}_i\} + \lambda \|\boldsymbol{w}\|^2
+\end{align*},&lt;/script&gt;
+
+&lt;p&gt;の勾配を求めます．その勾配&lt;script type=&quot;math/tex&quot;&gt;\nabla J_i(\boldsymbol{w})&lt;/script&gt;を用いて，パラメータを&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w} \leftarrow \boldsymbol{w} - \eta\nabla J_i(\boldsymbol{w})&lt;/script&gt;と更新します．これを収束まで繰り返します．&lt;/p&gt;
+
+&lt;p&gt;しかし，ヒンジ損失は&lt;script type=&quot;math/tex&quot;&gt;1-y_i\boldsymbol{w}^T \boldsymbol{x}_i = 0&lt;/script&gt;を満たす点で微分不可能なため，劣勾配を考えます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\nabla J_i(\boldsymbol{w}) = \left\{
+\begin{array}{ll}
+-y_i\boldsymbol{x}_i + 2 \lambda \boldsymbol{w} &amp; (1-y_i\boldsymbol{w}^T \boldsymbol{x}_i \geq 0) \\
+2 \lambda \boldsymbol{w} &amp; otherwise
+\end{array}\right.
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;これを踏まえると，アルゴリズムは以下のようになります．&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;ランダムに&lt;script type=&quot;math/tex&quot;&gt;(\boldsymbol{x}_i,y_i) \in \{(\boldsymbol{x}_i,y_i)\}_{i=1}^n&lt;/script&gt;を取り出す．&lt;/li&gt;
+  &lt;li&gt;以下のように&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}&lt;/script&gt;を更新 (&lt;script type=&quot;math/tex&quot;&gt;\eta&lt;/script&gt;はステップサイズ)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\boldsymbol{w} \leftarrow
+w - \eta*\left(2 \lambda \boldsymbol{w} + 
+\left\{
+\begin{array}{ll}
+-y_i\boldsymbol{x}_i &amp; (1-y_i\boldsymbol{w}^T \boldsymbol{x}_i \geq 0) \\
+0 &amp; otherwise
+\end{array}\right.\right)
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;実装してみました．
+&lt;script src=&quot;https://gist.github.com/nktmemoja/15c7120a873f6195ee86.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;結果は以下のようになりました．
+&lt;img src=&quot;/assets/softmarginsvm_demo.png&quot; alt=&quot;softmarginsvm_demo.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;なお，以下に書いたように，実装においてはステップサイズの決定が非常に難しいです．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;http://nktmemoja.github.io/jekyll/update/2016/01/10/gradient-method.html&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;実際に使用する時は，scikit-learnのsklearn.linear_model.SGDClassifierを使うのが賢明でしょう．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;今回はソフトマージンSVMを定式化し，確率的勾配法を用いて実装してみた．
+とりあえず簡単な人工データでうまく動くことを確認した．
+この実装は実用に耐えうるものではないので，簡単なデモだと思ってください^^．
+読んでいただき，ありがとうございました．&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 11 Jan 2016 12:43:59 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/01/11/softmarginsvm.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/01/11/softmarginsvm.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
     
       <item>
         <title>勾配法で目的関数値は単調に減少していくのか？</title>
@@ -87,7 +216,7 @@ f(\boldsymbol{y}) &amp;\leq f(\boldsymbol{x}) + \langle \nabla f(\boldsymbol{x})
       </item>
     
       <item>
-        <title>Hard-Margin Support Vector Machine (SVM)の定式化</title>
+        <title>ハードマージンSupport Vector Machine (SVM)の定式化</title>
         <description>&lt;p&gt;&lt;a rel=&quot;nofollow&quot; href=&quot;http://www.amazon.co.jp/gp/product/4061529064/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=7399&amp;amp;creativeASIN=4061529064&amp;amp;linkCode=as2&amp;amp;tag=nettodesyuu00-22&quot; target=&quot;_blank&quot;&gt;サポートベクトルマシン (機械学習プロフェッショナルシリーズ)&lt;/a&gt;&lt;img src=&quot;http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&amp;amp;l=as2&amp;amp;o=9&amp;amp;a=4061529064&quot; width=&quot;1&quot; height=&quot;1&quot; border=&quot;0&quot; alt=&quot;&quot; style=&quot;border:none !important; margin:0px !important;&quot; /&gt;
 を読んでいます．
 SVMについて，わかっている気になっていましたが，わかっていませんでした．
@@ -837,112 +966,6 @@ s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldo
         
         
         <category>Uncategorized</category>
-        
-      </item>
-    
-      <item>
-        <title>word2vecでニュース記事分類</title>
-        <description>&lt;p&gt;word2vecの応用として文書分類，ここではニュース分類をやってみました． データはlivedoorニュースコーパスを使いました． あと，wikipediaのデータで学習させたモデルを使いました．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://www.rondhuit.com/download.html#ldcc&quot; title=&quot;http://www.rondhuit.com/download.html#ldcc&quot;&gt;http://www.rondhuit.com/download.html#ldcc&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;bag-of-wordsを用いた場合は以下で議論されています．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://qiita.com/yasunori/items/31a23eb259482e4824e2&quot; title=&quot;http://qiita.com/yasunori/items/31a23eb259482e4824e2&quot;&gt;http://qiita.com/yasunori/items/31a23eb259482e4824e2&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;さて，今回はword2vecを使って文書分類に挑戦してみます． word2vecにより，単語空間は有限次元ベクトル空間で表現されています． 単語&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;のベクトル表現を&lt;script type=&quot;math/tex&quot;&gt;v(x)&lt;/script&gt;とし長さ1に正規化されているとします （正規化すると内積がcos類似度になる．特に正規化しなくてもよいと思うが念のため）． さらに，文書&lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;のベクトル表現を&lt;script type=&quot;math/tex&quot;&gt;v(d)&lt;/script&gt;とします． ここで，文書&lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;は単語を元に持つ集合（順序は考慮しない）とします．&lt;/p&gt;
-
-&lt;p&gt;さて，最もシンプルな文書ベクトルは以下のようになるだろう．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-v(d) = \frac{1}{|d|} \sum_{x \in d} v(x) 
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;これをモデル１とする． 
-次に，以下のような重み付きバージョンを考える．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-v(d) = \frac{1}{|d|} \sum_{x \in d} w(x) v(x) , \ \sum_{w \in d} \ w(x)=1
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;この重み&lt;script type=&quot;math/tex&quot;&gt;w(x)&lt;/script&gt;には，例えばTFIDFやPMIなんかが使えると思う． ちなみに重みは足して1になるようにしておく．これをモデル２とする． 今回は，モデル１とモデル２を比較してみる．&lt;/p&gt;
-
-&lt;p&gt;モデル１はすぐに構築できるが，モデル２の重みを何にしようか迷う． 今回のタスクは文書分類なのだから，クラス分類において重要な単語には大きな重みをつけるべきだろう． そう考えると，以下の重み関数はどうだろうか．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-w(x,d) = \frac{c(x,d)}{\sum_{x&#39; \in d} c(x&#39;,d)}\log\frac{\#\mathcal{Y}}{\#\{y| x \in y\}}
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;ここで&lt;script type=&quot;math/tex&quot;&gt;c(x,d)&lt;/script&gt;は，単語&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;の文書&lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;における出現回数， &lt;script type=&quot;math/tex&quot;&gt;\mathcal{Y}=\{1,\ldots,c\}&lt;/script&gt;はクラスで，&lt;script type=&quot;math/tex&quot;&gt;\#&lt;/script&gt;は集合の要素数をさす． logの項はidfのクラス版で，その単語がいろんなクラスに出現するなら分母が大きくなり全体が小さくなる． 逆に，その単語があるクラスにしか出てこないならその単語の重みは大きくなる． これはあまりにもハードな重みな気がするが，とりあえずこれ（以下tficfと呼ぶ）を使ってみる．&lt;/p&gt;
-
-&lt;p&gt;さて，まずは文書を形態素解析するのだが（形態素解析を使わないバージョンは次に書こうと思う）， 辞書には最近流行りのneologdを使う．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/neologd/mecab-ipadic-neologd&quot; title=&quot;https://github.com/neologd/mecab-ipadic-neologd&quot;&gt;https://github.com/neologd/mecab-ipadic-neologd&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ライブドアニュースコーパスのディレクトリ構成は以下のようになっていることを想定．&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;livedoor_corpus/
-  dokujo-tsushin/
-  it-life-hack/
-  kaden-channel/
-  livedoor-homme/
-  movie-enter/
-  peachy/
-  smax/
-  sports-watch/
-  topic-news/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;なお，カテゴリ数は9で総文書数は7376であった． 分類器にはロジスティック回帰を用いた．&lt;/p&gt;
-
-&lt;p&gt;以下に実験結果を示す．&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;uniform&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;tficf&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.85 (0.01)&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.52 (0.03)&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;tficfが重み付けを行った結果だ．ものすごく悪い． 一方重み付けを行わないモデル (uniform) はかなりいい性能を発揮している． 重み付けによりここまで性能が落ちるとは思わなかった． 何かバグがないか追求してみるが，今のところword2vecで学習した単語空間をそのまま使っても特に問題はなさそうだ． それにしても上のqiitaの記事ではBOW+kNNというシンプルな組み合わせながら精度が89%と報告されている． これはおそらく文書分類というタスクでは，文書が多数の単語を含むのでBOWでも十分にそれを表現できているため，と解釈できる． 逆に，一つの文書が短かったり，単語そのものを分類しなければならないようなタスクでは，word2vecの真価が発揮されるのではないかと思う．&lt;/p&gt;
-
-&lt;p&gt;単語分類については以下に簡単な例がある．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://nktmemo.wordpress.com/2015/06/27/word2vec%E3%81%A7%E5%AD%A6%E7%BF%92%E3%81%97%E3%81%9F%E3%83%99%E3%82%AF%E3%83%88%E3%83%AB%E8%A1%A8%E7%8F%BE%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E5%88%86%E9%A1%9E%E5%99%A8%E3%82%92%E4%BD%9C%E3%81%A3/&quot; title=&quot;https://nktmemo.wordpress.com/2015/06/27/word2vec%E3%81%A7%E5%AD%A6%E7%BF%92%E3%81%97%E3%81%9F%E3%83%99%E3%82%AF%E3%83%88%E3%83%AB%E8%A1%A8%E7%8F%BE%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E5%88%86%E9%A1%9E%E5%99%A8%E3%82%92%E4%BD%9C%E3%81%A3/&quot;&gt;https://nktmemo.wordpress.com/2015/06/27/word2vec%E3%81%A7%E5%AD%A6%E7%BF%92%E3%81%97%E3%81%9F%E3%83%99%E3%82%AF%E3%83%88%E3%83%AB%E8%A1%A8%E7%8F%BE%E3%82%92%E4%BD%BF%E3%81%A3%E3%81%A6%E5%88%86%E9%A1%9E%E5%99%A8%E3%82%92%E4%BD%9C%E3%81%A3/&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;実は，短い文書においては，TFICFの有効性を確認した．よって長い文書でも動くはずなのだが，今回は動かなかった． というわけでバグを探すのと，word2vecの他の応用も考えてみる． 実験に使ったコードはGistに置いておくので，気が向いたら試してみてください:&lt;/p&gt;
-
-&lt;script src=&quot;https://gist.github.com/nkt1546789/375b00280e8cea3da271.js&quot;&gt;&lt;/script&gt;
-
-&lt;p&gt;追記（2016/01/08）：Word2Vecを使って文書分類器を構成するメリットは，単語と文書を同じ空間内で考えられること，だと後日思いました．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://nktmemoja.github.io/machine%20learning/2015/10/06/06204600.html&quot;&gt;Word2Vec+教師あり次元削減で文書分類+単語分類&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Sun, 19 Jul 2015 22:56:00 +0900</pubDate>
-        <link>http://nktmemoja.github.io/machine%20learning/python/2015/07/19/19225600.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/python/2015/07/19/19225600.html</guid>
-        
-        
-        <category>Machine Learning</category>
-        
-        <category>python</category>
         
       </item>
     
