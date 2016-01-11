@@ -98,7 +98,7 @@ $$
 $$
 \begin{align*}
 \boldsymbol{w} \leftarrow
-w - \eta*\left(2 \lambda \boldsymbol{w} + 
+\boldsymbol{w} - \eta\left(2 \lambda \boldsymbol{w} + 
 \left\{
 \begin{array}{ll}
 -y_i\boldsymbol{x}_i & (1-y_i\boldsymbol{w}^T \boldsymbol{x}_i \geq 0) \\
@@ -115,11 +115,11 @@ $$
 
 なお，以下に書いたように，実装においてはステップサイズの決定が非常に難しいです．
 
-- http://nktmemoja.github.io/jekyll/update/2016/01/10/gradient-method.html
+- [勾配法で目的関数値は単調に減少していくのか？][gradient-method]
 
 実際に使用する時は，scikit-learnのsklearn.linear_model.SGDClassifierを使うのが賢明でしょう．
 
-- http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html
+- <a href="http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html" target="_blank">http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html</a>
 
 今回はソフトマージンSVMを定式化し，確率的勾配法を用いて実装してみた．
 とりあえず簡単な人工データでうまく動くことを確認した．
@@ -128,3 +128,5 @@ $$
 
 [previous]: http://nktmemoja.github.io/jekyll/update/2016/01/07/hardmarginsvmformulation.html
 [result]: assets/softmarginsvm_demo.png
+[gradient-method]: [http://nktmemoja.github.io/jekyll/update/2016/01/10/gradient-method.html]
+[scikit]: http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html

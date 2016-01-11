@@ -6,8 +6,8 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 11 Jan 2016 12:45:34 +0900</pubDate>
-    <lastBuildDate>Mon, 11 Jan 2016 12:45:34 +0900</lastBuildDate>
+    <pubDate>Mon, 11 Jan 2016 12:54:29 +0900</pubDate>
+    <lastBuildDate>Mon, 11 Jan 2016 12:54:29 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
@@ -96,7 +96,7 @@ J_i(\boldsymbol{w}) = \max\{0,1-y_i\boldsymbol{w}^T \boldsymbol{x}_i\} + \lambda
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{align*}
 \boldsymbol{w} \leftarrow
-w - \eta*\left(2 \lambda \boldsymbol{w} + 
+\boldsymbol{w} - \eta\left(2 \lambda \boldsymbol{w} + 
 \left\{
 \begin{array}{ll}
 -y_i\boldsymbol{x}_i &amp; (1-y_i\boldsymbol{w}^T \boldsymbol{x}_i \geq 0) \\
@@ -113,13 +113,13 @@ w - \eta*\left(2 \lambda \boldsymbol{w} +
 &lt;p&gt;なお，以下に書いたように，実装においてはステップサイズの決定が非常に難しいです．&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;http://nktmemoja.github.io/jekyll/update/2016/01/10/gradient-method.html&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;[http://nktmemoja.github.io/jekyll/update/2016/01/10/gradient-method.html]&quot;&gt;勾配法で目的関数値は単調に減少していくのか？&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;実際に使用する時は，scikit-learnのsklearn.linear_model.SGDClassifierを使うのが賢明でしょう．&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html&quot; target=&quot;_blank&quot;&gt;http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;今回はソフトマージンSVMを定式化し，確率的勾配法を用いて実装してみた．
