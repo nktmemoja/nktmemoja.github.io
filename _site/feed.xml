@@ -6,9 +6,439 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 11 Jan 2016 12:54:29 +0900</pubDate>
-    <lastBuildDate>Mon, 11 Jan 2016 12:54:29 +0900</lastBuildDate>
+    <pubDate>Thu, 26 May 2016 02:04:28 +0900</pubDate>
+    <lastBuildDate>Thu, 26 May 2016 02:04:28 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
+    
+      <item>
+        <title>Adjusted Rand Index (ARI) について勉強してみた</title>
+        <description>&lt;p&gt;クラスタリングの性能評価でよくAdjusted Rand Index (ARI) が使われます．
+僕もよく使っていますが，お恥ずかしながらよく知らずに使っていました．
+というのも，Rand Index (RI) は理解できるのですが，ARIのAdjustedの意味がよくわかりませんでした．
+というわけで，勉強してみました．&lt;/p&gt;
+
+&lt;p&gt;まず，クラスタリングは，サンプル&lt;script type=&quot;math/tex&quot;&gt;S = \{o_i\}_{i=1}^n&lt;/script&gt;を&lt;script type=&quot;math/tex&quot;&gt;k (1 \leq k \leq n)&lt;/script&gt;個の互いに素なグループに分けることを目的とします．
+この記事では，真のクラスタリング結果と，クラスタリングアルゴリズムの結果が似ているかどうかを測ることを目的とします．
+なお，ここでは，クラスタリングの結果をクラスタラベルで表現することにします．&lt;/p&gt;
+
+&lt;p&gt;さて，&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;に対する，
+真のクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{\ell}=[\ell_1 \cdots \ell_n], \ell_i \in \{1, \ldots, k\} \forall i=1, \ldots, n&lt;/script&gt;，
+クラスタリングアルゴリズムによるクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\hat{ \boldsymbol{\ell}}=[\hat{\ell}_1 \cdots \hat{\ell}_n], \hat{\ell}_i \in \{1, \ldots, \hat{k}\} \forall i=1, \ldots, n&lt;/script&gt;とします．
+クラスタリングの結果は，分類のようにラベルで考えるのではなく，ラベルのペアで考えます．
+つまり，「このサンプルとこのサンプルは同じクラスタに属するか否か」で性能を評価します．&lt;/p&gt;
+
+&lt;p&gt;そのような指標の一つである，Rand Indexは次式で定義されます（自己流です）．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+RI(\boldsymbol{\ell}, \hat{\boldsymbol{\ell}}) = \frac{1}{|C(n, 2)|}\sum_{(i, j) \in C(n, 2)} I(I(\ell_i = \ell_j) = I(\hat{\ell}_i = \hat{\ell}_j))
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;ただし，
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+C(n, 2) = \{(i, j) | i, j \in \{1, \ldots, n\}, i&lt;j \} %]]&gt;&lt;/script&gt;
+はサンプルの2つの全組み合わせ．&lt;/p&gt;
+
+&lt;p&gt;これはわかりやすいです．サンプルペアが同じクラスタに属するのか違うクラスタに属するのかが測れそうです．&lt;/p&gt;
+
+&lt;p&gt;よくRIの欠点として，「二つのクラスタリングに相関がなくても，高い値をとってしまう」という説明がなされます．
+これの意味は，「適当（ランダム）にやっても高い値をとってしまう」ということではないかと思います．
+さて，この「相関」ですが，普通「相関」というと確率変数間の相関をイメージしますよね．
+ということでどの確率変数とどの確率変数の間の相関のことを言っているのかから考えていきます．&lt;/p&gt;
+
+&lt;p&gt;まず，以下の二つの標本を考えます：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+X &amp;= \{I(\ell_i = \ell_j) | (i,j) \in C(n, 2)\} \\
+Y &amp;= \{I(\hat{\ell}_i = \hat{\ell}_j) | (i,j) \in C(n, 2)\}
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;そして，&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;に対応する確率変数をそれぞれ&lt;script type=&quot;math/tex&quot;&gt;x, y&lt;/script&gt;とし，&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;はそれぞれ&lt;script type=&quot;math/tex&quot;&gt;x, y&lt;/script&gt;の従う確率分布から独立に生成されたと仮定します (i.i.d.)．
+上で言った「相関」とは，多分この&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;の相関のことだと思います．&lt;/p&gt;
+
+&lt;p&gt;さて，適当にやった時，つまり，&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;に相関がない (&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;) 時に，RIの値を下げたいのですが，どうしたら良いでしょうか？
+もう少し具体的にいうと，RIの値は分子で決まるので，RIの分子の値を下げたいのですが，どうしたら良いでしょう？
+直感的にいうと，「適当にクラスタリングしたら，RIの分子がどのくらいになるか」がわかれば，それをペナルティに設定すれば良さそうではないですか？
+というわけで，ペナルティ = 適当にクラスタリングした時のRIの分子のおおよその値 = &lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時のRIの分子のおおよその値を求めていきます．&lt;/p&gt;
+
+&lt;p&gt;とりあえず，見やすくするために，上の&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;を，
+&lt;script type=&quot;math/tex&quot;&gt;X = \{x_i\}_{i=1}^{m}, Y = \{y_i\}_{i=1}^{m}, m={}_n C _2&lt;/script&gt;と置き直します．
+さらに，&lt;script type=&quot;math/tex&quot;&gt;Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)&lt;/script&gt;と置きます．
+そうすると，RIは以下の式になります．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m I(x_i = y_i)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;上でざっくり定義したペナルティを求めるために，&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;が，それぞれベルヌーイ分布に従う，
+つまり，&lt;script type=&quot;math/tex&quot;&gt;x \sim Bernoulli(p_x), y \sim Bernoulli(p_y), x \perp y&lt;/script&gt;を仮定します．
+さらに，&lt;script type=&quot;math/tex&quot;&gt;Bernoulli(p_x), Bernoulli(p_y)&lt;/script&gt;の確率質量関数をそれぞれ&lt;script type=&quot;math/tex&quot;&gt;p(x), p(y)&lt;/script&gt;とします．
+ここで，RIの分子の和の中に出現する，以下で定義される確率変数&lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt;を考えます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+z = I(x = y)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;さらに，&lt;script type=&quot;math/tex&quot;&gt;Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)&lt;/script&gt;と置きます．
+そうすると，RIの式が，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m z_i
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;と超絶シンプルになりました．
+さて，上で定義したペナルティは「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時のRIの分子のおおよその値」でした．
+ここで，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+z&#39; = \sum_{i=1}^m z_i
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;と定義すると，求めたいペナルティはまさに，「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時の&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値」に相当するのではないでしょうか？
+というわけでここから，「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時の&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値」を求めていきます．&lt;/p&gt;
+
+&lt;p&gt;まず，&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;より，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+p(z=1) &amp;= p(x=1, y=1) + p(x=0, y=0) = p(x=1)p(y=1) + p(x=0)p(y=0)
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;となります．よって，&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値は，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\mathbb{E}\left[z&#39;\right] &amp;= \mathbb{E}\left[\sum_{i=1}^m z_i\right] \\
+&amp;= \sum_{i=1}^m \mathbb{E}\left[z_i\right] \\
+&amp;= \sum_{i=1}^m 0 \cdot p(z=0) + 1 \cdot p(z=1) \\
+&amp;= m p(z=1) \\
+&amp;= m \left(p(x=1)p(y=1) + p(x=0)p(y=0) \right)\\
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;と書けます．すっきりしましたね．
+&lt;script type=&quot;math/tex&quot;&gt;p(x=0), p(x=1), p(y=0), p(y=1)&lt;/script&gt;は未知なので，標本から推定してやらねばなりません．
+ここでは，以下のように，最尤推定で求めることにしましょう．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+p(x=1) &amp;= \frac{1}{m} \sum_{i=1}^m x_i, \ p(x=0) = 1 - p(x=1) \\
+p(y=1) &amp;= \frac{1}{m} \sum_{i=1}^m y_i, \ p(y=0) = 1 - p(y=1)
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;あとは&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値をRIの分母分子から引いてやるとARIに一致します．
+Wikipediaの定義式なんかと一致するのを示したほうが良かったですね…．
+時間があれば追記しておきます．
+なお，具体例は以下のページが参考になります．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://y-uti.hatenablog.jp/entry/2014/01/19/133936&quot; target=&quot;_blank&quot;&gt;http://y-uti.hatenablog.jp/entry/2014/01/19/133936&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Tue, 24 May 2016 19:46:44 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>Adjusted Rand Index (ARI) について勉強してみた</title>
+        <description>&lt;p&gt;クラスタリングの性能評価でよくAdjusted Rand Index (ARI) が使われます．
+僕もよく使っていますが，お恥ずかしながらよく知らずに使っていました．
+というのも，Rand Index (RI) は理解できるのですが，ARIのAdjustedの意味がよくわかりませんでした．
+というわけで，勉強してみました．&lt;/p&gt;
+
+&lt;p&gt;まず，クラスタリングは，サンプル&lt;script type=&quot;math/tex&quot;&gt;S = \{o_i\}_{i=1}^n&lt;/script&gt;を&lt;script type=&quot;math/tex&quot;&gt;k (1 \leq k \leq n)&lt;/script&gt;個の互いに素なグループに分けることを目的とします．
+この記事では，真のクラスタリング結果と，クラスタリングアルゴリズムの結果が似ているかどうかを測ることを目的とします．
+なお，ここでは，クラスタリングの結果をクラスタラベルで表現することにします．&lt;/p&gt;
+
+&lt;p&gt;さて，&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;に対する，
+真のクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{\ell}=[\ell_1 \cdots \ell_n], \ell_i \in \{1, \ldots, k\} \forall i=1, \ldots, n&lt;/script&gt;，
+クラスタリングアルゴリズムによるクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\hat{ \boldsymbol{\ell}}=[\hat{\ell}_1 \cdots \hat{\ell}_n], \hat{\ell}_i \in \{1, \ldots, \hat{k}\} \forall i=1, \ldots, n&lt;/script&gt;とします．
+クラスタリングの結果は，分類のようにラベルで考えるのではなく，ラベルのペアで考えます．
+つまり，「このサンプルとこのサンプルは同じクラスタに属するか否か」で性能を評価します．&lt;/p&gt;
+
+&lt;p&gt;そのような指標の一つである，Rand Indexは次式で定義されます（自己流です）．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+RI(\boldsymbol{\ell}, \hat{\boldsymbol{\ell}}) = \frac{1}{|C(n, 2)|}\sum_{(i, j) \in C(n, 2)} I(I(\ell_i = \ell_j) = I(\hat{\ell}_i = \hat{\ell}_j))
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;ただし，
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+C(n, 2) = \{(i, j) | i, j \in \{1, \ldots, n\}, i&lt;j \} %]]&gt;&lt;/script&gt;
+はサンプルの2つの全組み合わせ．&lt;/p&gt;
+
+&lt;p&gt;これはわかりやすいです．サンプルペアが同じクラスタに属するのか違うクラスタに属するのかが測れそうです．&lt;/p&gt;
+
+&lt;p&gt;よくRIの欠点として，「二つのクラスタリングに相関がなくても，高い値をとってしまう」という説明がなされます．
+これの意味は，「適当（ランダム）にやっても高い値をとってしまう」ということではないかと思います．
+さて，この「相関」ですが，普通「相関」というと確率変数間の相関をイメージしますよね．
+ということでどの確率変数とどの確率変数の間の相関のことを言っているのかから考えていきます．&lt;/p&gt;
+
+&lt;p&gt;まず，以下の二つの標本を考えます：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+X &amp;= \{I(\ell_i = \ell_j) | (i,j) \in C(n, 2)\} \\
+Y &amp;= \{I(\hat{\ell}_i = \hat{\ell}_j) | (i,j) \in C(n, 2)\}
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;そして，&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;に対応する確率変数をそれぞれ&lt;script type=&quot;math/tex&quot;&gt;x, y&lt;/script&gt;とし，&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;はそれぞれ&lt;script type=&quot;math/tex&quot;&gt;x, y&lt;/script&gt;の従う確率分布から独立に生成されたと仮定します (i.i.d.)．
+上で言った「相関」とは，多分この&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;の相関のことだと思います．&lt;/p&gt;
+
+&lt;p&gt;さて，適当にやった時，つまり，&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;に相関がない (&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;) 時に，RIの値を下げたいのですが，どうしたら良いでしょうか？
+もう少し具体的にいうと，RIの値は分子で決まるので，RIの分子の値を下げたいのですが，どうしたら良いでしょう？
+直感的にいうと，「適当にクラスタリングしたら，RIの分子がどのくらいになるか」がわかれば，それをペナルティに設定すれば良さそうではないですか？
+というわけで，ペナルティ = 適当にクラスタリングした時のRIの分子のおおよその値 = &lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時のRIの分子のおおよその値を求めていきます．&lt;/p&gt;
+
+&lt;p&gt;とりあえず，見やすくするために，上の&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;を，
+&lt;script type=&quot;math/tex&quot;&gt;X = \{x_i\}_{i=1}^{m}, Y = \{y_i\}_{i=1}^{m}, m={}_n C _2&lt;/script&gt;と置き直します．
+さらに，&lt;script type=&quot;math/tex&quot;&gt;Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)&lt;/script&gt;と置きます．
+そうすると，RIは以下の式になります．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m I(x_i = y_i)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;上でざっくり定義したペナルティを求めるために，&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;が，それぞれベルヌーイ分布に従う，
+つまり，&lt;script type=&quot;math/tex&quot;&gt;x \sim Bernoulli(p_x), y \sim Bernoulli(p_y), x \perp y&lt;/script&gt;を仮定します．
+さらに，&lt;script type=&quot;math/tex&quot;&gt;Bernoulli(p_x), Bernoulli(p_y)&lt;/script&gt;の確率質量関数をそれぞれ&lt;script type=&quot;math/tex&quot;&gt;p(x), p(y)&lt;/script&gt;とします．
+ここで，RIの分子の和の中に出現する，以下で定義される確率変数&lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt;を考えます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+z = I(x = y)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;さらに，&lt;script type=&quot;math/tex&quot;&gt;Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)&lt;/script&gt;と置きます．
+そうすると，RIの式が，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m z_i
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;と超絶シンプルになりました．
+さて，上で定義したペナルティは「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時のRIの分子のおおよその値」でした．
+ここで，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+z&#39; = \sum_{i=1}^m z_i
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;と定義すると，求めたいペナルティはまさに，「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時の&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値」に相当するのではないでしょうか？
+というわけでここから，「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時の&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値」を求めていきます．&lt;/p&gt;
+
+&lt;p&gt;まず，&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;より，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+p(z=1) &amp;= p(x=1, y=1) + p(x=0, y=0) = p(x=1)p(y=1) + p(x=0)p(y=0)
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;となります．よって，&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値は，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\mathbb{E}\left[z&#39;\right] &amp;= \mathbb{E}\left[\sum_{i=1}^m z_i\right] \\
+&amp;= \sum_{i=1}^m \mathbb{E}\left[z_i\right] \\
+&amp;= \sum_{i=1}^m 0 \cdot p(z=0) + 1 \cdot p(z=1) \\
+&amp;= m p(z=1) \\
+&amp;= m \left(p(x=1)p(y=1) + p(x=0)p(y=0) \right)\\
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;と書けます．すっきりしましたね．
+&lt;script type=&quot;math/tex&quot;&gt;p(x=0), p(x=1), p(y=0), p(y=1)&lt;/script&gt;は未知なので，標本から推定してやらねばなりません．
+ここでは，以下のように，最尤推定で求めることにしましょう．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+p(x=1) &amp;= \frac{1}{m} \sum_{i=1}^m x_i, \ p(x=0) = 1 - p(x=1) \\
+p(y=1) &amp;= \frac{1}{m} \sum_{i=1}^m y_i, \ p(y=0) = 1 - p(y=1)
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;あとは&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値をRIの分母分子から引いてやるとARIに一致します．
+Wikipediaの定義式なんかと一致するのを示したほうが良かったですね…．
+時間があれば追記しておきます．
+なお，具体例は以下のページが参考になります．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://y-uti.hatenablog.jp/entry/2014/01/19/133936&quot; target=&quot;_blank&quot;&gt;http://y-uti.hatenablog.jp/entry/2014/01/19/133936&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Tue, 24 May 2016 19:46:44 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>pystructのChainCRF + FrankWolfSVMで各系列への予測値を取得する方法</title>
+        <description>&lt;p&gt;pystructは構造化学習のいくつかの手法を，Python上に実装したライブラリである．
+その中に系列ラベリングの手法である，条件付き確率場も実装されている．
+使い方は簡単で，例えば&lt;a href=&quot;https://pystruct.github.io/auto_examples/plot_letters.html#sphx-glr-auto-examples-plot-letters-py&quot;&gt;OCR Letter sequence recognition&lt;/a&gt;にデモコードがある．&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;ypred&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;batch_joint_feature&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ypred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+</description>
+        <pubDate>Mon, 29 Feb 2016 17:39:04 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/02/29/pystruct-crf.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/02/29/pystruct-crf.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>単語間関係分類</title>
+        <description>&lt;h2 id=&quot;section&quot;&gt;定式化&lt;/h2&gt;
+
+&lt;p&gt;定義：&lt;br /&gt;
+　&lt;script type=&quot;math/tex&quot;&gt;\mathcal{X}&lt;/script&gt;: 単語空間&lt;br /&gt;
+　&lt;script type=&quot;math/tex&quot;&gt;\mathcal{Z} = \{(x, y)|x, y \in \mathcal{X}\}&lt;/script&gt;: 単語間関係空間&lt;br /&gt;
+　&lt;script type=&quot;math/tex&quot;&gt;\mathcal{S} = \{-1, 1\}&lt;/script&gt;: 関係候補成立のラベル&lt;br /&gt;
+　&lt;script type=&quot;math/tex&quot;&gt;\mathcal{T} = \{-1, 1\}&lt;/script&gt;: 関係成立のラベル&lt;/p&gt;
+
+&lt;p&gt;目的:
+&lt;script type=&quot;math/tex&quot;&gt;p(s,t|x,y), \ ((x,y) \in \mathcal{Z}, s \in \mathcal{S}, t \in \mathcal{T})&lt;/script&gt;
+の推定&lt;br /&gt;
+仮定: &lt;script type=&quot;math/tex&quot;&gt;p(s,t|x,y) = p(s|x,y)p(t|x,y)&lt;/script&gt;  つまり，&lt;script type=&quot;math/tex&quot;&gt;x,y&lt;/script&gt;が関係分類の候補であることと，&lt;script type=&quot;math/tex&quot;&gt;x,y&lt;/script&gt;の関係が成立していることは独立である．&lt;br /&gt;
+制約: &lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+\forall x,y \in \mathcal{X}, \ p(t=1|x,y) &gt; p(t=-1|x,y) \Leftrightarrow p(t=1|y,x) &lt; p(t=-1|y,x) %]]&gt;&lt;/script&gt;&lt;br /&gt;
+この制約は，&lt;script type=&quot;math/tex&quot;&gt;p(t=1|y,x) = p(t=-1|x,y)&lt;/script&gt;ならば満たされるので，これを制約とする．&lt;br /&gt;
+設定: トレーニングデータとして，&lt;script type=&quot;math/tex&quot;&gt;\{(x_i, y_i, t_i)\}_{i=1}^n&lt;/script&gt;が与えられる&lt;br /&gt;
+補足: &lt;script type=&quot;math/tex&quot;&gt;s&lt;/script&gt;を考えるのは，&lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt;だけだと，関係が成立するかしないかしか表現できないので，
+どっちでもない場合というか2語が全く関係ない場合にめちゃくちゃな予測をしてしまう．
+これは，分類問題一般に言えることだが，定義したクラスに対して，「それ以外」な入力が必ずと言っていいほど存在するので，
+本来はこのような設定で問題を考えるべきだと僕は思う．
+このような設定の場合は，One Class SVMなどのOutlier Detectionの手法が用いられる．
+予測:&lt;br /&gt;
+&lt;script type=&quot;math/tex&quot;&gt;(\boldsymbol{x}, \boldsymbol{y})&lt;/script&gt;の関係が成り立っているかどうかは以下のように予測する．
+まず，以下で定義する&lt;script type=&quot;math/tex&quot;&gt;(\hat{s}, \hat{t})&lt;/script&gt;を求める．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+(\hat{s}, \hat{t}) = \text{argmax}_{(s,t) \in \mathcal{S} \times \mathcal{T}} \ p(s, t|\boldsymbol{x},\boldsymbol{y})
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;そして，&lt;script type=&quot;math/tex&quot;&gt;\hat{s}=1, \hat{t}=1&lt;/script&gt;の時に限り，&lt;script type=&quot;math/tex&quot;&gt;(\boldsymbol{x}, \boldsymbol{y})&lt;/script&gt;の関係が成り立っているとする．&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;p(s|\boldsymbol{x},\boldsymbol{y})&lt;/script&gt;について．
+今回は，関係候補となる単語同士は互いに似ているとして，類似度&lt;script type=&quot;math/tex&quot;&gt;s: \mathcal{X} \times \mathcal{X} \rightarrow [0,1]&lt;/script&gt;を用いて，
+&lt;script type=&quot;math/tex&quot;&gt;p(s=1|x,y) = s(x,y)&lt;/script&gt;
+と定義する．
+さらに，簡単のため，&lt;script type=&quot;math/tex&quot;&gt;\mathcal{X}=\mathbb{R}^d&lt;/script&gt;とする．&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;p(t|\boldsymbol{x},\boldsymbol{y})&lt;/script&gt;
+の推定には，ロジスティック回帰を用いる．
+&lt;script type=&quot;math/tex&quot;&gt;p(t|\boldsymbol{x},\boldsymbol{y})&lt;/script&gt;
+を以下で定義される，対数線形モデル&lt;script type=&quot;math/tex&quot;&gt;q(t|\boldsymbol{x},\boldsymbol{y};\boldsymbol{\theta}), \boldsymbol{\theta} \in \mathbb{R}^d&lt;/script&gt;でモデル化する．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+q(t|\boldsymbol{x},\boldsymbol{y};\boldsymbol{\theta}) = \frac{1}{1 + \exp\left(t \cdot \boldsymbol{\theta}^T(\boldsymbol{x}-\boldsymbol{y})\right)}
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;このモデルでは，&lt;script type=&quot;math/tex&quot;&gt;(\boldsymbol{x}, \boldsymbol{y})&lt;/script&gt;を&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{x}-\boldsymbol{y}&lt;/script&gt;として扱っている．
+このようにモデルを定義すると，&lt;script type=&quot;math/tex&quot;&gt;q(t=1|\boldsymbol{y},\boldsymbol{x}) = q(t=-1|\boldsymbol{x},\boldsymbol{y})&lt;/script&gt;となり，自動的に制約が満たされる．&lt;/p&gt;
+
+&lt;p&gt;以上より，解くべき問題は，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\max_{\boldsymbol{\theta}} &amp;\ \sum_{i=1}^n \log q(t_i|\boldsymbol{x}_i,\boldsymbol{y}_i;\boldsymbol{\theta}) \\
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;となり，通常のロジスティック回帰に一致する．&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;実験&lt;/h2&gt;
+
+&lt;h3 id=&quot;word2vec&quot;&gt;Word2Vec&lt;/h3&gt;
+
+&lt;p&gt;gensim.Word2Vec, d=100, 他default&lt;/p&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;関係学習&lt;/h3&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;結果&lt;/h3&gt;
+</description>
+        <pubDate>Sun, 21 Feb 2016 04:06:36 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/02/21/word-relation-learning.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/02/21/word-relation-learning.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>劣モジュラ最適化による文書要約（理論編）</title>
+        <description>&lt;p&gt;&lt;a rel=&quot;nofollow&quot; href=&quot;http://www.amazon.co.jp/gp/product/4061529099/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=7399&amp;amp;creativeASIN=4061529099&amp;amp;linkCode=as2&amp;amp;tag=nettodesyuu00-22&quot; target=&quot;_blank&quot;&gt;劣モジュラ最適化と機械学習 (機械学習プロフェッショナルシリーズ)&lt;/a&gt;&lt;img src=&quot;http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&amp;amp;l=as2&amp;amp;o=9&amp;amp;a=4061529099&quot; width=&quot;1&quot; height=&quot;1&quot; border=&quot;0&quot; alt=&quot;&quot; style=&quot;border:none !important; margin:0px !important;&quot; /&gt;
+を読んでいます．
+この中に，劣モジュラ最適化の文書要約への応用が紹介されていたので，勉強がてら書こうと思います．
+やっぱりこういう理論的なものを学ぶ時は，応用を同時に学ぶといいですよね．&lt;/p&gt;
+
+&lt;p&gt;さて，まずは文書要約について．
+文書要約手法には，抽出型と生成型があるらしいです．
+抽出型は，要約対象に出てくる要素（例えば文）を組み合わせて，要約を作るアプローチです．
+生成型は，要約対象の文書の内容を理解して，要約を生成するアプローチです．
+直感的には，抽出型の方がシンプルで簡単そうな気がします．
+というわけで，今回は抽出型について書こうと思います．&lt;/p&gt;
+
+&lt;p&gt;さて，問題を定式化していきましょう．
+抽出対象は文にしようと思います．
+文書を文の集合と考えると，ある文書は&lt;script type=&quot;math/tex&quot;&gt;V=\{1,\ldots,n\}&lt;/script&gt;と表されます．
+ここで，&lt;script type=&quot;math/tex&quot;&gt;n&lt;/script&gt;はその文書が含む総文数です．
+抽出型の文書要約はなんらかの基準で&lt;script type=&quot;math/tex&quot;&gt;S \subseteq V&lt;/script&gt;を選ぶ問題だと解釈できます．&lt;/p&gt;
+
+&lt;p&gt;このような基準は，自然言語処理分野で数多く提案されているみたいですが，
+今回は本に出てきた，「関連性」と「多様性」による基準を採用しようと思います．
+ここでいう関連性とは，要約文と本文との関連度を表し，
+多様性は，要約文に含まれる文の多様性を表します．
+つまり，この二つを同時に最大化したいわけです．
+さて，要約文&lt;script type=&quot;math/tex&quot;&gt;S \subseteq V&lt;/script&gt;の関連性を&lt;script type=&quot;math/tex&quot;&gt;L(S)&lt;/script&gt;，多様性を&lt;script type=&quot;math/tex&quot;&gt;R(S)&lt;/script&gt;と表し，要約文の良さを表す関数&lt;script type=&quot;math/tex&quot;&gt;f_{doc}&lt;/script&gt;を以下で定義します．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+f_{doc} = L(S) + \lambda R(S)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;ここで，&lt;script type=&quot;math/tex&quot;&gt;\lambda&lt;/script&gt;はトレードオフを調節するパラメータです．
+さて，まずは全文&lt;script type=&quot;math/tex&quot;&gt;V&lt;/script&gt;と要約文&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;の関連性を表す関数&lt;script type=&quot;math/tex&quot;&gt;L(S)&lt;/script&gt;について考えましょう．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+L(S) = \sum_{i \in V} \min\{C_i(S), \gamma C_i(V)\}
+\end{align*}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+C_i(S) = \sum_{j \in S} s_{ij}
+\end{align*}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+R(S) = \sum_{k=1}^K \sqrt{\sum_{j \in P_k \cap S} r_j}
+\end{align*}&lt;/script&gt;
+</description>
+        <pubDate>Tue, 09 Feb 2016 00:09:34 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/02/09/document-summarization-via-submodular.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/02/09/document-summarization-via-submodular.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
     
       <item>
         <title>ソフトマージンSVMのヒンジ損失最小化学習としての解釈とその実装</title>
@@ -491,481 +921,6 @@ s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldo
         
         
         <category>Machine Learning</category>
-        
-      </item>
-    
-      <item>
-        <title>Word2Vec+教師あり次元削減で文書分類+単語分類</title>
-        <description>&lt;p&gt;前回:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://nktmemo.wordpress.com/2015/09/29/%E6%96%87%E6%9B%B8%E5%88%86%E9%A1%9E%E5%99%A8%E3%81%A7%E5%8D%98%E8%AA%9E%E5%88%86%E9%A1%9E%E3%82%92%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B/&quot; title=&quot;https://nktmemo.wordpress.com/2015/09/29/%E6%96%87%E6%9B%B8%E5%88%86%E9%A1%9E%E5%99%A8%E3%81%A7%E5%8D%98%E8%AA%9E%E5%88%86%E9%A1%9E%E3%82%92%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B/&quot;&gt;文書分類器で単語分類をしてみる&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;の続きです．&lt;/p&gt;
-
-&lt;p&gt;まずは，前回のおさらい． 前回は，文書に対してはラベル付きデータが与えられており，単語についてはラベルなしデータが与えられているという設定を考えました． そして，文書と単語が同じ空間に存在すれば，半教師付き学習に帰着することを示しました． 詳しくは前回の記事を見ていただくとして，これからは半教師付き学習の設定で話を進めます．&lt;/p&gt;
-
-&lt;p&gt;今回は，前回の記事でいう単語ベクトル集合&lt;script type=&quot;math/tex&quot;&gt;\{x_i\}_{i=n_d}^{n}&lt;/script&gt;をWord2Vecで学習させます． 食わせるコーパスは分類対象の文書集合です．&lt;/p&gt;
-
-&lt;p&gt;その後，教師あり次元削減手法であるFisher Discriminant Analysis (FDA)を使って&lt;script type=&quot;math/tex&quot;&gt;B:\mathbb{R}^d\rightarrow\mathbb{R}^m&lt;/script&gt;を学習させます． これによって，Word2Vecで学習した単語ベクトルたちは，より低次元の空間に落とし込まれます． つまり，&lt;script type=&quot;math/tex&quot;&gt;z=Bx&lt;/script&gt;として，&lt;script type=&quot;math/tex&quot;&gt;\{(z_i,y_i)\}_{i=1}^{n_d}&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;\{z_i\}_{i=n_d}^{n}&lt;/script&gt;を得ます． 今回は，&lt;script type=&quot;math/tex&quot;&gt;m=c-1&lt;/script&gt;としました，ただし，&lt;script type=&quot;math/tex&quot;&gt;c&lt;/script&gt;はクラス数です．&lt;/p&gt;
-
-&lt;p&gt;なぜこのような処理をするかというと，Word2Vecのような教師なし学習では，必ずしも「望ましい結果」が得られるとは限りません． なぜなら，「望ましい結果」についての情報を一切与えていないからです． 今回の目的は文書分類+単語分類です． この目的に対して，Word2Vecが必ずしも望ましい結果を返すとは限らないのです．&lt;/p&gt;
-
-&lt;p&gt;そこで，教師あり次元削減を使います． FDAは，簡単にいうと，同じクラスに属するサンプルは近く，異なるクラスに属するサンプルは遠くなるよう，射影行列を学習します． ここでは，「望ましい結果」教師データとして与えるので，学習後の空間は分類という目的に対して望ましい空間になっていると期待できます．&lt;/p&gt;
-
-&lt;p&gt;さて，あとは対して面白いことはしていません． &lt;script type=&quot;math/tex&quot;&gt;\{(z_i,y_i)\}_{i=1}^{n_d}&lt;/script&gt;で確率的分類器を学習させ，&lt;script type=&quot;math/tex&quot;&gt;\{z_i\}_{i=n_d}^{n}&lt;/script&gt;に対して予測をします．&lt;/p&gt;
-
-&lt;p&gt;前回と同じデータを使って実験をしました． 結果の出力には同様にwordcloudを使わせてもらいました．&lt;/p&gt;
-
-&lt;p&gt;ガールズ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-girls.png&quot; alt=&quot;girls.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;ニュース・ゴシップ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-news1.png&quot; alt=&quot;news.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;エンタメ・カルチャー: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-entertainment1.png&quot; alt=&quot;entertainment.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;おでかけ・グルメ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-spot1.png&quot; alt=&quot;spot.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;暮らし・アイデア: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-life1.png&quot; alt=&quot;life.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;レシピ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-recipe1.png&quot; alt=&quot;recipe.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;カラダ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-wellness1.png&quot; alt=&quot;wellness.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;ビジネススキル: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-business1.png&quot; alt=&quot;business.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;IT・ガジェット: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-tech1.png&quot; alt=&quot;tech.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;デザイン・アート: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-design1.png&quot; alt=&quot;design.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;雑学: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-trivia1.png&quot; alt=&quot;trivia.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;おもしろ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-humor1.png&quot; alt=&quot;humor.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;定番: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-popular1.png&quot; alt=&quot;popular.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;評価データがなくて定性的に評価するしかないのですが，前回と比べて，かなり改善されている気がします． 雑学とかおもしろ，定番なんかは定義がよくわからなくて判断しにくいですが，それ以外はうまく単語分類ができていると思います．&lt;/p&gt;
-
-&lt;p&gt;今回は，Word2Vec+教師あり次元削減 (FDA) を使って文書分類器を作成し，それを使って単語分類をしてみました． 結果として，このアプローチはなかなか良いと感じました． 文書分類，単語分類については，これでひと段落した感じがします． 本当は単語分類なんかはマルチラベル分類問題として解くべくなのかもしれませんが，あまりこの問題に執着してもあれなので． 次は要約や，トレンド抽出なんかをやっていきたいなあなんて思っています．&lt;/p&gt;
-
-&lt;p&gt;前回と今回はコードを載せていません． これはコードがなかなか複雑なためです． もし，見てみたいという方がいたら，コメントからでも，Twitterからでもなんでも良いので言ってください！ 読んでいただき，ありがとうございました．&lt;/p&gt;
-
-</description>
-        <pubDate>Tue, 06 Oct 2015 20:46:00 +0900</pubDate>
-        <link>http://nktmemoja.github.io/machine%20learning/2015/10/06/06204600.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/2015/10/06/06204600.html</guid>
-        
-        <category>Machine Learning</category>
-        
-        <category>NLP</category>
-        
-        <category>python</category>
-        
-        
-        <category>Machine Learning</category>
-        
-      </item>
-    
-      <item>
-        <title>文書分類器で単語分類をしてみる</title>
-        <description>&lt;p&gt;keywords: 文書分類 (document classification）， 単語分類（word classification）， Pointwise mutual information&lt;/p&gt;
-
-&lt;h2 id=&quot;sec-1&quot;&gt;はじめに&lt;/h2&gt;
-&lt;p&gt;文書へのラベリングと単語へのラベリングはどちらが簡単だろう？ 例えば多くのニュースサイトではすでに文書は分類されている． しかし，単語が分類されているのは見たことがない． というより，そんなものを表に出してもあまり意味がないので表に出ていないのだろう． この状況を踏まえると，データをクロールする側からすると，ラベル付き文書データを入手するのは容易で， ラベル付き単語データを入手するのは困難だと言える．&lt;/p&gt;
-
-&lt;p&gt;いま，文書データをクロールして，検索エンジンを作ることを考えよう． 各文書にはラベルが付いている． このラベル情報を活かせないか？ 例えばクエリにラベルが付いていれば，クエリと文書のラベルを見て，一致するものを出せばよい，あるいはそういう場合にスコアが高くなるように，検索エンジンのスコアを設計すれば良い． このように，単語へのラベリングはある程度需要があると推測される．&lt;/p&gt;
-
-&lt;h2 id=&quot;sec-2&quot;&gt;定式化&lt;/h2&gt;
-
-&lt;p&gt;さて，今回やるのは，ラベル付き文書データを使って，単語分類をしようというもの． つまり，持っているものは，&lt;script type=&quot;math/tex&quot;&gt;\{(d_i,y_i)\}_{i=1}^{n_d}&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;\{w_i\}_{i=1}^{n_w}&lt;/script&gt;， ただし，&lt;script type=&quot;math/tex&quot;&gt;d_i \in \mathcal{D}&lt;/script&gt;は文書，&lt;script type=&quot;math/tex&quot;&gt;y_i \in \mathcal{Y}&lt;/script&gt;は文書に対するラベル, &lt;script type=&quot;math/tex&quot;&gt;w_i \in \mathcal{W}&lt;/script&gt;は単語を意味する．&lt;/p&gt;
-
-&lt;p&gt;ここで，もし単語と文書が同じ空間に存在すれば，文書分類器を使って単語分類ができると思われる． つまり，&lt;script type=&quot;math/tex&quot;&gt;\mathcal{S}=\mathcal{D}=\mathcal{W}&lt;/script&gt;とし，なんらかの変換&lt;script type=&quot;math/tex&quot;&gt;\phi:\mathcal{S} \rightarrow \mathcal{X}&lt;/script&gt;を定義すればよい． ここまで来れば，&lt;script type=&quot;math/tex&quot;&gt;x_i=\phi(d_i) \ \forall i=1,\ldots,n_d, \ x_{n_w+j}=\phi(w_j) \ \forall j=1,\ldots,n_w&lt;/script&gt;とし， &lt;script type=&quot;math/tex&quot;&gt;\{(x_i,y_i)\}_{i=1}^{n_d}&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;\{x_i\}_{i=n_d}^{n}&lt;/script&gt;を得る．ただし&lt;script type=&quot;math/tex&quot;&gt;n=n_d+n_w&lt;/script&gt;． こうして見てみると，単語と文書を同じ空間に写像すれば，これは半教師付き分類問題に帰着することがわかる．&lt;/p&gt;
-
-&lt;p&gt;簡単のために，&lt;script type=&quot;math/tex&quot;&gt;\mathcal{X}=\mathbb{R}^d, \ \mathcal{Y}=\{1,\ldots,c\}&lt;/script&gt;とする． 今回は，「文書は単語の線形結合で表される」という仮定を置いてみる．つまり， &lt;script type=&quot;math/tex&quot;&gt;d=\sum_{i=1}^{n_w} \alpha^{(d)}_i w_i, \ \alpha^{(d)}_i \in \mathbb{R} \ \forall_i=1,\ldots,n_w&lt;/script&gt;  となる．さらに，「&lt;script type=&quot;math/tex&quot;&gt;\phi&lt;/script&gt;は線形写像である」という仮定を置くと，
- &lt;script type=&quot;math/tex&quot;&gt;\phi(d)=\sum_{i=1}^{n_w} \alpha^{(d)}_i \phi(w_i)&lt;/script&gt;
- となる．というわけで，&lt;script type=&quot;math/tex&quot;&gt;\phi&lt;/script&gt;ではなくて，コーパスから&lt;script type=&quot;math/tex&quot;&gt;\{\phi(w_i)\}_{i=1}^{n_w}&lt;/script&gt;を学習することにする．&lt;/p&gt;
-
-&lt;p&gt;さて，やらなければならないのは，&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;コーパスから&lt;script type=&quot;math/tex&quot;&gt;\{\phi(w_i)\}_{i=1}^{n_w}&lt;/script&gt;を学習する&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\alpha&lt;/script&gt;の決定&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;である．だいぶシンプルになったな．1に関しては死ぬほど研究されているので，その中から適用な手法を使うことにする． ここでは，PPMIを使って単語ベクトルを決定してみる．この辺は特に珍しくもないので，例えば以下を参照してください．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://www.cl.ecei.tohoku.ac.jp/nlp100/&quot; title=&quot;http://www.cl.ecei.tohoku.ac.jp/nlp100/&quot;&gt;http://www.cl.ecei.tohoku.ac.jp/nlp100/&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;残る問題は２だ．とりあえずシンプルさを追求して，単語の出現回数を使うことにする．つまり，&lt;script type=&quot;math/tex&quot;&gt;\alpha^{(d)}_i=c(w_i,d)&lt;/script&gt;とする． ただし，&lt;script type=&quot;math/tex&quot;&gt;c(w_i,d)&lt;/script&gt;は，文書&lt;script type=&quot;math/tex&quot;&gt;d&lt;/script&gt;における単語&lt;script type=&quot;math/tex&quot;&gt;w_i&lt;/script&gt;の出現回数である． これで全ての問題が一応解決した．さあ，あとは実装するだけ．&lt;/p&gt;
-
-&lt;div id=&quot;outline-container-sec-3&quot; class=&quot;outline-2&quot;&gt;
-&lt;h2 id=&quot;sec-3&quot;&gt;実装&lt;/h2&gt;
-&lt;div class=&quot;outline-text-2&quot; id=&quot;text-3&quot;&gt;
- コードは後日載せます． やっていることは，PPMIを要素とした単語-文脈行列を作り，その各行を単語ベクトルとします． あとは↑の定式化通りに文書ベクトルを生成し，文書分類器を作ります． その後，単語ベクトルたちを分類器にかけます． 文書分類器には，ロジスティック回帰（sklearn.linear_model.LogisticRegressionCV）を用います． デフォルト設定です（アプローチの可能性を見たいだけなので）． 
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;h2 id=&quot;sec-4&quot;&gt;実験&lt;/h2&gt;
-&lt;p&gt;データはnaverまとめからクロールしたものを使う． カテゴリとそれに対応するクロールした文書数を以下の表に示す． これが今回の訓練データ．&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;カテゴリ&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;文書数&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;ガールズ&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;600&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;ニュース・ゴシップ&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;976&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;エンタメ・カルチャー&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;480&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;おでかけ・グルメ&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;867&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;暮らし・アイデア&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;737&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;レシピ&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;702&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;カラダ&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;708&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;ビジネススキル&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;558&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;IT・ガジェット&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;231&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;デザイン・アート&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;479&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;雑学&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;667&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;おもしろ&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;584&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;定番&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;257&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;総異なり語数は14767件で，これが今回の分類対象となる． さて，結果はただ単語を羅列してもおもしろくないので，wordcloudを使おうと思う． これについては以下を参考にしました，ありがとうございます．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://qiita.com/kenmatsu4/items/9b6ac74f831443d29074&quot; title=&quot;http://qiita.com/kenmatsu4/items/9b6ac74f831443d29074&quot;&gt;http://qiita.com/kenmatsu4/items/9b6ac74f831443d29074&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div id=&quot;outline-container-sec-4-1&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-1&quot;&gt;ガールズ&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-1&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-girls.png&quot; alt=&quot;girls.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-2&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-2&quot;&gt;ニュース・ゴシップ&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-2&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-news.png&quot; alt=&quot;news.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-3&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-3&quot;&gt;エンタメ・カルチャー&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-3&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-entertainment.png&quot; alt=&quot;entertainment.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-4&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-4&quot;&gt;おでかけ・グルメ&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-4&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-spot.png&quot; alt=&quot;spot.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-5&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-5&quot;&gt;暮らし・アイデア&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-5&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-life.png&quot; alt=&quot;life.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-6&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-6&quot;&gt;レシピ&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-6&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-recipe.png&quot; alt=&quot;recipe.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-7&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-7&quot;&gt;カラダ&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-7&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-wellness.png&quot; alt=&quot;wellness.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-8&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-8&quot;&gt;ビジネススキル&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-8&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-business.png&quot; alt=&quot;business.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-9&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-9&quot;&gt;IT・ガジェット&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-9&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-tech.png&quot; alt=&quot;tech.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-10&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-10&quot;&gt;デザイン・アート&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-10&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-design.png&quot; alt=&quot;design.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-11&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-11&quot;&gt;雑学&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-11&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-trivia.png&quot; alt=&quot;trivia.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-12&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-12&quot;&gt;おもしろ&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-12&quot;&gt;
-&lt;div class=&quot;figure&quot;&gt; &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/09/wpid-humor.png&quot; alt=&quot;humor.png&quot; /&gt;  &lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;div id=&quot;outline-container-sec-4-13&quot; class=&quot;outline-3&quot;&gt;
-&lt;h3 id=&quot;sec-4-13&quot;&gt;定番&lt;/h3&gt;
-&lt;div class=&quot;outline-text-3&quot; id=&quot;text-4-13&quot;&gt;
- 該当単語なし 
-&lt;/div&gt;
-&lt;/div&gt;
-
-&lt;h2 id=&quot;sec-5&quot;&gt;おわりに&lt;/h2&gt;
-&lt;p&gt;今回はラベル付き文書データから文書分類器を学習し，それを単語分類に使用してみた． 結果は定性的に測るしかないが，うまくいっているところはあるのでアプローチは悪くないのかなと思う． 定番に該当がないのは定番だからなのだろうか？笑 ただ，もっと分類器をチューニングしたほうが良い気がする． いまはただロジスティック回帰にぶん投げているだけなので．&lt;/p&gt;
-
-&lt;p&gt;次回は，教師あり次元削減，具体的にはFisher Discriminant Analysis (FDA)をかけてみます． いまは生の単語-文脈行列を使っているので，情報をもっと圧縮させて次元を削減しようと思います． さらに，教師ありデータを使うことで，同じラベルを持つものは近くなり，異なるラベルを持つものは遠くなるよう次元削減後の空間を学習します（正確には射影行列）． まぁとりあえずいいんではなかろうか．&lt;/p&gt;
-
-</description>
-        <pubDate>Tue, 29 Sep 2015 20:33:00 +0900</pubDate>
-        <link>http://nktmemoja.github.io/machine%20learning/2015/09/29/29203300.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/2015/09/29/29203300.html</guid>
-        
-        <category>Machine Learning</category>
-        
-        <category>python</category>
-        
-        
-        <category>Machine Learning</category>
-        
-      </item>
-    
-      <item>
-        <title>RBF (Gaussian) Kernel Modelを使うためのWrapper Classを作りました</title>
-        <description>&lt;p&gt;分類問題において，非線形な決定境界を表現するための一つの方法に，RBF Kernel Modelがあります． これは，入力$latex x$を以下で定義される$latex \phi(x)$に変換するものです．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-\phi_i(x)=\exp\left(-\gamma\|x-x_i\|\right), \ \forall i=1,\ldots,n
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;コードはGistに載せてあります：&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://gist.github.com/nkt1546789/e41199340f7a42c515be&quot; title=&quot;https://gist.github.com/nkt1546789/e41199340f7a42c515be&quot;&gt;https://gist.github.com/nkt1546789/e41199340f7a42c515be&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;使い方は，例えばsklearnのLogisticRegressionに適用したい場合は，&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RbfModelWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LogisticRegression&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;同様にRidgeに適用したい場合は，&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RbfModelWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Ridge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;ちなみにGridSearchもできるようになっています：&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;n&quot;&gt;gs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GridSearchCV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RbfModelWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Ridge&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param_grid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;gamma&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;logspace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;alpha&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]})&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;とりあえずデモとして，2moonsを分類してみました：&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn.linear_model&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LogisticRegression&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;datasets&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn.grid_search&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;GridSearchCV&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;matplotlib.pyplot&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;plt&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;500&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;datasets&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;make_moons&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n_samples&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;noise&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=.&lt;/span&gt;&lt;span class=&quot;mo&quot;&gt;05&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;permutation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;int32&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:]&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;param_grid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;gamma&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;logspace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;9&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)}&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;grid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GridSearchCV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RbfModelWrapper&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LogisticRegression&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param_grid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param_grid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;grid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;grid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;best_estimator_&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;accuracy:&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=.&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;xx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;yy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;meshgrid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linspace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-                  &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;linspace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;300&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;Z&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ravel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;yy&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ravel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()])&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Z&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Z&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reshape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;contour&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;yy&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Z&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;levels&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;linewidths&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;colors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;green&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scatter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;blue&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scatter&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;red&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;40&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;tight&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;xlim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ylim&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;legend&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;collections&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-           &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;r&amp;quot;decision boundary&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;positive&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;unlabeled&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-           &lt;span class=&quot;n&quot;&gt;prop&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;size&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;lower right&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tight_layout&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;plt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;show&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;以下のように100%の精度で分類出来ました：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/rbfmodel_demo.png&quot; alt=&quot;image name&quot; /&gt;&lt;/p&gt;
-
-</description>
-        <pubDate>Tue, 25 Aug 2015 08:03:00 +0900</pubDate>
-        <link>http://nktmemoja.github.io/uncategorized/2015/08/25/25080300.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/uncategorized/2015/08/25/25080300.html</guid>
-        
-        
-        <category>Uncategorized</category>
-        
-      </item>
-    
-      <item>
-        <title>ラプラス正則化 (Laplacian Regularization) を使った半教師付き分類</title>
-        <description>&lt;p&gt;教師ありデータ&lt;script type=&quot;math/tex&quot;&gt;\{(x_i,y_i)\}_{i=1}^{n_l}&lt;/script&gt;と教師なしデータ&lt;script type=&quot;math/tex&quot;&gt;\{x_j\}_{j=n_l+1}^{n}&lt;/script&gt;を 用いて学習する枠組みを半教師付き学習と呼ぶ． 少量の教師ありデータと大量の教師なしデータを持っているという設定は非常に現実的で， 半教師付き学習は実用的な枠組みだと思う．&lt;/p&gt;
-
-&lt;p&gt;ラプラス正則化の基本的なアイデアは，「似ているものは同じラベルを持つ」というもの． 具体的には，類似度行列&lt;script type=&quot;math/tex&quot;&gt;W&lt;/script&gt;を受け取り， 類似度が高いものは予測値も近くなるような正則化を行う． 今回はラプラス正則化のリッジ回帰への適用例を考えてみる． ラプラス正則化を施したリッジ回帰の最適化問題は以下で与えられる．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-\min_{\theta} \ \sum_{i=1}^{n_l} (y_i-f_{\theta}(x_i))^2 + \alpha \|\theta\|^2 + \beta \sum_{j=n_l+1}^{n} \sum_{k=n_l+1}^n W_{jk} (f_\theta(x_j)-f_\theta(x_k))^2
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;最後の項がラプラス正則化項． この項は結局ラプラス行列というもので表されるのでラプラス正則化と呼ばれている．&lt;/p&gt;
-
-&lt;p&gt;ここでは，非線形な決定境界を表現するために，&lt;script type=&quot;math/tex&quot;&gt;f_\theta&lt;/script&gt;には以下で定義するRBFカーネルモデルを用いることにする．&lt;/p&gt;
-&lt;p style=&quot;text-align:center;&quot;&gt;$$ f_{\theta}(x) = \sum_{\ell=1}^n \theta_\ell k(x,x_\ell), \ k(x,x_\ell)=\exp\left(-\gamma\|x-x_\ell\|^2\right) $$&lt;/p&gt;
-&lt;p&gt;コードは以下のようになった．&lt;/p&gt;
-
-&lt;p&gt;https://gist.github.com/nkt1546789/add3f33ceee65294d0a8&lt;/p&gt;
-
-&lt;p&gt;実行結果はこんな感じ． 左が訓練データで赤と青がラベル付きデータで白い点がラベルなしデータ． このように，たった2つの教師ありデータから正しく分類ができている．&lt;/p&gt;
-&lt;div class=&quot;figure&quot;&gt;
-
-&lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/07/wpid-laplacian_regularization_2moons.png&quot; alt=&quot;laplacian_regularization_2moons.png&quot; /&gt;
-
-&lt;/div&gt;
-&lt;div class=&quot;figure&quot;&gt;
-
-&lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/07/wpid-laplacian_regularization_2circles.png&quot; alt=&quot;laplacian_regularization_2circles.png&quot; /&gt;
-
-&lt;/div&gt;
-
-&lt;p&gt;ちなみに，RBFカーネルモデルにすべてのデータ点を使っているものポイント．&lt;/p&gt;
-
-&lt;p&gt;ラプラス正則化は目的関数に一つ項を加えるだけで， 教師なしデータも活用できるのでお手軽で性能も素晴らしいので是非使ってみてください．
-もちろん，上の例のように，十分な量の訓練データが与えられていない場合，パラメータチューニングが非常に難しいです．
-教師ありデータが十分にあれば，交差検定ができる．&lt;/p&gt;
-</description>
-        <pubDate>Sat, 25 Jul 2015 08:00:00 +0900</pubDate>
-        <link>http://nktmemoja.github.io/machine%20learning/python/2015/07/25/25080000.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/python/2015/07/25/25080000.html</guid>
-        
-        
-        <category>Machine Learning</category>
-        
-        <category>python</category>
-        
-      </item>
-    
-      <item>
-        <title>BOW+TFIDFでニュース記事分類</title>
-        <description>&lt;p&gt;前回：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://nktmemo.wordpress.com/2015/07/19/word2vectfidf%E3%81%A7%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E8%A8%98%E4%BA%8B%E5%88%86%E9%A1%9E/&quot; title=&quot;word2vecでニュース記事分類&quot;&gt;word2vecでニュース記事分類&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;の続き．というかこっちを先にするべきだった． 引き続きlivedoorニュースコーパスを使う． クラス数は9で総文書数は7356件． 今回の対象はタイトルと全文． なので各文書がある程度長いことを想定 （次回はここをタイトルのみにして短い文書に対する分類結果も出してみる）．&lt;/p&gt;
-
-&lt;p&gt;前回はword2vecを使ったが， 今回は普通にBag-of-WordsモデルとそれにTFIDFで重み付けをしたものを比較してみる． 実験の設定は前回と同じなので，前回の結果とも比較できる． 各文書がある程度長いのでBOWでもいい結果が出るだろうと予測したが，どうなんだろうか．&lt;/p&gt;
-
-&lt;p&gt;結果は以下のようになった．&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;BOW+TF&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;BOW+TFIDF&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;w2v&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.95 (0.004)&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.95 (0.004)&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.85 (0.007)&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;検定はしていないが，おそらくBOW (+ TFIDF)はword2vecを使ったモデルよりも性能が良いと言っていいだろう． 以下の要因が考えられる．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;十分な数のトレーニングデータが与えられているため&lt;/li&gt;
-  &lt;li&gt;文書がある程度長く，多くの単語を含むため&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;次回からは，このあたりを制限していって，結果がどう変わるかを見ていこうと思う． あと，word2vecをこのコーパスでトレーニングしてもいいかも．&lt;/p&gt;
-
-</description>
-        <pubDate>Tue, 21 Jul 2015 20:53:00 +0900</pubDate>
-        <link>http://nktmemoja.github.io/uncategorized/2015/07/21/21205300.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/uncategorized/2015/07/21/21205300.html</guid>
-        
-        
-        <category>Uncategorized</category>
         
       </item>
     
