@@ -6,8 +6,8 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 26 May 2016 02:04:28 +0900</pubDate>
-    <lastBuildDate>Thu, 26 May 2016 02:04:28 +0900</lastBuildDate>
+    <pubDate>Sun, 05 Jun 2016 15:30:28 +0900</pubDate>
+    <lastBuildDate>Sun, 05 Jun 2016 15:30:28 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
@@ -25,98 +25,62 @@
 真のクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{\ell}=[\ell_1 \cdots \ell_n], \ell_i \in \{1, \ldots, k\} \forall i=1, \ldots, n&lt;/script&gt;，
 クラスタリングアルゴリズムによるクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\hat{ \boldsymbol{\ell}}=[\hat{\ell}_1 \cdots \hat{\ell}_n], \hat{\ell}_i \in \{1, \ldots, \hat{k}\} \forall i=1, \ldots, n&lt;/script&gt;とします．
 クラスタリングの結果は，分類のようにラベルで考えるのではなく，ラベルのペアで考えます．
-つまり，「このサンプルとこのサンプルは同じクラスタに属するか否か」で性能を評価します．&lt;/p&gt;
+つまり，「このサンプルとこのサンプルは同じクラスタに属するか否か」で性能を評価します．
+というわけで，&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{\ell}&lt;/script&gt;と &lt;script type=&quot;math/tex&quot;&gt;\hat{\boldsymbol{\ell}}&lt;/script&gt;を以下のように表現し直します．&lt;/p&gt;
 
-&lt;p&gt;そのような指標の一つである，Rand Indexは次式で定義されます（自己流です）．&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\mathcal{X} &amp;= \{I(\ell_i = \ell_j) | (i,j) \in C(n, 2)\} = \{x_i\}_{i=1}^m\\
+\mathcal{Y} &amp;= \{I(\hat{\ell}_i = \hat{\ell}_j) | (i,j) \in C(n, 2)\} = \{y_i\}_{i=1}^m
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;m={}_n C _2&lt;/script&gt;．
+さて，ここで，Rand Indexの定義を見てみます．
+正規化されていないRand Indexは次式で定義されます（自己流です）．&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-RI(\boldsymbol{\ell}, \hat{\boldsymbol{\ell}}) = \frac{1}{|C(n, 2)|}\sum_{(i, j) \in C(n, 2)} I(I(\ell_i = \ell_j) = I(\hat{\ell}_i = \hat{\ell}_j))
+RI(x, y) = \sum_{i=1}^m I(x_i=y_i)
 \end{align*}&lt;/script&gt;
 
-&lt;p&gt;ただし，
-&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-C(n, 2) = \{(i, j) | i, j \in \{1, \ldots, n\}, i&lt;j \} %]]&gt;&lt;/script&gt;
-はサンプルの2つの全組み合わせ．&lt;/p&gt;
-
-&lt;p&gt;これはわかりやすいです．サンプルペアが同じクラスタに属するのか違うクラスタに属するのかが測れそうです．&lt;/p&gt;
+&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt;は指示関数で，&lt;script type=&quot;math/tex&quot;&gt;I(true) = 1, I(false) = 0&lt;/script&gt;です．
+この式は，&lt;script type=&quot;math/tex&quot;&gt;x_i=y_i&lt;/script&gt; の数を表しており，二つのクラスタリングがどのくらい似ているかを表しています．&lt;/p&gt;
 
 &lt;p&gt;よくRIの欠点として，「二つのクラスタリングに相関がなくても，高い値をとってしまう」という説明がなされます．
-これの意味は，「適当（ランダム）にやっても高い値をとってしまう」ということではないかと思います．
-さて，この「相関」ですが，普通「相関」というと確率変数間の相関をイメージしますよね．
-ということでどの確率変数とどの確率変数の間の相関のことを言っているのかから考えていきます．&lt;/p&gt;
+これの意味は，「適当（ランダム）にクラスタリングしても高い値をとってしまう」ということだと思います．
+&lt;script type=&quot;math/tex&quot;&gt;x_i = 0&lt;/script&gt;となる&lt;script type=&quot;math/tex&quot;&gt;\mathcal{X}&lt;/script&gt;内の要素数が，&lt;script type=&quot;math/tex&quot;&gt;x_i = 1&lt;/script&gt;となる要素数に比べて圧倒的に多いので，
+例えば「全てを異なるクラスタに分ける」というクラスタリングを行うと，&lt;script type=&quot;math/tex&quot;&gt;y_i = 0&lt;/script&gt;となり，RIの値が高くなってしまいます．
+これは，分類問題において，クラスバランスが偏った状態で精度を使うのが適切ではない理由に似ています．&lt;/p&gt;
 
-&lt;p&gt;まず，以下の二つの標本を考えます：&lt;/p&gt;
+&lt;p&gt;このような問題を解決しようと提案されたのがARIです．
+ARIでは，適当に行われたであろうクラスタリングにペナルティを与えます．
+どのようなペナルティが適切でしょうか？
+ARIでは，ペナルティ＝「適当にクラスタリングした時のRIの値」と考えます．
+以下このペナルティを求めていきます．&lt;/p&gt;
+
+&lt;p&gt;まず，二つのデータ&lt;script type=&quot;math/tex&quot;&gt;\mathcal{X}, \mathcal{Y}&lt;/script&gt;がぞれぞれ独立に同一の分布&lt;script type=&quot;math/tex&quot;&gt;p(x), p(y)&lt;/script&gt;から生成されたと仮定します：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\mathcal{X} \stackrel{i.i.d.}{\sim} p(x)\\
+\mathcal{Y} \stackrel{i.i.d.}{\sim} p(y)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;p(y)&lt;/script&gt;はそれぞれ確率変数&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;の従う分布に対応する確率密度関数を表します．
+まず，上で定義したペナルティ中の「適当にクラスタリングした時」というのを，「&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;が独立な時」と定義します．
+そうすると，求めるペナルティは「&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;が独立な時のRIの値」となり，具体的になりました．
+そのようなペナルティは，以下で求められます．&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
 \begin{align*}
-X &amp;= \{I(\ell_i = \ell_j) | (i,j) \in C(n, 2)\} \\
-Y &amp;= \{I(\hat{\ell}_i = \hat{\ell}_j) | (i,j) \in C(n, 2)\}
+\mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]
+&amp;= \mathbb{E}_{(x,y) \sim p(x,y)}\left[ \sum_{i=1}^m I(x_i=y_i) \right] \\
+&amp;= \sum_{x=0}^1 \sum_{y=0}^1 \sum_{i=1}^m I(x_i=y_i) p(x, y) \\
+&amp;= \sum_{i=1}^m \left( p(x=1, y=1) + p(x=0, y=0) \right) \\
+&amp;= m \left( p(x=1, y=1) + p(x=0, y=0) \right) \\
+&amp;= m \left( p(x=1)p(y=1) + p(x=0)p(y=0) \right)
 \end{align*} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;そして，&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;に対応する確率変数をそれぞれ&lt;script type=&quot;math/tex&quot;&gt;x, y&lt;/script&gt;とし，&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;はそれぞれ&lt;script type=&quot;math/tex&quot;&gt;x, y&lt;/script&gt;の従う確率分布から独立に生成されたと仮定します (i.i.d.)．
-上で言った「相関」とは，多分この&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;の相関のことだと思います．&lt;/p&gt;
-
-&lt;p&gt;さて，適当にやった時，つまり，&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;に相関がない (&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;) 時に，RIの値を下げたいのですが，どうしたら良いでしょうか？
-もう少し具体的にいうと，RIの値は分子で決まるので，RIの分子の値を下げたいのですが，どうしたら良いでしょう？
-直感的にいうと，「適当にクラスタリングしたら，RIの分子がどのくらいになるか」がわかれば，それをペナルティに設定すれば良さそうではないですか？
-というわけで，ペナルティ = 適当にクラスタリングした時のRIの分子のおおよその値 = &lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時のRIの分子のおおよその値を求めていきます．&lt;/p&gt;
-
-&lt;p&gt;とりあえず，見やすくするために，上の&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;を，
-&lt;script type=&quot;math/tex&quot;&gt;X = \{x_i\}_{i=1}^{m}, Y = \{y_i\}_{i=1}^{m}, m={}_n C _2&lt;/script&gt;と置き直します．
-さらに，&lt;script type=&quot;math/tex&quot;&gt;Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)&lt;/script&gt;と置きます．
-そうすると，RIは以下の式になります．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m I(x_i = y_i)
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;上でざっくり定義したペナルティを求めるために，&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;が，それぞれベルヌーイ分布に従う，
-つまり，&lt;script type=&quot;math/tex&quot;&gt;x \sim Bernoulli(p_x), y \sim Bernoulli(p_y), x \perp y&lt;/script&gt;を仮定します．
-さらに，&lt;script type=&quot;math/tex&quot;&gt;Bernoulli(p_x), Bernoulli(p_y)&lt;/script&gt;の確率質量関数をそれぞれ&lt;script type=&quot;math/tex&quot;&gt;p(x), p(y)&lt;/script&gt;とします．
-ここで，RIの分子の和の中に出現する，以下で定義される確率変数&lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt;を考えます．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-z = I(x = y)
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;さらに，&lt;script type=&quot;math/tex&quot;&gt;Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)&lt;/script&gt;と置きます．
-そうすると，RIの式が，&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m z_i
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;と超絶シンプルになりました．
-さて，上で定義したペナルティは「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時のRIの分子のおおよその値」でした．
-ここで，&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-z&#39; = \sum_{i=1}^m z_i
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;と定義すると，求めたいペナルティはまさに，「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時の&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値」に相当するのではないでしょうか？
-というわけでここから，「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時の&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値」を求めていきます．&lt;/p&gt;
-
-&lt;p&gt;まず，&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;より，&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align*}
-p(z=1) &amp;= p(x=1, y=1) + p(x=0, y=0) = p(x=1)p(y=1) + p(x=0)p(y=0)
-\end{align*} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;となります．よって，&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値は，&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align*}
-\mathbb{E}\left[z&#39;\right] &amp;= \mathbb{E}\left[\sum_{i=1}^m z_i\right] \\
-&amp;= \sum_{i=1}^m \mathbb{E}\left[z_i\right] \\
-&amp;= \sum_{i=1}^m 0 \cdot p(z=0) + 1 \cdot p(z=1) \\
-&amp;= m p(z=1) \\
-&amp;= m \left(p(x=1)p(y=1) + p(x=0)p(y=0) \right)\\
-\end{align*} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;と書けます．すっきりしましたね．
-&lt;script type=&quot;math/tex&quot;&gt;p(x=0), p(x=1), p(y=0), p(y=1)&lt;/script&gt;は未知なので，標本から推定してやらねばなりません．
+&lt;p&gt;最後の変形は&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;の独立性を使いました．
+&lt;script type=&quot;math/tex&quot;&gt;p(x=0), p(x=1), p(y=0), p(y=1)&lt;/script&gt;は未知なので，データから推定してやらねばなりません．
 ここでは，以下のように，最尤推定で求めることにしましょう．&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
@@ -125,143 +89,26 @@ p(x=1) &amp;= \frac{1}{m} \sum_{i=1}^m x_i, \ p(x=0) = 1 - p(x=1) \\
 p(y=1) &amp;= \frac{1}{m} \sum_{i=1}^m y_i, \ p(y=0) = 1 - p(y=1)
 \end{align*} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;あとは&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値をRIの分母分子から引いてやるとARIに一致します．
-Wikipediaの定義式なんかと一致するのを示したほうが良かったですね…．
-時間があれば追記しておきます．
-なお，具体例は以下のページが参考になります．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://y-uti.hatenablog.jp/entry/2014/01/19/133936&quot; target=&quot;_blank&quot;&gt;http://y-uti.hatenablog.jp/entry/2014/01/19/133936&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Tue, 24 May 2016 19:46:44 +0900</pubDate>
-        <link>http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html</guid>
-        
-        
-        <category>jekyll</category>
-        
-        <category>update</category>
-        
-      </item>
-    
-      <item>
-        <title>Adjusted Rand Index (ARI) について勉強してみた</title>
-        <description>&lt;p&gt;クラスタリングの性能評価でよくAdjusted Rand Index (ARI) が使われます．
-僕もよく使っていますが，お恥ずかしながらよく知らずに使っていました．
-というのも，Rand Index (RI) は理解できるのですが，ARIのAdjustedの意味がよくわかりませんでした．
-というわけで，勉強してみました．&lt;/p&gt;
-
-&lt;p&gt;まず，クラスタリングは，サンプル&lt;script type=&quot;math/tex&quot;&gt;S = \{o_i\}_{i=1}^n&lt;/script&gt;を&lt;script type=&quot;math/tex&quot;&gt;k (1 \leq k \leq n)&lt;/script&gt;個の互いに素なグループに分けることを目的とします．
-この記事では，真のクラスタリング結果と，クラスタリングアルゴリズムの結果が似ているかどうかを測ることを目的とします．
-なお，ここでは，クラスタリングの結果をクラスタラベルで表現することにします．&lt;/p&gt;
-
-&lt;p&gt;さて，&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;に対する，
-真のクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{\ell}=[\ell_1 \cdots \ell_n], \ell_i \in \{1, \ldots, k\} \forall i=1, \ldots, n&lt;/script&gt;，
-クラスタリングアルゴリズムによるクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\hat{ \boldsymbol{\ell}}=[\hat{\ell}_1 \cdots \hat{\ell}_n], \hat{\ell}_i \in \{1, \ldots, \hat{k}\} \forall i=1, \ldots, n&lt;/script&gt;とします．
-クラスタリングの結果は，分類のようにラベルで考えるのではなく，ラベルのペアで考えます．
-つまり，「このサンプルとこのサンプルは同じクラスタに属するか否か」で性能を評価します．&lt;/p&gt;
-
-&lt;p&gt;そのような指標の一つである，Rand Indexは次式で定義されます（自己流です）．&lt;/p&gt;
+&lt;p&gt;無事上で定義したペナルティをもとめることができました．
+RIから求めたペナルティを引けば，ARIの完成になります：&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-RI(\boldsymbol{\ell}, \hat{\boldsymbol{\ell}}) = \frac{1}{|C(n, 2)|}\sum_{(i, j) \in C(n, 2)} I(I(\ell_i = \ell_j) = I(\hat{\ell}_i = \hat{\ell}_j))
+ARI(x, y) = \sum_{i=1}^m I(x_i=y_i) - \mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]
 \end{align*}&lt;/script&gt;
 
-&lt;p&gt;ただし，
-&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-C(n, 2) = \{(i, j) | i, j \in \{1, \ldots, n\}, i&lt;j \} %]]&gt;&lt;/script&gt;
-はサンプルの2つの全組み合わせ．&lt;/p&gt;
-
-&lt;p&gt;これはわかりやすいです．サンプルペアが同じクラスタに属するのか違うクラスタに属するのかが測れそうです．&lt;/p&gt;
-
-&lt;p&gt;よくRIの欠点として，「二つのクラスタリングに相関がなくても，高い値をとってしまう」という説明がなされます．
-これの意味は，「適当（ランダム）にやっても高い値をとってしまう」ということではないかと思います．
-さて，この「相関」ですが，普通「相関」というと確率変数間の相関をイメージしますよね．
-ということでどの確率変数とどの確率変数の間の相関のことを言っているのかから考えていきます．&lt;/p&gt;
-
-&lt;p&gt;まず，以下の二つの標本を考えます：&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align*}
-X &amp;= \{I(\ell_i = \ell_j) | (i,j) \in C(n, 2)\} \\
-Y &amp;= \{I(\hat{\ell}_i = \hat{\ell}_j) | (i,j) \in C(n, 2)\}
-\end{align*} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;そして，&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;に対応する確率変数をそれぞれ&lt;script type=&quot;math/tex&quot;&gt;x, y&lt;/script&gt;とし，&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;はそれぞれ&lt;script type=&quot;math/tex&quot;&gt;x, y&lt;/script&gt;の従う確率分布から独立に生成されたと仮定します (i.i.d.)．
-上で言った「相関」とは，多分この&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;の相関のことだと思います．&lt;/p&gt;
-
-&lt;p&gt;さて，適当にやった時，つまり，&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;に相関がない (&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;) 時に，RIの値を下げたいのですが，どうしたら良いでしょうか？
-もう少し具体的にいうと，RIの値は分子で決まるので，RIの分子の値を下げたいのですが，どうしたら良いでしょう？
-直感的にいうと，「適当にクラスタリングしたら，RIの分子がどのくらいになるか」がわかれば，それをペナルティに設定すれば良さそうではないですか？
-というわけで，ペナルティ = 適当にクラスタリングした時のRIの分子のおおよその値 = &lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時のRIの分子のおおよその値を求めていきます．&lt;/p&gt;
-
-&lt;p&gt;とりあえず，見やすくするために，上の&lt;script type=&quot;math/tex&quot;&gt;X, Y&lt;/script&gt;を，
-&lt;script type=&quot;math/tex&quot;&gt;X = \{x_i\}_{i=1}^{m}, Y = \{y_i\}_{i=1}^{m}, m={}_n C _2&lt;/script&gt;と置き直します．
-さらに，&lt;script type=&quot;math/tex&quot;&gt;Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)&lt;/script&gt;と置きます．
-そうすると，RIは以下の式になります．&lt;/p&gt;
+&lt;p&gt;通常，RIは以下のように，0から1の値をとるように正規化して使われます．&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m I(x_i = y_i)
+normalized RI(x, y) = \frac{1}{m} \sum_{i=1}^m I(x_i=y_i)
 \end{align*}&lt;/script&gt;
 
-&lt;p&gt;上でざっくり定義したペナルティを求めるために，&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;が，それぞれベルヌーイ分布に従う，
-つまり，&lt;script type=&quot;math/tex&quot;&gt;x \sim Bernoulli(p_x), y \sim Bernoulli(p_y), x \perp y&lt;/script&gt;を仮定します．
-さらに，&lt;script type=&quot;math/tex&quot;&gt;Bernoulli(p_x), Bernoulli(p_y)&lt;/script&gt;の確率質量関数をそれぞれ&lt;script type=&quot;math/tex&quot;&gt;p(x), p(y)&lt;/script&gt;とします．
-ここで，RIの分子の和の中に出現する，以下で定義される確率変数&lt;script type=&quot;math/tex&quot;&gt;z&lt;/script&gt;を考えます．&lt;/p&gt;
+&lt;p&gt;なので，正規化したARIは以下のようになります．&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-z = I(x = y)
+normalized ARI(x, y) = \frac{\sum_{i=1}^m I(x_i=y_i) - \mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]}{m-\mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]} 
 \end{align*}&lt;/script&gt;
 
-&lt;p&gt;さらに，&lt;script type=&quot;math/tex&quot;&gt;Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)&lt;/script&gt;と置きます．
-そうすると，RIの式が，&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m z_i
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;と超絶シンプルになりました．
-さて，上で定義したペナルティは「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時のRIの分子のおおよその値」でした．
-ここで，&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-z&#39; = \sum_{i=1}^m z_i
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;と定義すると，求めたいペナルティはまさに，「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時の&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値」に相当するのではないでしょうか？
-というわけでここから，「&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;の時の&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値」を求めていきます．&lt;/p&gt;
-
-&lt;p&gt;まず，&lt;script type=&quot;math/tex&quot;&gt;x \perp y&lt;/script&gt;より，&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align*}
-p(z=1) &amp;= p(x=1, y=1) + p(x=0, y=0) = p(x=1)p(y=1) + p(x=0)p(y=0)
-\end{align*} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;となります．よって，&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値は，&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align*}
-\mathbb{E}\left[z&#39;\right] &amp;= \mathbb{E}\left[\sum_{i=1}^m z_i\right] \\
-&amp;= \sum_{i=1}^m \mathbb{E}\left[z_i\right] \\
-&amp;= \sum_{i=1}^m 0 \cdot p(z=0) + 1 \cdot p(z=1) \\
-&amp;= m p(z=1) \\
-&amp;= m \left(p(x=1)p(y=1) + p(x=0)p(y=0) \right)\\
-\end{align*} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;と書けます．すっきりしましたね．
-&lt;script type=&quot;math/tex&quot;&gt;p(x=0), p(x=1), p(y=0), p(y=1)&lt;/script&gt;は未知なので，標本から推定してやらねばなりません．
-ここでは，以下のように，最尤推定で求めることにしましょう．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align*}
-p(x=1) &amp;= \frac{1}{m} \sum_{i=1}^m x_i, \ p(x=0) = 1 - p(x=1) \\
-p(y=1) &amp;= \frac{1}{m} \sum_{i=1}^m y_i, \ p(y=0) = 1 - p(y=1)
-\end{align*} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;あとは&lt;script type=&quot;math/tex&quot;&gt;z&#39;&lt;/script&gt;の期待値をRIの分母分子から引いてやるとARIに一致します．
-Wikipediaの定義式なんかと一致するのを示したほうが良かったですね…．
+&lt;p&gt;Wikipediaの定義式なんかと一致するのを示したほうが良かったですね…．
 時間があれば追記しておきます．
 なお，具体例は以下のページが参考になります．&lt;/p&gt;
 
@@ -912,6 +759,78 @@ s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldo
         <pubDate>Tue, 27 Oct 2015 20:57:00 +0900</pubDate>
         <link>http://nktmemoja.github.io/machine%20learning/2015/10/27/27205700.html</link>
         <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/2015/10/27/27205700.html</guid>
+        
+        <category>Machine Learning</category>
+        
+        <category>NLP</category>
+        
+        <category>python</category>
+        
+        
+        <category>Machine Learning</category>
+        
+      </item>
+    
+      <item>
+        <title>Word2Vec+教師あり次元削減で文書分類+単語分類</title>
+        <description>&lt;p&gt;前回:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://nktmemo.wordpress.com/2015/09/29/%E6%96%87%E6%9B%B8%E5%88%86%E9%A1%9E%E5%99%A8%E3%81%A7%E5%8D%98%E8%AA%9E%E5%88%86%E9%A1%9E%E3%82%92%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B/&quot; title=&quot;https://nktmemo.wordpress.com/2015/09/29/%E6%96%87%E6%9B%B8%E5%88%86%E9%A1%9E%E5%99%A8%E3%81%A7%E5%8D%98%E8%AA%9E%E5%88%86%E9%A1%9E%E3%82%92%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B/&quot;&gt;文書分類器で単語分類をしてみる&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;の続きです．&lt;/p&gt;
+
+&lt;p&gt;まずは，前回のおさらい． 前回は，文書に対してはラベル付きデータが与えられており，単語についてはラベルなしデータが与えられているという設定を考えました． そして，文書と単語が同じ空間に存在すれば，半教師付き学習に帰着することを示しました． 詳しくは前回の記事を見ていただくとして，これからは半教師付き学習の設定で話を進めます．&lt;/p&gt;
+
+&lt;p&gt;今回は，前回の記事でいう単語ベクトル集合&lt;script type=&quot;math/tex&quot;&gt;\{x_i\}_{i=n_d}^{n}&lt;/script&gt;をWord2Vecで学習させます． 食わせるコーパスは分類対象の文書集合です．&lt;/p&gt;
+
+&lt;p&gt;その後，教師あり次元削減手法であるFisher Discriminant Analysis (FDA)を使って&lt;script type=&quot;math/tex&quot;&gt;B:\mathbb{R}^d\rightarrow\mathbb{R}^m&lt;/script&gt;を学習させます． これによって，Word2Vecで学習した単語ベクトルたちは，より低次元の空間に落とし込まれます． つまり，&lt;script type=&quot;math/tex&quot;&gt;z=Bx&lt;/script&gt;として，&lt;script type=&quot;math/tex&quot;&gt;\{(z_i,y_i)\}_{i=1}^{n_d}&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;\{z_i\}_{i=n_d}^{n}&lt;/script&gt;を得ます． 今回は，&lt;script type=&quot;math/tex&quot;&gt;m=c-1&lt;/script&gt;としました，ただし，&lt;script type=&quot;math/tex&quot;&gt;c&lt;/script&gt;はクラス数です．&lt;/p&gt;
+
+&lt;p&gt;なぜこのような処理をするかというと，Word2Vecのような教師なし学習では，必ずしも「望ましい結果」が得られるとは限りません． なぜなら，「望ましい結果」についての情報を一切与えていないからです． 今回の目的は文書分類+単語分類です． この目的に対して，Word2Vecが必ずしも望ましい結果を返すとは限らないのです．&lt;/p&gt;
+
+&lt;p&gt;そこで，教師あり次元削減を使います． FDAは，簡単にいうと，同じクラスに属するサンプルは近く，異なるクラスに属するサンプルは遠くなるよう，射影行列を学習します． ここでは，「望ましい結果」教師データとして与えるので，学習後の空間は分類という目的に対して望ましい空間になっていると期待できます．&lt;/p&gt;
+
+&lt;p&gt;さて，あとは対して面白いことはしていません． &lt;script type=&quot;math/tex&quot;&gt;\{(z_i,y_i)\}_{i=1}^{n_d}&lt;/script&gt;で確率的分類器を学習させ，&lt;script type=&quot;math/tex&quot;&gt;\{z_i\}_{i=n_d}^{n}&lt;/script&gt;に対して予測をします．&lt;/p&gt;
+
+&lt;p&gt;前回と同じデータを使って実験をしました． 結果の出力には同様にwordcloudを使わせてもらいました．&lt;/p&gt;
+
+&lt;p&gt;ガールズ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-girls.png&quot; alt=&quot;girls.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;ニュース・ゴシップ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-news1.png&quot; alt=&quot;news.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;エンタメ・カルチャー: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-entertainment1.png&quot; alt=&quot;entertainment.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;おでかけ・グルメ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-spot1.png&quot; alt=&quot;spot.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;暮らし・アイデア: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-life1.png&quot; alt=&quot;life.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;レシピ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-recipe1.png&quot; alt=&quot;recipe.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;カラダ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-wellness1.png&quot; alt=&quot;wellness.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;ビジネススキル: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-business1.png&quot; alt=&quot;business.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;IT・ガジェット: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-tech1.png&quot; alt=&quot;tech.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;デザイン・アート: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-design1.png&quot; alt=&quot;design.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;雑学: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-trivia1.png&quot; alt=&quot;trivia.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;おもしろ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-humor1.png&quot; alt=&quot;humor.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;定番: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-popular1.png&quot; alt=&quot;popular.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;評価データがなくて定性的に評価するしかないのですが，前回と比べて，かなり改善されている気がします． 雑学とかおもしろ，定番なんかは定義がよくわからなくて判断しにくいですが，それ以外はうまく単語分類ができていると思います．&lt;/p&gt;
+
+&lt;p&gt;今回は，Word2Vec+教師あり次元削減 (FDA) を使って文書分類器を作成し，それを使って単語分類をしてみました． 結果として，このアプローチはなかなか良いと感じました． 文書分類，単語分類については，これでひと段落した感じがします． 本当は単語分類なんかはマルチラベル分類問題として解くべくなのかもしれませんが，あまりこの問題に執着してもあれなので． 次は要約や，トレンド抽出なんかをやっていきたいなあなんて思っています．&lt;/p&gt;
+
+&lt;p&gt;前回と今回はコードを載せていません． これはコードがなかなか複雑なためです． もし，見てみたいという方がいたら，コメントからでも，Twitterからでもなんでも良いので言ってください！ 読んでいただき，ありがとうございました．&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 06 Oct 2015 20:46:00 +0900</pubDate>
+        <link>http://nktmemoja.github.io/machine%20learning/2015/10/06/06204600.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/2015/10/06/06204600.html</guid>
         
         <category>Machine Learning</category>
         

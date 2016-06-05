@@ -90,98 +90,62 @@
 真のクラスタラベルを<script type="math/tex">\boldsymbol{\ell}=[\ell_1 \cdots \ell_n], \ell_i \in \{1, \ldots, k\} \forall i=1, \ldots, n</script>，
 クラスタリングアルゴリズムによるクラスタラベルを<script type="math/tex">\hat{ \boldsymbol{\ell}}=[\hat{\ell}_1 \cdots \hat{\ell}_n], \hat{\ell}_i \in \{1, \ldots, \hat{k}\} \forall i=1, \ldots, n</script>とします．
 クラスタリングの結果は，分類のようにラベルで考えるのではなく，ラベルのペアで考えます．
-つまり，「このサンプルとこのサンプルは同じクラスタに属するか否か」で性能を評価します．</p>
+つまり，「このサンプルとこのサンプルは同じクラスタに属するか否か」で性能を評価します．
+というわけで，<script type="math/tex">\boldsymbol{\ell}</script>と <script type="math/tex">\hat{\boldsymbol{\ell}}</script>を以下のように表現し直します．</p>
 
-<p>そのような指標の一つである，Rand Indexは次式で定義されます（自己流です）．</p>
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align*}
+\mathcal{X} &= \{I(\ell_i = \ell_j) | (i,j) \in C(n, 2)\} = \{x_i\}_{i=1}^m\\
+\mathcal{Y} &= \{I(\hat{\ell}_i = \hat{\ell}_j) | (i,j) \in C(n, 2)\} = \{y_i\}_{i=1}^m
+\end{align*} %]]></script>
+
+<p>ただし，<script type="math/tex">m={}_n C _2</script>．
+さて，ここで，Rand Indexの定義を見てみます．
+正規化されていないRand Indexは次式で定義されます（自己流です）．</p>
 
 <script type="math/tex; mode=display">\begin{align*}
-RI(\boldsymbol{\ell}, \hat{\boldsymbol{\ell}}) = \frac{1}{|C(n, 2)|}\sum_{(i, j) \in C(n, 2)} I(I(\ell_i = \ell_j) = I(\hat{\ell}_i = \hat{\ell}_j))
+RI(x, y) = \sum_{i=1}^m I(x_i=y_i)
 \end{align*}</script>
 
-<p>ただし，
-<script type="math/tex">% <![CDATA[
-C(n, 2) = \{(i, j) | i, j \in \{1, \ldots, n\}, i<j \} %]]></script>
-はサンプルの2つの全組み合わせ．</p>
-
-<p>これはわかりやすいです．サンプルペアが同じクラスタに属するのか違うクラスタに属するのかが測れそうです．</p>
+<p>ただし，<script type="math/tex">I</script>は指示関数で，<script type="math/tex">I(true) = 1, I(false) = 0</script>です．
+この式は，<script type="math/tex">x_i=y_i</script> の数を表しており，二つのクラスタリングがどのくらい似ているかを表しています．</p>
 
 <p>よくRIの欠点として，「二つのクラスタリングに相関がなくても，高い値をとってしまう」という説明がなされます．
-これの意味は，「適当（ランダム）にやっても高い値をとってしまう」ということではないかと思います．
-さて，この「相関」ですが，普通「相関」というと確率変数間の相関をイメージしますよね．
-ということでどの確率変数とどの確率変数の間の相関のことを言っているのかから考えていきます．</p>
+これの意味は，「適当（ランダム）にクラスタリングしても高い値をとってしまう」ということだと思います．
+<script type="math/tex">x_i = 0</script>となる<script type="math/tex">\mathcal{X}</script>内の要素数が，<script type="math/tex">x_i = 1</script>となる要素数に比べて圧倒的に多いので，
+例えば「全てを異なるクラスタに分ける」というクラスタリングを行うと，<script type="math/tex">y_i = 0</script>となり，RIの値が高くなってしまいます．
+これは，分類問題において，クラスバランスが偏った状態で精度を使うのが適切ではない理由に似ています．</p>
 
-<p>まず，以下の二つの標本を考えます：</p>
+<p>このような問題を解決しようと提案されたのがARIです．
+ARIでは，適当に行われたであろうクラスタリングにペナルティを与えます．
+どのようなペナルティが適切でしょうか？
+ARIでは，ペナルティ＝「適当にクラスタリングした時のRIの値」と考えます．
+以下このペナルティを求めていきます．</p>
+
+<p>まず，二つのデータ<script type="math/tex">\mathcal{X}, \mathcal{Y}</script>がぞれぞれ独立に同一の分布<script type="math/tex">p(x), p(y)</script>から生成されたと仮定します：</p>
+
+<script type="math/tex; mode=display">\begin{align*}
+\mathcal{X} \stackrel{i.i.d.}{\sim} p(x)\\
+\mathcal{Y} \stackrel{i.i.d.}{\sim} p(y)
+\end{align*}</script>
+
+<p><script type="math/tex">p(x)</script>と<script type="math/tex">p(y)</script>はそれぞれ確率変数<script type="math/tex">x</script>と<script type="math/tex">y</script>の従う分布に対応する確率密度関数を表します．
+まず，上で定義したペナルティ中の「適当にクラスタリングした時」というのを，「<script type="math/tex">x</script>と<script type="math/tex">y</script>が独立な時」と定義します．
+そうすると，求めるペナルティは「<script type="math/tex">x</script>と<script type="math/tex">y</script>が独立な時のRIの値」となり，具体的になりました．
+そのようなペナルティは，以下で求められます．</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
 \begin{align*}
-X &= \{I(\ell_i = \ell_j) | (i,j) \in C(n, 2)\} \\
-Y &= \{I(\hat{\ell}_i = \hat{\ell}_j) | (i,j) \in C(n, 2)\}
+\mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]
+&= \mathbb{E}_{(x,y) \sim p(x,y)}\left[ \sum_{i=1}^m I(x_i=y_i) \right] \\
+&= \sum_{x=0}^1 \sum_{y=0}^1 \sum_{i=1}^m I(x_i=y_i) p(x, y) \\
+&= \sum_{i=1}^m \left( p(x=1, y=1) + p(x=0, y=0) \right) \\
+&= m \left( p(x=1, y=1) + p(x=0, y=0) \right) \\
+&= m \left( p(x=1)p(y=1) + p(x=0)p(y=0) \right)
 \end{align*} %]]></script>
 
-<p>そして，<script type="math/tex">X, Y</script>に対応する確率変数をそれぞれ<script type="math/tex">x, y</script>とし，<script type="math/tex">X, Y</script>はそれぞれ<script type="math/tex">x, y</script>の従う確率分布から独立に生成されたと仮定します (i.i.d.)．
-上で言った「相関」とは，多分この<script type="math/tex">x</script>と<script type="math/tex">y</script>の相関のことだと思います．</p>
-
-<p>さて，適当にやった時，つまり，<script type="math/tex">x</script>と<script type="math/tex">y</script>に相関がない (<script type="math/tex">x \perp y</script>) 時に，RIの値を下げたいのですが，どうしたら良いでしょうか？
-もう少し具体的にいうと，RIの値は分子で決まるので，RIの分子の値を下げたいのですが，どうしたら良いでしょう？
-直感的にいうと，「適当にクラスタリングしたら，RIの分子がどのくらいになるか」がわかれば，それをペナルティに設定すれば良さそうではないですか？
-というわけで，ペナルティ = 適当にクラスタリングした時のRIの分子のおおよその値 = <script type="math/tex">x \perp y</script>の時のRIの分子のおおよその値を求めていきます．</p>
-
-<p>とりあえず，見やすくするために，上の<script type="math/tex">X, Y</script>を，
-<script type="math/tex">X = \{x_i\}_{i=1}^{m}, Y = \{y_i\}_{i=1}^{m}, m={}_n C _2</script>と置き直します．
-さらに，<script type="math/tex">Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)</script>と置きます．
-そうすると，RIは以下の式になります．</p>
-
-<script type="math/tex; mode=display">\begin{align*}
-RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m I(x_i = y_i)
-\end{align*}</script>
-
-<p>上でざっくり定義したペナルティを求めるために，<script type="math/tex">x</script>と<script type="math/tex">y</script>が，それぞれベルヌーイ分布に従う，
-つまり，<script type="math/tex">x \sim Bernoulli(p_x), y \sim Bernoulli(p_y), x \perp y</script>を仮定します．
-さらに，<script type="math/tex">Bernoulli(p_x), Bernoulli(p_y)</script>の確率質量関数をそれぞれ<script type="math/tex">p(x), p(y)</script>とします．
-ここで，RIの分子の和の中に出現する，以下で定義される確率変数<script type="math/tex">z</script>を考えます．</p>
-
-<script type="math/tex; mode=display">\begin{align*}
-z = I(x = y)
-\end{align*}</script>
-
-<p>さらに，<script type="math/tex">Z = \{z_i\}_{i=1}^m, z_i = I(x_i = y_i)</script>と置きます．
-そうすると，RIの式が，</p>
-
-<script type="math/tex; mode=display">\begin{align*}
-RI(y, \hat{y}) = \frac{1}{m} \sum_{i=1}^m z_i
-\end{align*}</script>
-
-<p>と超絶シンプルになりました．
-さて，上で定義したペナルティは「<script type="math/tex">x \perp y</script>の時のRIの分子のおおよその値」でした．
-ここで，</p>
-
-<script type="math/tex; mode=display">\begin{align*}
-z' = \sum_{i=1}^m z_i
-\end{align*}</script>
-
-<p>と定義すると，求めたいペナルティはまさに，「<script type="math/tex">x \perp y</script>の時の<script type="math/tex">z'</script>の期待値」に相当するのではないでしょうか？
-というわけでここから，「<script type="math/tex">x \perp y</script>の時の<script type="math/tex">z'</script>の期待値」を求めていきます．</p>
-
-<p>まず，<script type="math/tex">x \perp y</script>より，</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-\begin{align*}
-p(z=1) &= p(x=1, y=1) + p(x=0, y=0) = p(x=1)p(y=1) + p(x=0)p(y=0)
-\end{align*} %]]></script>
-
-<p>となります．よって，<script type="math/tex">z'</script>の期待値は，</p>
-
-<script type="math/tex; mode=display">% <![CDATA[
-\begin{align*}
-\mathbb{E}\left[z'\right] &= \mathbb{E}\left[\sum_{i=1}^m z_i\right] \\
-&= \sum_{i=1}^m \mathbb{E}\left[z_i\right] \\
-&= \sum_{i=1}^m 0 \cdot p(z=0) + 1 \cdot p(z=1) \\
-&= m p(z=1) \\
-&= m \left(p(x=1)p(y=1) + p(x=0)p(y=0) \right)\\
-\end{align*} %]]></script>
-
-<p>と書けます．すっきりしましたね．
-<script type="math/tex">p(x=0), p(x=1), p(y=0), p(y=1)</script>は未知なので，標本から推定してやらねばなりません．
+<p>最後の変形は<script type="math/tex">x</script>と<script type="math/tex">y</script>の独立性を使いました．
+<script type="math/tex">p(x=0), p(x=1), p(y=0), p(y=1)</script>は未知なので，データから推定してやらねばなりません．
 ここでは，以下のように，最尤推定で求めることにしましょう．</p>
 
 <script type="math/tex; mode=display">% <![CDATA[
@@ -190,8 +154,26 @@ p(x=1) &= \frac{1}{m} \sum_{i=1}^m x_i, \ p(x=0) = 1 - p(x=1) \\
 p(y=1) &= \frac{1}{m} \sum_{i=1}^m y_i, \ p(y=0) = 1 - p(y=1)
 \end{align*} %]]></script>
 
-<p>あとは<script type="math/tex">z'</script>の期待値をRIの分母分子から引いてやるとARIに一致します．
-Wikipediaの定義式なんかと一致するのを示したほうが良かったですね…．
+<p>無事上で定義したペナルティをもとめることができました．
+RIから求めたペナルティを引けば，ARIの完成になります：</p>
+
+<script type="math/tex; mode=display">\begin{align*}
+ARI(x, y) = \sum_{i=1}^m I(x_i=y_i) - \mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]
+\end{align*}</script>
+
+<p>通常，RIは以下のように，0から1の値をとるように正規化して使われます．</p>
+
+<script type="math/tex; mode=display">\begin{align*}
+normalized RI(x, y) = \frac{1}{m} \sum_{i=1}^m I(x_i=y_i)
+\end{align*}</script>
+
+<p>なので，正規化したARIは以下のようになります．</p>
+
+<script type="math/tex; mode=display">\begin{align*}
+normalized ARI(x, y) = \frac{\sum_{i=1}^m I(x_i=y_i) - \mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]}{m-\mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]} 
+\end{align*}</script>
+
+<p>Wikipediaの定義式なんかと一致するのを示したほうが良かったですね…．
 時間があれば追記しておきます．
 なお，具体例は以下のページが参考になります．</p>
 
