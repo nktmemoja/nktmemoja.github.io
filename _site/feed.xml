@@ -6,9 +6,85 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 05 Jun 2016 15:30:28 +0900</pubDate>
-    <lastBuildDate>Sun, 05 Jun 2016 15:30:28 +0900</lastBuildDate>
+    <pubDate>Fri, 01 Jul 2016 01:15:52 +0900</pubDate>
+    <lastBuildDate>Fri, 01 Jul 2016 01:15:52 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
+    
+      <item>
+        <title>Topic Modelの最尤推定の解の導出</title>
+        <description>&lt;p&gt;&lt;img src=&quot;http://nktmemoja.github.io/assets/CDEA4F6D-2A70-4053-87F7-B5D307125B2C.jpg&quot; alt=&quot;topic modelの最尤推定の解の導出1&quot; /&gt;
+&lt;img src=&quot;http://nktmemoja.github.io/assets/BE1823C6-24EB-440A-A6CC-61E15CC7C645.jpg&quot; alt=&quot;topic modelの最尤推定の解の導出1&quot; /&gt;&lt;/p&gt;
+</description>
+        <pubDate>Fri, 01 Jul 2016 01:07:03 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/07/01/topicmodel.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/07/01/topicmodel.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>クラスタリング評価指標V-Measureについて勉強してみた</title>
+        <description>&lt;h1 id=&quot;v-measure&quot;&gt;1. V-Measure&lt;/h1&gt;
+&lt;hr /&gt;
+
+&lt;p&gt;最近会社でクラスタリングを使っています．
+僕は今までクラスタリングの評価指標には&lt;a href=&quot;http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html&quot; target=&quot;_blank&quot;&gt;ARI&lt;/a&gt;を使っていたのですが，もう古いみたいですね．
+そこで，今回，V-Measure (Rosenberg 2007) というのを見つけたので勉強してみました．&lt;/p&gt;
+
+&lt;p&gt;クラスタリングの評価のポイントは，大きく分けて以下の2つになるみたいです．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Completeness: 同じクラスタに属するべきものが，同じクラスタに属している&lt;/li&gt;
+  &lt;li&gt;Homogeneity: 異なるクラスタに属するべきものが，異なるクラスタに属している&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;そしてこれらは，一般に再現率と適合率のように，トレードオフの関係にあります．
+例えば，全てのデータ点を1つのクラスタに入れてしまえば，Completeness=1ですが，Homogeneity=0です．
+反対に，全てのデータ点を異なるクラスタに入れると，Homogeneity=1ですが，Completeness=0です．&lt;/p&gt;
+
+&lt;p&gt;良いクラスタリングは，応用先によって違うと思うのですが，だいたいこれらのバランスを変えるだけで表現できそうな気がします．
+というわけで，これらの重み付き調和平均をとって，&lt;script type=&quot;math/tex&quot;&gt;V_\beta&lt;/script&gt;-Measureは以下で定義されます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+V_\beta = \frac{(1+\beta)*h*c}{(\beta*h)+c}
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;c&lt;/script&gt;はcompleteness, &lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt;はhomogeneity, &lt;script type=&quot;math/tex&quot;&gt;\beta&lt;/script&gt;はcompletenessへの重みです．
+&lt;script type=&quot;math/tex&quot;&gt;\beta &gt; 1&lt;/script&gt;の時，completenessをより重要視した評価になります．
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+\beta &lt; 1 %]]&gt;&lt;/script&gt;の時，homogeneityをより重要視した評価になります．
+とても使いやすそうですね．&lt;/p&gt;
+
+&lt;p&gt;ここからは，CompletenessやHomogeneityの定義を見ていくことにします．&lt;/p&gt;
+
+&lt;h1 id=&quot;completeness&quot;&gt;2. Completeness&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;p&gt;割と論文の記法に沿いたいですが，あまり好きでない部分があるので適宜変えます．
+今，&lt;script type=&quot;math/tex&quot;&gt;N&lt;/script&gt;個のデータ&lt;script type=&quot;math/tex&quot;&gt;D=\{1, \ldots, N\}&lt;/script&gt;があるとします．
+真のクラスタ集合を&lt;script type=&quot;math/tex&quot;&gt;C=\{c_i|c_i \subseteq D\}_{i=1}^m&lt;/script&gt;，ただし&lt;script type=&quot;math/tex&quot;&gt;c_i \cap c_j = \{\} \ \forall i,j&lt;/script&gt;とします．
+同様に，あるクラスタ集合（例えばクラスタリングアルゴリズムによる出力）を&lt;script type=&quot;math/tex&quot;&gt;K=\{k_i|k_i \subseteq D\}_{i=1}^n&lt;/script&gt;，ただし&lt;script type=&quot;math/tex&quot;&gt;k_i \cap k_j = \{\} \ \forall i,j&lt;/script&gt;とします．&lt;/p&gt;
+
+&lt;p&gt;completenessは，「同じクラスタに属するべきものが，同じクラスタに属している」度合いを表すと定義しました．
+そう考えると，例えば，&lt;script type=&quot;math/tex&quot;&gt;c_i&lt;/script&gt;の要素全てが&lt;script type=&quot;math/tex&quot;&gt;k_j&lt;/script&gt;に属していると，&lt;script type=&quot;math/tex&quot;&gt;c_i&lt;/script&gt;に対するcompletenessは最大ですよね．
+反対に，&lt;/p&gt;
+
+&lt;h1 id=&quot;homogeneity&quot;&gt;3. Homogeneity&lt;/h1&gt;
+&lt;hr /&gt;
+</description>
+        <pubDate>Sun, 05 Jun 2016 15:33:17 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/06/05/vmeasure.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/06/05/vmeasure.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
     
       <item>
         <title>Adjusted Rand Index (ARI) について勉強してみた</title>
@@ -675,168 +751,6 @@ s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldo
         <category>Machine Learning</category>
         
         <category>PU classification</category>
-        
-        
-        <category>Machine Learning</category>
-        
-      </item>
-    
-      <item>
-        <title>Word2Vecを使った単語間関係分類</title>
-        <description>&lt;p&gt;単語間には様々な関係があります． 今回は，単語間の関係をWord2Vecで学習させようと思います． Word2Vecにはアナロジーを捉えられるという話があります． あの有名な，king - man + woman = queen というやつですね． これは，king - man = queen - womanとも書けます． つまり，2語間の差が関係を表しており， この例だと，kingとmanの関係とqueenとwomanの関係が同じであると捉えることができます．&lt;/p&gt;
-
-&lt;p&gt;さて，Word2Vecで学習したベクトル表現を使うと，差ベクトルがうまいこと関係を表すと書きましたが， 必ずしもそうなっているとは限りません． 加えて，ユーザが扱いたい関係とWord2Vecで学習した関係が一致しているとも限りません． そこで，今回も例のごとく教師あり学習を使います． ユーザは教師データを通して，扱いたい関係をアルゴリズムに伝えることができます．&lt;/p&gt;
-
-&lt;p&gt;最初からあまり多くの関係を対象にするのはしんどいので，今回はis-a, has-a関係のみに着目します． これは，僕の理解では，柔道 is-a スポーツ，スポーツ has-a 柔道みたいなものだと思っています． まずは&lt;a href=&quot;https://gist.github.com/nkt1546789/a3b3a4c166fc1c0486a1&quot; title=&quot;training data&quot;&gt;training data&lt;/a&gt;を用意します． is-aとhas-aは反対の関係になっていると思うので，has-aのデータだけ用意します． この中には (スポーツ，野球)というhas-a関係を表す順序対がリストで格納されています． リスト内の順序対に対して差ベクトルを計算し，一つのデータとして扱います．&lt;/p&gt;
-
-&lt;p&gt;コードは以下のようになりました．&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;training&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;gensim.models&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Word2Vec&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn.linear_model&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LogisticRegressionCV&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Word2Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;/path/to/your/w2v_model&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;training&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;permutation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:]&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;Xtr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;ytr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;Xte&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;yte&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LogisticRegressionCV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Xtr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ytr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;n&quot;&gt;ypred&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Xte&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-
-&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;metrics&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;metrics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;accuracy_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;yte&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ypred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# &amp;amp;gt;&amp;amp;gt;&amp;amp;gt; 0.99502487562189057&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;今回は厳密な実験はせずに，簡単に性能を見てみました． テストデータに対して，99%の精度を出すことができました． 以下簡単なテストデータへの予測例です．&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;enumerate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ypred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-	&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;has-a&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-	&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;quot;is-a&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;
-
-&lt;span class=&quot;c&quot;&gt;# results:&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;ブルーベリー&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;果物&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;動物&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;モルモット&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;動物&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ワタボウシタマリン&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;登山&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;ロデオ&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;動物&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ユーラシアカワウソ&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;フリーダイビング&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;競馬&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ゴルフ&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;いかがでしょうか？うまく狙った関係が分類できていると思います． とりあえずはうまくいきました！これで成功です！ これがどこまで実用に耐えられるかはやってみないとわかりませんが．&lt;/p&gt;
-
-</description>
-        <pubDate>Tue, 27 Oct 2015 20:57:00 +0900</pubDate>
-        <link>http://nktmemoja.github.io/machine%20learning/2015/10/27/27205700.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/2015/10/27/27205700.html</guid>
-        
-        <category>Machine Learning</category>
-        
-        <category>NLP</category>
-        
-        <category>python</category>
-        
-        
-        <category>Machine Learning</category>
-        
-      </item>
-    
-      <item>
-        <title>Word2Vec+教師あり次元削減で文書分類+単語分類</title>
-        <description>&lt;p&gt;前回:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://nktmemo.wordpress.com/2015/09/29/%E6%96%87%E6%9B%B8%E5%88%86%E9%A1%9E%E5%99%A8%E3%81%A7%E5%8D%98%E8%AA%9E%E5%88%86%E9%A1%9E%E3%82%92%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B/&quot; title=&quot;https://nktmemo.wordpress.com/2015/09/29/%E6%96%87%E6%9B%B8%E5%88%86%E9%A1%9E%E5%99%A8%E3%81%A7%E5%8D%98%E8%AA%9E%E5%88%86%E9%A1%9E%E3%82%92%E3%81%97%E3%81%A6%E3%81%BF%E3%82%8B/&quot;&gt;文書分類器で単語分類をしてみる&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;の続きです．&lt;/p&gt;
-
-&lt;p&gt;まずは，前回のおさらい． 前回は，文書に対してはラベル付きデータが与えられており，単語についてはラベルなしデータが与えられているという設定を考えました． そして，文書と単語が同じ空間に存在すれば，半教師付き学習に帰着することを示しました． 詳しくは前回の記事を見ていただくとして，これからは半教師付き学習の設定で話を進めます．&lt;/p&gt;
-
-&lt;p&gt;今回は，前回の記事でいう単語ベクトル集合&lt;script type=&quot;math/tex&quot;&gt;\{x_i\}_{i=n_d}^{n}&lt;/script&gt;をWord2Vecで学習させます． 食わせるコーパスは分類対象の文書集合です．&lt;/p&gt;
-
-&lt;p&gt;その後，教師あり次元削減手法であるFisher Discriminant Analysis (FDA)を使って&lt;script type=&quot;math/tex&quot;&gt;B:\mathbb{R}^d\rightarrow\mathbb{R}^m&lt;/script&gt;を学習させます． これによって，Word2Vecで学習した単語ベクトルたちは，より低次元の空間に落とし込まれます． つまり，&lt;script type=&quot;math/tex&quot;&gt;z=Bx&lt;/script&gt;として，&lt;script type=&quot;math/tex&quot;&gt;\{(z_i,y_i)\}_{i=1}^{n_d}&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;\{z_i\}_{i=n_d}^{n}&lt;/script&gt;を得ます． 今回は，&lt;script type=&quot;math/tex&quot;&gt;m=c-1&lt;/script&gt;としました，ただし，&lt;script type=&quot;math/tex&quot;&gt;c&lt;/script&gt;はクラス数です．&lt;/p&gt;
-
-&lt;p&gt;なぜこのような処理をするかというと，Word2Vecのような教師なし学習では，必ずしも「望ましい結果」が得られるとは限りません． なぜなら，「望ましい結果」についての情報を一切与えていないからです． 今回の目的は文書分類+単語分類です． この目的に対して，Word2Vecが必ずしも望ましい結果を返すとは限らないのです．&lt;/p&gt;
-
-&lt;p&gt;そこで，教師あり次元削減を使います． FDAは，簡単にいうと，同じクラスに属するサンプルは近く，異なるクラスに属するサンプルは遠くなるよう，射影行列を学習します． ここでは，「望ましい結果」教師データとして与えるので，学習後の空間は分類という目的に対して望ましい空間になっていると期待できます．&lt;/p&gt;
-
-&lt;p&gt;さて，あとは対して面白いことはしていません． &lt;script type=&quot;math/tex&quot;&gt;\{(z_i,y_i)\}_{i=1}^{n_d}&lt;/script&gt;で確率的分類器を学習させ，&lt;script type=&quot;math/tex&quot;&gt;\{z_i\}_{i=n_d}^{n}&lt;/script&gt;に対して予測をします．&lt;/p&gt;
-
-&lt;p&gt;前回と同じデータを使って実験をしました． 結果の出力には同様にwordcloudを使わせてもらいました．&lt;/p&gt;
-
-&lt;p&gt;ガールズ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-girls.png&quot; alt=&quot;girls.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;ニュース・ゴシップ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-news1.png&quot; alt=&quot;news.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;エンタメ・カルチャー: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-entertainment1.png&quot; alt=&quot;entertainment.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;おでかけ・グルメ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-spot1.png&quot; alt=&quot;spot.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;暮らし・アイデア: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-life1.png&quot; alt=&quot;life.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;レシピ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-recipe1.png&quot; alt=&quot;recipe.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;カラダ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-wellness1.png&quot; alt=&quot;wellness.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;ビジネススキル: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-business1.png&quot; alt=&quot;business.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;IT・ガジェット: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-tech1.png&quot; alt=&quot;tech.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;デザイン・アート: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-design1.png&quot; alt=&quot;design.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;雑学: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-trivia1.png&quot; alt=&quot;trivia.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;おもしろ: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-humor1.png&quot; alt=&quot;humor.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;定番: &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-popular1.png&quot; alt=&quot;popular.png&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;評価データがなくて定性的に評価するしかないのですが，前回と比べて，かなり改善されている気がします． 雑学とかおもしろ，定番なんかは定義がよくわからなくて判断しにくいですが，それ以外はうまく単語分類ができていると思います．&lt;/p&gt;
-
-&lt;p&gt;今回は，Word2Vec+教師あり次元削減 (FDA) を使って文書分類器を作成し，それを使って単語分類をしてみました． 結果として，このアプローチはなかなか良いと感じました． 文書分類，単語分類については，これでひと段落した感じがします． 本当は単語分類なんかはマルチラベル分類問題として解くべくなのかもしれませんが，あまりこの問題に執着してもあれなので． 次は要約や，トレンド抽出なんかをやっていきたいなあなんて思っています．&lt;/p&gt;
-
-&lt;p&gt;前回と今回はコードを載せていません． これはコードがなかなか複雑なためです． もし，見てみたいという方がいたら，コメントからでも，Twitterからでもなんでも良いので言ってください！ 読んでいただき，ありがとうございました．&lt;/p&gt;
-
-</description>
-        <pubDate>Tue, 06 Oct 2015 20:46:00 +0900</pubDate>
-        <link>http://nktmemoja.github.io/machine%20learning/2015/10/06/06204600.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/2015/10/06/06204600.html</guid>
-        
-        <category>Machine Learning</category>
-        
-        <category>NLP</category>
-        
-        <category>python</category>
         
         
         <category>Machine Learning</category>
