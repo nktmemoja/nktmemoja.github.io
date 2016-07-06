@@ -6,8 +6,8 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 07 Jul 2016 01:28:02 +0900</pubDate>
-    <lastBuildDate>Thu, 07 Jul 2016 01:28:02 +0900</lastBuildDate>
+    <pubDate>Thu, 07 Jul 2016 01:33:08 +0900</pubDate>
+    <lastBuildDate>Thu, 07 Jul 2016 01:33:08 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
@@ -55,7 +55,7 @@ max_{\mathbf{f}} \ \mathbf{f}^T \mathbf{u} - \alpha \|\mathbf{f}\|^2 - \beta \su
 \mathbf{f} = (\mathbf{L} + \gamma \mathbf{I}_n)^{-1} \mathbf{u}
 \end{align*}&lt;/script&gt;
 
-&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;\gamma=\frac{\alpha}{\beta}&lt;/script&gt;であり，これは通常の正則化パラメータと同じように事前に決めてやるものとします．
+&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{L} = \mathbf{D}-\mathbf{A}&lt;/script&gt;，&lt;script type=&quot;math/tex&quot;&gt;D_{ii} = \sum_{j=1}^n A_{ij}&lt;/script&gt;は対角行列，&lt;script type=&quot;math/tex&quot;&gt;\gamma=\frac{\alpha}{\beta}&lt;/script&gt;であり，これは通常の正則化パラメータと同じように事前に決めてやるものとします．
 これで，望ましい結果というのを，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;だけでなく，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;でも表現できるようになりました．
 次回は，これをウェブページ解析に応用したいと思います．&lt;/p&gt;
 </description>

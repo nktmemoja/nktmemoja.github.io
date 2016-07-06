@@ -120,7 +120,7 @@ max_{\mathbf{f}} \ \mathbf{f}^T \mathbf{u} - \alpha \|\mathbf{f}\|^2 - \beta \su
 \mathbf{f} = (\mathbf{L} + \gamma \mathbf{I}_n)^{-1} \mathbf{u}
 \end{align*}</script>
 
-<p>ただし，<script type="math/tex">\gamma=\frac{\alpha}{\beta}</script>であり，これは通常の正則化パラメータと同じように事前に決めてやるものとします．
+<p>ただし，<script type="math/tex">\mathbf{L} = \mathbf{D}-\mathbf{A}</script>，<script type="math/tex">D_{ii} = \sum_{j=1}^n A_{ij}</script>は対角行列，<script type="math/tex">\gamma=\frac{\alpha}{\beta}</script>であり，これは通常の正則化パラメータと同じように事前に決めてやるものとします．
 これで，望ましい結果というのを，<script type="math/tex">\mathbf{A}</script>だけでなく，<script type="math/tex">\mathbf{u}</script>でも表現できるようになりました．
 次回は，これをウェブページ解析に応用したいと思います．</p>
 
