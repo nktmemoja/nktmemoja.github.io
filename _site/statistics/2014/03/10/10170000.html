@@ -116,12 +116,12 @@
 <p>問題：<script type="math/tex">\sigma=9.48</script>, がわかっている時，<script type="math/tex">E=1.2, c=0.95</script>を達成する標本サイズnを求めよ．<br />
 このサイトでは，1-c=aとして説明している．僕が書いたaとは違います，混乱するかもしれませんね． よし，Rで求めてみよう．</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="o">&gt;</span> E <span class="o">=</span> <span class="m">1.2</span>
-<span class="o">&gt;</span> <span class="kt">c</span> <span class="o">=</span> <span class="m">0.95</span>
-<span class="o">&gt;</span> a <span class="o">=</span> <span class="p">(</span><span class="m">1</span><span class="o">-</span><span class="kt">c</span><span class="p">)</span> <span class="o">/</span> <span class="m">2</span>
-<span class="o">&gt;</span> Za <span class="o">=</span> qnorm<span class="p">(</span><span class="m">1</span><span class="o">-</span>a<span class="p">)</span> <span class="c1">#前記事参照のこと</span>
-<span class="o">&gt;</span> n <span class="o">=</span> Za<span class="o">^</span><span class="m">2</span> <span class="o">*</span> sigma<span class="o">^</span><span class="m">2</span> <span class="o">/</span> E<span class="o">^</span><span class="m">2</span>
-<span class="o">&gt;</span> n
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="o">&gt;</span> <span class="n">E</span> <span class="o">=</span> <span class="m">1.2</span>
+<span class="o">&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="m">0.95</span>
+<span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="m">1</span><span class="o">-</span><span class="n">c</span><span class="p">)</span> <span class="o">/</span> <span class="m">2</span>
+<span class="o">&gt;</span> <span class="n">Za</span> <span class="o">=</span> <span class="n">qnorm</span><span class="p">(</span><span class="m">1</span><span class="o">-</span><span class="n">a</span><span class="p">)</span> <span class="c1">#前記事参照のこと
+</span><span class="o">&gt;</span> <span class="n">n</span> <span class="o">=</span> <span class="n">Za</span><span class="o">^</span><span class="m">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">^</span><span class="m">2</span> <span class="o">/</span> <span class="n">E</span><span class="o">^</span><span class="m">2</span>
+<span class="o">&gt;</span> <span class="n">n</span>
 <span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="m">239.7454</span></code></pre></figure>
 
 <p>よって，母分散が9.48のとき，E=1.2, c=0.95を達成には標本サイズを240以上にしなければならない．</p>
@@ -200,7 +200,7 @@
       </div>
 
       <div class="footer-col footer-col-3">
-        <p>nktmemo provides interesting articles about Machine Learning and NLP. 
+        <p>nktmemo provides interesting articles about Machine Learning and NLP.
 </p>
       </div>
     </div>

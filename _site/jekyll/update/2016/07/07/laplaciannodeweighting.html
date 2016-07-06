@@ -5,12 +5,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>劣モジュラ最適化による文書要約（理論編）</title>
-  <meta name="description" content="劣モジュラ最適化と機械学習 (機械学習プロフェッショナルシリーズ)を読んでいます．この中に，劣モジュラ最適化の文書要約への応用が紹介されていたので，勉強がてら書こうと思います．やっぱりこういう理論的なものを学ぶ時は，応用を同時に学ぶといいですよね．">
+  <title>ラプラス正則化を使った，半教師付きグラフノード重み付け</title>
+  <meta name="description" content="半教師付きの設定で，グラフノードに重み付けをつけるアルゴリズム (Laplacian Node Weighting)を考えてみました（名前適当だし，日本語でどう表すかが非常に難しい）．グラフのノードに重みをつける手法としては，PageRankが有名です．一つやりたいことがあって，最初PageRankを使っていたの...">
 
   <link rel="stylesheet" href="/css/main.css">
   <!--<link rel="stylesheet" href="/assets/css/pygments.css">-->
-  <link rel="canonical" href="http://nktmemoja.github.io/jekyll/update/2016/02/09/document-summarization-via-submodular.html">
+  <link rel="canonical" href="http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html">
   <link rel="alternate" type="application/rss+xml" title="nktmemo_ja" href="http://nktmemoja.github.io/feed.xml">
   <script type="text/javascript"
     src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
@@ -72,61 +72,64 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">劣モジュラ最適化による文書要約（理論編）</h1>
-    <p class="post-meta"><time datetime="2016-02-09T00:09:34+09:00" itemprop="datePublished">Feb 9, 2016</time></p>
+    <h1 class="post-title" itemprop="name headline">ラプラス正則化を使った，半教師付きグラフノード重み付け</h1>
+    <p class="post-meta"><time datetime="2016-07-07T00:48:19+09:00" itemprop="datePublished">Jul 7, 2016</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p><a rel="nofollow" href="http://www.amazon.co.jp/gp/product/4061529099/ref=as_li_ss_tl?ie=UTF8&amp;camp=247&amp;creative=7399&amp;creativeASIN=4061529099&amp;linkCode=as2&amp;tag=nettodesyuu00-22" target="_blank">劣モジュラ最適化と機械学習 (機械学習プロフェッショナルシリーズ)</a><img src="http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&amp;l=as2&amp;o=9&amp;a=4061529099" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-を読んでいます．
-この中に，劣モジュラ最適化の文書要約への応用が紹介されていたので，勉強がてら書こうと思います．
-やっぱりこういう理論的なものを学ぶ時は，応用を同時に学ぶといいですよね．</p>
+    <p>半教師付きの設定で，グラフノードに重み付けをつけるアルゴリズム (Laplacian Node Weighting)を考えてみました（名前適当だし，日本語でどう表すかが非常に難しい）．
+グラフのノードに重みをつける手法としては，PageRankが有名です．
+一つやりたいことがあって，最初PageRankを使っていたのですが，教師的な情報を組み込むのが難しかったので，自分で考えることにしました．
+というのも，PageRankでは，すべてのグラフノードの重みを1に初期化します．
+単純にここに教師的な情報を組み込む，例えば数個のノードの重みを高くするなど，をやってみたのですが，最終的に出てくる解にあまり反映されなかったのです．
+なぜなのか，をいろいろ考えましたが，PageRankはノードの重みを繰り返し伝搬するので，初期値が大事というより，エッジが大事なんだと今は思っています（もう少しちゃんと考える必要あり）．</p>
 
-<p>さて，まずは文書要約について．
-文書要約手法には，抽出型と生成型があるらしいです．
-抽出型は，要約対象に出てくる要素（例えば文）を組み合わせて，要約を作るアプローチです．
-生成型は，要約対象の文書の内容を理解して，要約を生成するアプローチです．
-直感的には，抽出型の方がシンプルで簡単そうな気がします．
-というわけで，今回は抽出型について書こうと思います．</p>
+<p>定式化していきましょう．
+グラフ<script type="math/tex">G=(V, E), V=\{1, \ldots, n\}, E \subseteq V \times V</script>を考えます．
+扱いやすいように，エッジは隣接行列 (Adjacency matrix) <script type="math/tex">\mathbf{A}</script>で表現することにします．
+<script type="math/tex">\mathbf{A}</script>をいろいろ変えることで，いろんなグラフが表現できますが，ここでは一般の行列にしときます．
+重み付けにおける教師データとは何か？という話になると思うのですが，ここでは，高い（低い）重みがついて欲しいノードの集合<script type="math/tex">V^{*} \subseteq V</script>が与えられることにします．</p>
 
-<p>さて，問題を定式化していきましょう．
-抽出対象は文にしようと思います．
-文書を文の集合と考えると，ある文書は<script type="math/tex">V=\{1,\ldots,n\}</script>と表されます．
-ここで，<script type="math/tex">n</script>はその文書が含む総文数です．
-抽出型の文書要約はなんらかの基準で<script type="math/tex">S \subseteq V</script>を選ぶ問題だと解釈できます．</p>
+<p>さて，各ノードにおける重みを<script type="math/tex">\mathbf{f} = [f_1 \cdots f_n]</script>と表すことにして，これを求めることがゴールになります．
+とりあえず，<script type="math/tex">V^{*}</script>の要素に該当する重みを大きくしたいので，<script type="math/tex">\mathbf{u} = [u_1 \cdots u_n]</script>を以下で定義します．</p>
 
-<p>このような基準は，自然言語処理分野で数多く提案されているみたいですが，
-今回は本に出てきた，「関連性」と「多様性」による基準を採用しようと思います．
-ここでいう関連性とは，要約文と本文との関連度を表し，
-多様性は，要約文に含まれる文の多様性を表します．
-つまり，この二つを同時に最大化したいわけです．
-さて，要約文<script type="math/tex">S \subseteq V</script>の関連性を<script type="math/tex">L(S)</script>，多様性を<script type="math/tex">R(S)</script>と表し，要約文の良さを表す関数<script type="math/tex">f_{doc}</script>を以下で定義します．</p>
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align*}
+u_i = \left\{\begin{array}{cc}
+1 & if \ i \in V^{*} \\
+0 & otherwise
+\end{array}\right.
+\end{align*} %]]></script>
 
-<script type="math/tex; mode=display">\begin{align*}
-f_{doc} = L(S) + \lambda R(S)
-\end{align*}</script>
-
-<p>ここで，<script type="math/tex">\lambda</script>はトレードオフを調節するパラメータです．
-さて，まずは全文<script type="math/tex">V</script>と要約文<script type="math/tex">S</script>の関連性を表す関数<script type="math/tex">L(S)</script>について考えましょう．</p>
-
-<script type="math/tex; mode=display">\begin{align*}
-L(S) = \sum_{i \in V} \min\{C_i(S), \gamma C_i(V)\}
-\end{align*}</script>
+<p>こうすると，<script type="math/tex">V^{*}</script>のスコアの合計値を，<script type="math/tex">\mathbf{f}^T \mathbf{u}</script>と表すことができます．
+今，<script type="math/tex">\mathbf{f}^T \mathbf{u}</script>を最大化すれば良さそうですが，今回はラプラス正則化 (Laplacian Regularization) と呼ばれるものを加えます．
+これは，ノード間にエッジが存在する場合，それらのスコアを近づける，というアイデアです．
+ノード<script type="math/tex">i</script>と<script type="math/tex">j</script>の間にエッジが存在する，すなわち<script type="math/tex">A_{ij}=1</script>なら<script type="math/tex">(f_i - f_j)^2</script>を最小化します．
+これは，<script type="math/tex">A_{ij}(f_i - f_j)^2</script>と書けますね．これをすべてのノードに対してやります．
+以上を踏まえて，以下の問題を解きます．</p>
 
 <script type="math/tex; mode=display">\begin{align*}
-C_i(S) = \sum_{j \in S} s_{ij}
+max_{\mathbf{f}} \ \mathbf{f}^T \mathbf{u} - \alpha \|\mathbf{f}\|^2 - \beta \sum_{i,j=1}^n A_{ij}(f_i - f_j)^2
 \end{align*}</script>
 
+<p>ただし，第2項にl2正則を加えています．
+第3項がラプラス正則化です．
+これの解は以下のように解析的に得られます．</p>
+
 <script type="math/tex; mode=display">\begin{align*}
-R(S) = \sum_{k=1}^K \sqrt{\sum_{j \in P_k \cap S} r_j}
+\mathbf{f} = (\mathbf{L} + \gamma \mathbf{I}_n)^{-1} \mathbf{u}
 \end{align*}</script>
+
+<p>ただし，<script type="math/tex">\gamma=\frac{\alpha}{\beta}</script>であり，これは通常の正則化パラメータと同じように事前に決めてやるものとします．
+これで，望ましい結果というのを，<script type="math/tex">\mathbf{A}</script>だけでなく，<script type="math/tex">\mathbf{u}</script>でも表現できるようになりました．
+次回は，これをウェブページ解析に応用したいと思います．</p>
 
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css">
 
-  <a href="https://twitter.com/intent/tweet?text=劣モジュラ最適化による文書要約（理論編）&url=http://nktmemoja.github.io/jekyll/update/2016/02/09/document-summarization-via-submodular.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
-  <a href="https://facebook.com/sharer.php?u=http://nktmemoja.github.io/jekyll/update/2016/02/09/document-summarization-via-submodular.html" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square"></i></a>
-  <a href="http://www.linkedin.com/shareArticle?mini=true&url=http://nktmemoja.github.io/jekyll/update/2016/02/09/document-summarization-via-submodular.html" rel="nofollow" target="_blank" title="Share on Linkedlin"><i class="fa fa-linkedin-square"></i></a>
-  <a href="https://plus.google.com/share?url=http://nktmemoja.github.io/jekyll/update/2016/02/09/document-summarization-via-submodular.html" rel="nofollow" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square"></i></a>
+  <a href="https://twitter.com/intent/tweet?text=ラプラス正則化を使った，半教師付きグラフノード重み付け&url=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
+  <a href="https://facebook.com/sharer.php?u=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square"></i></a>
+  <a href="http://www.linkedin.com/shareArticle?mini=true&url=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Linkedlin"><i class="fa fa-linkedin-square"></i></a>
+  <a href="https://plus.google.com/share?url=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square"></i></a>
 
 
 
@@ -195,7 +198,7 @@ R(S) = \sum_{k=1}^K \sqrt{\sum_{j \in P_k \cap S} r_j}
       </div>
 
       <div class="footer-col footer-col-3">
-        <p>nktmemo provides interesting articles about Machine Learning and NLP. 
+        <p>nktmemo provides interesting articles about Machine Learning and NLP.
 </p>
       </div>
     </div>

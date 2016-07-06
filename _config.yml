@@ -9,8 +9,8 @@
 title: nktmemo_ja
 email: h.tanaka36@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-    nktmemo provides interesting articles about Machine Learning and NLP. 
-    
+    nktmemo provides interesting articles about Machine Learning and NLP.
+
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://nktmemoja.github.io" # the base hostname & protocol for your site
 twitter_username: nkt_dev
@@ -18,4 +18,4 @@ github_username:  nkt1546789
 
 # Build settings
 markdown: kramdown
-highlighter: pygments
+#highlighter: pygments

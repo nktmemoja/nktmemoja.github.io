@@ -352,6 +352,19 @@ pre {
   background-position: 0 50%;
   padding-left: 10px; }
 
+table {
+  border-collapse: collapse; }
+
+table thead th {
+  vertical-align: top;
+  color: #333;
+  background-color: #eee;
+  border: 1px solid #b9b9b9; }
+
+table tbody td {
+  background-color: #fff;
+  border: 1px solid #b9b9b9; }
+
 .highlight {
   /* Comment */
   /* Error */
