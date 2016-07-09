@@ -5,12 +5,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>上側，下側確率とquantile（確率点）の関係</title>
-  <meta name="description" content="を，点の上側確率と呼ぶ．    を，点の下側確率と呼ぶ．    上側確率がである点をと書く．    下側確率がaである点をと書く    をのquantileと呼ぶ（aが％表示ならpercentileと呼ぶ）．    これらの定義が普通みたいだ．aの上側確率をquantileと呼ぶなら上側quantileみたいに言...">
+  <title>単語間関係分類</title>
+  <meta name="description" content="定式化">
 
   <link rel="stylesheet" href="/css/main.css">
   <!--<link rel="stylesheet" href="/assets/css/pygments.css">-->
-  <link rel="canonical" href="http://nktmemoja.github.io/statistics/2014/03/09/09115700.html">
+  <link rel="canonical" href="http://nktmemoja.github.io/jekyll/update/2016/02/21/word-relation-learning.html">
   <link rel="alternate" type="application/rss+xml" title="nktmemo_ja" href="http://nktmemoja.github.io/feed.xml">
   <script type="text/javascript"
     src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
@@ -76,35 +76,85 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">上側，下側確率とquantile（確率点）の関係</h1>
-    <p class="post-meta"><time datetime="2014-03-09T11:57:00+09:00" itemprop="datePublished">Mar 9, 2014</time></p>
+    <h1 class="post-title" itemprop="name headline">単語間関係分類</h1>
+    <p class="post-meta"><time datetime="2016-02-21T04:06:36+09:00" itemprop="datePublished">Feb 21, 2016</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p><script type="math/tex">P(X>x_0)</script>を，点<script type="math/tex">x_0</script>の上側確率と呼ぶ．    <script type="math/tex">% <![CDATA[
-P(X<x_0) %]]></script>を，点<script type="math/tex">x_0</script>の下側確率と呼ぶ．    上側確率が<script type="math/tex">a</script>である点を<script type="math/tex">Z_a</script>と書く．    下側確率がaである点を<script type="math/tex">q(a)</script>と書く    <script type="math/tex">q(a)</script>を<script type="math/tex">a</script>のquantileと呼ぶ（aが％表示ならpercentileと呼ぶ）．    これらの定義が普通みたいだ．aの上側確率をquantileと呼ぶなら上側quantileみたいに言わないと混乱するだろう． 本によって定義が違ったりするから，何をquantile（あるいはpercentile）と定義しているかしっかり確認する必要がある．    さて，用語の定義が済んだところで，本題に入ろう． 今回は<script type="math/tex">Z_a</script>と<script type="math/tex">q(a)</script>の関係を明記しておこうと思う． 多分，これだけわかっていたら定義の上側下側がころころ変わっても対応できると思う． 上側確率がaである点を<script type="math/tex">Z_a</script>と書く．この定義は以下の図でイメージできる．</p>
+    <h2 id="section">定式化</h2>
 
-<p><img src="https://www.evernote.com/shard/s66/sh/5dd7b5d4-2f1d-40ad-9e3d-a83d97b149f5/7f15ddf01937b0d0133b60b55c22ba63/res/45108f7e-652a-40fb-8002-21c2cc1e523c/skitch.png" alt="skitch.png" /></p>
+<p>定義：<br />
+　<script type="math/tex">\mathcal{X}</script>: 単語空間<br />
+　<script type="math/tex">\mathcal{Z} = \{(x, y)|x, y \in \mathcal{X}\}</script>: 単語間関係空間<br />
+　<script type="math/tex">\mathcal{S} = \{-1, 1\}</script>: 関係候補成立のラベル<br />
+　<script type="math/tex">\mathcal{T} = \{-1, 1\}</script>: 関係成立のラベル</p>
 
-<p>さて，この定義を採用すると，quantileは以下の図のようなイメージになる．</p>
+<p>目的:
+<script type="math/tex">p(s,t|x,y), \ ((x,y) \in \mathcal{Z}, s \in \mathcal{S}, t \in \mathcal{T})</script>
+の推定<br />
+仮定: <script type="math/tex">p(s,t|x,y) = p(s|x,y)p(t|x,y)</script>  つまり，<script type="math/tex">x,y</script>が関係分類の候補であることと，<script type="math/tex">x,y</script>の関係が成立していることは独立である．<br />
+制約: <script type="math/tex">% <![CDATA[
+\forall x,y \in \mathcal{X}, \ p(t=1|x,y) > p(t=-1|x,y) \Leftrightarrow p(t=1|y,x) < p(t=-1|y,x) %]]></script><br />
+この制約は，<script type="math/tex">p(t=1|y,x) = p(t=-1|x,y)</script>ならば満たされるので，これを制約とする．<br />
+設定: トレーニングデータとして，<script type="math/tex">\{(x_i, y_i, t_i)\}_{i=1}^n</script>が与えられる<br />
+補足: <script type="math/tex">s</script>を考えるのは，<script type="math/tex">t</script>だけだと，関係が成立するかしないかしか表現できないので，
+どっちでもない場合というか2語が全く関係ない場合にめちゃくちゃな予測をしてしまう．
+これは，分類問題一般に言えることだが，定義したクラスに対して，「それ以外」な入力が必ずと言っていいほど存在するので，
+本来はこのような設定で問題を考えるべきだと僕は思う．
+このような設定の場合は，One Class SVMなどのOutlier Detectionの手法が用いられる．
+予測:<br />
+<script type="math/tex">(\boldsymbol{x}, \boldsymbol{y})</script>の関係が成り立っているかどうかは以下のように予測する．
+まず，以下で定義する<script type="math/tex">(\hat{s}, \hat{t})</script>を求める．</p>
 
-<p><img src="https://www.evernote.com/shard/s66/sh/8e54e407-6238-4637-a243-2706d57fec95/ce618a093d4a0c295f7f855afb1e2c74/deep/0/quantile.png" alt="quantile.png" /></p>
+<script type="math/tex; mode=display">\begin{align*}
+(\hat{s}, \hat{t}) = \text{argmax}_{(s,t) \in \mathcal{S} \times \mathcal{T}} \ p(s, t|\boldsymbol{x},\boldsymbol{y})
+\end{align*}</script>
 
-<p>結局，</p>
+<p>そして，<script type="math/tex">\hat{s}=1, \hat{t}=1</script>の時に限り，<script type="math/tex">(\boldsymbol{x}, \boldsymbol{y})</script>の関係が成り立っているとする．</p>
 
-<p style="text-align:center;"> $$ \displaystyle  Z_a = q(1-a) $$ </p>
+<p><script type="math/tex">p(s|\boldsymbol{x},\boldsymbol{y})</script>について．
+今回は，関係候補となる単語同士は互いに似ているとして，類似度<script type="math/tex">s: \mathcal{X} \times \mathcal{X} \rightarrow [0,1]</script>を用いて，
+<script type="math/tex">p(s=1|x,y) = s(x,y)</script>
+と定義する．
+さらに，簡単のため，<script type="math/tex">\mathcal{X}=\mathbb{R}^d</script>とする．</p>
 
-<p>が成り立つ． これを理解しておくと後で役に立つ． ちなみに，Rを使うとq(a)は以下のようにして求めることができる．</p>
+<p><script type="math/tex">p(t|\boldsymbol{x},\boldsymbol{y})</script>
+の推定には，ロジスティック回帰を用いる．
+<script type="math/tex">p(t|\boldsymbol{x},\boldsymbol{y})</script>
+を以下で定義される，対数線形モデル<script type="math/tex">q(t|\boldsymbol{x},\boldsymbol{y};\boldsymbol{\theta}), \boldsymbol{\theta} \in \mathbb{R}^d</script>でモデル化する．</p>
 
-<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">qnorm</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></code></pre></figure>
+<script type="math/tex; mode=display">\begin{align*}
+q(t|\boldsymbol{x},\boldsymbol{y};\boldsymbol{\theta}) = \frac{1}{1 + \exp\left(t \cdot \boldsymbol{\theta}^T(\boldsymbol{x}-\boldsymbol{y})\right)}
+\end{align*}</script>
 
+<p>このモデルでは，<script type="math/tex">(\boldsymbol{x}, \boldsymbol{y})</script>を<script type="math/tex">\boldsymbol{x}-\boldsymbol{y}</script>として扱っている．
+このようにモデルを定義すると，<script type="math/tex">q(t=1|\boldsymbol{y},\boldsymbol{x}) = q(t=-1|\boldsymbol{x},\boldsymbol{y})</script>となり，自動的に制約が満たされる．</p>
+
+<p>以上より，解くべき問題は，</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align*}
+\max_{\boldsymbol{\theta}} &\ \sum_{i=1}^n \log q(t_i|\boldsymbol{x}_i,\boldsymbol{y}_i;\boldsymbol{\theta}) \\
+\end{align*} %]]></script>
+
+<p>となり，通常のロジスティック回帰に一致する．</p>
+
+<h2 id="section-1">実験</h2>
+
+<h3 id="word2vec">Word2Vec</h3>
+
+<p>gensim.Word2Vec, d=100, 他default</p>
+
+<h3 id="section-2">関係学習</h3>
+
+<h3 id="section-3">結果</h3>
 
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css">
 
-  <a href="https://twitter.com/intent/tweet?text=上側，下側確率とquantile（確率点）の関係&url=http://nktmemoja.github.io/statistics/2014/03/09/09115700.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
-  <a href="https://facebook.com/sharer.php?u=http://nktmemoja.github.io/statistics/2014/03/09/09115700.html" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square"></i></a>
-  <a href="http://www.linkedin.com/shareArticle?mini=true&url=http://nktmemoja.github.io/statistics/2014/03/09/09115700.html" rel="nofollow" target="_blank" title="Share on Linkedlin"><i class="fa fa-linkedin-square"></i></a>
-  <a href="https://plus.google.com/share?url=http://nktmemoja.github.io/statistics/2014/03/09/09115700.html" rel="nofollow" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square"></i></a>
+  <a href="https://twitter.com/intent/tweet?text=単語間関係分類&url=http://nktmemoja.github.io/jekyll/update/2016/02/21/word-relation-learning.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
+  <a href="https://facebook.com/sharer.php?u=http://nktmemoja.github.io/jekyll/update/2016/02/21/word-relation-learning.html" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square"></i></a>
+  <a href="http://www.linkedin.com/shareArticle?mini=true&url=http://nktmemoja.github.io/jekyll/update/2016/02/21/word-relation-learning.html" rel="nofollow" target="_blank" title="Share on Linkedlin"><i class="fa fa-linkedin-square"></i></a>
+  <a href="https://plus.google.com/share?url=http://nktmemoja.github.io/jekyll/update/2016/02/21/word-relation-learning.html" rel="nofollow" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square"></i></a>
 
 
 

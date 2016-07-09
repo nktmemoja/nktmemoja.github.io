@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>半教師付きページランクを用いたウェブページ中の単語への重み付け</title>
+  <meta name="description" content="はじめに前回">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <!--<link rel="stylesheet" href="/assets/css/pygments.css">-->
+  <link rel="canonical" href="http://nktmemoja.github.io/jekyll/update/2016/07/07/sspagerank-webpageanalysis.html">
+  <link rel="alternate" type="application/rss+xml" title="nktmemo_ja" href="http://nktmemoja.github.io/feed.xml">
+  <script type="text/javascript"
+    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-47154979-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">nktmemo_ja</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">半教師付きページランクを用いたウェブページ中の単語への重み付け</h1>
+    <p class="post-meta"><time datetime="2016-07-07T23:39:59+09:00" itemprop="datePublished">Jul 7, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h2 id="section">はじめに</h2>
+<p>前回</p>
+
+<ul>
+  <li><a href="http://nktmemoja.github.io/jekyll/update/2016/07/06/laplaciannodeweighting.html" target="_blank">ラプラス正則化を用いた半教師付きページランク</a></li>
+</ul>
+
+<p>というのを紹介してみました．
+今回はこれをウェブページ中の単語への重み付けに応用してみます．
+このアルゴリズムは半教師付きですが，教師データが自動的に得られる場合があります．
+その一例が，ウェブページです．
+ウェブページは<meta />内にタイトルやディスクリプション，キーワードなどの重要な情報を持っています．
+これにより，教師データがほぼ自動的に得られます．
+ウェブページでなくとも，論文だと，タイトル・アブストラクトなどが得られますし，大体のテキストに適用できるのではないかと思います．</p>
+
+<p>単語への重み付けを，以下のように，半教師付きページランクの二段階適用によって行います．</p>
+
+<ol>
+  <li>テキストへの重み付け</li>
+  <li>単語への重み付け</li>
+</ol>
+
+<p>なお，ここでいうテキストとは，DOMツリーの中のテキストノードが持つテキストを指します．</p>
+
+<h3 id="section-1">テキストへの重み付け</h3>
+
+<p>ウェブページ<script type="math/tex">d</script>を順序対を用いて<script type="math/tex">d = (w_1, \ldots, w_n)</script>と表します（これはDOMツリーを深さ優先探索し，テキストノードだけ拾えば得られます）．
+ただし，<script type="math/tex">w_i</script>はテキストで，これも順序対を用いて
+<script type="math/tex">w_i = (w_{i1},\ldots,w_{in_{i}})</script>
+と表します．ここで，<script type="math/tex">V</script>を<script type="math/tex">d</script>に出現する単語集合とし，<script type="math/tex">w_{ij} \in V</script>とします．
+本節では，<script type="math/tex">\{w_i\}_{i=1}^n</script>への重み<script type="math/tex">\{f_{i}\}_{i=1}^n</script>を獲得することを目的とします．
+ただし，<script type="math/tex">f_i</script>は<script type="math/tex">w_i</script>への重みです．</p>
+
+<p>半教師付きページランクは，隣接行列<script type="math/tex">\mathbf{A}</script> と，初期値<script type="math/tex">\mathbf{u}</script>を必要としますので，これを定義するだけで済みます．
+まず，<script type="math/tex">\mathbf{A}</script>を，以下で定義されるテキスト間の類似度行列とします．</p>
+
+<script type="math/tex; mode=display">A_{ij} = sim(w_i, w_j)</script>
+
+<p>テキスト間類似度関数<script type="math/tex">sim</script>はコサインでもジャッカードでもなんでもいいです．
+次に，<script type="math/tex">\mathbf{u}</script>を，以下のように定義します．</p>
+
+<script type="math/tex; mode=display">u_i =
+sim(w_i, w_{title}) + sim(w_i, w_{desc})</script>
+
+<p>ただし，<script type="math/tex">w_{title}</script>は<script type="math/tex">d</script>のタイトル，<script type="math/tex">w_{desc}</script>はディスクリプションとします．
+あるいはもう少し厳格に，以下のようにタイトルとディスクリプションだけ使うことも考えられます．</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+u_i =
+\left\{\begin{array}{ll}
+1 & if \ w_i = w_{title} \ or \ w_i = w_{desc} \\
+0 & otherwise
+\end{array}\right. %]]></script>
+
+<p>これで半教師付きページランクを適用するのに必要なものが揃いました．
+あとは実行して，<script type="math/tex">\mathbf{f} = [f_1 \cdots f_n]</script>を得ます．</p>
+
+<p>ここでやっていることは，まず，<script type="math/tex">\mathbf{u}</script>でもって，タイトルとディスクリプションは大事だということを表現しています．
+さらに，隣接行列をテキスト間の類似度行列とすることで，半教師付きページランクがタイトルとディスクリプションに似ているテキストは重要だと判断します．</p>
+
+<h3 id="section-2">単語への重み付け</h3>
+<p>上でテキストの重要度を計算した後，単語への重み付けを実行します．
+本節の目的はウェブページ<script type="math/tex">d</script>中に出現する単語集合<script type="math/tex">V=\{v_i\}_{i=1}^N</script>への重み<script type="math/tex">\{g_i\}_{i=1}^N</script>を獲得することです．</p>
+
+<p>ここでも半教師付きページランクを用います．
+上と同じように隣接行列<script type="math/tex">\mathbf{A}'</script>を，</p>
+
+<script type="math/tex; mode=display">A'_{ij} = sim'(v_i, v_j),</script>
+
+<p>と定義します．
+<script type="math/tex">\mathbf{u}'</script>は，以下のように定義します．</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+u'_i =
+\left\{\begin{array}{ll}
+1 & if \ v_i \in V_{title} \ or \ v_i \in V_{desc} \\
+0 & otherwise
+\end{array}\right. %]]></script>
+
+<p>ただし，<script type="math/tex">V_{title}</script>はタイトル中に出現する単語集合，<script type="math/tex">V_{desc}</script>はディスクリプション中に出現する単語集合です．</p>
+
+<p>単語間類似度関数<script type="math/tex">sim'</script>の定義についてですが，
+今回は，単語の分布仮設の意味での類似度とします．
+分布仮設は簡単にいうと，「共起する単語が似ている単語は意味的に似ている」と言うものです．
+これは，例えば文脈ベクトルのコサイン類似度で定義されます．
+これを行うために，<script type="math/tex">C_{ij}</script>を，<script type="math/tex">v_i</script>と<script type="math/tex">v_j</script>が共起範囲<script type="math/tex">k</script>で共起した回数として，共起行列<script type="math/tex">\mathbf{C} = [\mathbf{c}_1 \cdots \mathbf{c}_N]</script>を作ります．
+<script type="math/tex">v_i</script>の文脈ベクトルは<script type="math/tex">\mathbf{c}_i</script>に対応します．
+ここで，<script type="math/tex">sim'</script>を以下のように定義します．</p>
+
+<script type="math/tex; mode=display">sim'(v_i, v_j) = \frac{\langle \mathbf{c}_i, \mathbf{c}_j \rangle}{\|\mathbf{c}_i\|\|\mathbf{c}_j\|}</script>
+
+<p>以上の定義で半教師付きページランクを適用することにより，単語への重み<script type="math/tex">\mathbf{g} = [g_1 \cdots g_N]</script>が得られます．</p>
+
+<h2 id="section-3">実験</h2>
+<p>実験してみました．
+今回は結果をtf (term frequency)と比較します．
+本当はtfidfと比較したいのですが，idfがコーパス依存なので，tfだけと比較します．</p>
+
+<p>データとしては，比較的ノイズが多いページを選びました．
+ノイズというのは，ヘッダーフッター，メニュー，広告などを指します．
+最近のウェブページはこのような多くのノイズを含んでいます．
+最近では，広告配信業者がページの内容に応じて関連の高い広告を埋め込んでいたりするので，ウェブページの解析がより難しくなっているように思います…．</p>
+
+<p>話がそれましたが，以下の二つのURLをデータとします．</p>
+
+<ol>
+  <li><a href="http://www.lifehacker.jp/2016/07/160702_grilledapple.html" target="_blank">屋外料理のデザートに、スモーキーで甘い「りんごのグリル」はいかが？</a></li>
+  <li><a href="http://tabelog.com/shizuoka/A2201/A220102/22000892/dtlrvwlst/37192867/?lid=unpickup_review" target="_blank">『生しらす！』by 0141 : 和食処 するが蕎 - 蒲原/そば [食べログ]</a></li>
+  <li><a href="http://curazy.com/archives/142844" target="_blank">癒されたい人集合！一生離れないと誓った「にこいちアニマル」に悶える12選 | CuRAZY [クレイジー]</a></li>
+</ol>
+
+<p>1, 2, 3に対する結果をそれぞれ表1, 2, 3に示します．
+なお，タイトルに出現する単語は表示していません．
+TFより明らかに良い結果となっていると思います．
+ただ，ページ3のように画像メインのページだと情報が少なくてほとんどの要素が0になってしまいます．
+これは，外部情報，例えばword2vecなどを用いて<script type="math/tex">sim'</script>を定義してやるといいかもしれません．</p>
+
+<p>今回は可能性をみたかっただけなので，定性評価してしませんが，定量評価も比較的容易にできると思います．
+というのも，この手法はよくあるDOM構造を利用したメインコンテンツ抽出とは違って，DOM構造に非依存なので，
+同じドメインのページを大量に集めてテストしても大丈夫だと思います．
+そういう意味ではパラメータもチューニングも自動化できるかもしれません．</p>
+
+<p>次回は，word2vecなどを使って，性能改善を図りたいと思います．</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">表1</th>
+      <th style="text-align: left">提案法</th>
+      <th style="text-align: left"> </th>
+      <th>TF</th>
+      <th> </th>
+    </tr>
+    <tr>
+      <th style="text-align: center">順位</th>
+      <th style="text-align: left">単語</th>
+      <th style="text-align: left">スコア</th>
+      <th>単語</th>
+      <th>スコア</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">1</td>
+      <td style="text-align: left">サイド</td>
+      <td style="text-align: left">0.028785</td>
+      <td>title</td>
+      <td>0.01176</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">2</td>
+      <td style="text-align: left">紹介</td>
+      <td style="text-align: left">0.027523</td>
+      <td>トラブル</td>
+      <td>0.00941</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">3</td>
+      <td style="text-align: left">food</td>
+      <td style="text-align: left">0.021117</td>
+      <td>エアコン</td>
+      <td>0.00941</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">4</td>
+      <td style="text-align: left">bbq</td>
+      <td style="text-align: left">0.020636</td>
+      <td>男女</td>
+      <td>0.00941</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">5</td>
+      <td style="text-align: left">肉</td>
+      <td style="text-align: left">0.019335</td>
+      <td>温度</td>
+      <td>0.00941</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">6</td>
+      <td style="text-align: left">ディッシュ</td>
+      <td style="text-align: left">0.018379</td>
+      <td>設定</td>
+      <td>0.00941</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">7</td>
+      <td style="text-align: left">メニュー</td>
+      <td style="text-align: left">0.018254</td>
+      <td>staff</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">8</td>
+      <td style="text-align: left">考え</td>
+      <td style="text-align: left">0.018254</td>
+      <td>by</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">9</td>
+      <td style="text-align: left">即座</td>
+      <td style="text-align: left">0.017824</td>
+      <td>about</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">10</td>
+      <td style="text-align: left">フルーツ</td>
+      <td style="text-align: left">0.013205</td>
+      <td>advertising</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">11</td>
+      <td style="text-align: left">メリット</td>
+      <td style="text-align: left">0.010944</td>
+      <td>lifehacker</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">12</td>
+      <td style="text-align: left">概念</td>
+      <td style="text-align: left">0.010802</td>
+      <td>privacy</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">13</td>
+      <td style="text-align: left">アイデア</td>
+      <td style="text-align: left">0.010072</td>
+      <td>inc</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">14</td>
+      <td style="text-align: left">グラニースミス</td>
+      <td style="text-align: left">0.006758</td>
+      <td>生活</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">15</td>
+      <td style="text-align: left">酸味</td>
+      <td style="text-align: left">0.006684</td>
+      <td>mediagene</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">16</td>
+      <td style="text-align: left">最適</td>
+      <td style="text-align: left">0.006622</td>
+      <td>サイド</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">17</td>
+      <td style="text-align: left">リンク</td>
+      <td style="text-align: left">0.006463</td>
+      <td>方法</td>
+      <td>0.00706</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">18</td>
+      <td style="text-align: left">参照</td>
+      <td style="text-align: left">0.006408</td>
+      <td>hot</td>
+      <td>0.00471</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">19</td>
+      <td style="text-align: left">ベーコン</td>
+      <td style="text-align: left">0.006405</td>
+      <td>円満</td>
+      <td>0.00471</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">20</td>
+      <td style="text-align: left">フレーバー</td>
+      <td style="text-align: left">0.00639</td>
+      <td>旅行</td>
+      <td>0.00471</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">表2</th>
+      <th style="text-align: left">提案法</th>
+      <th style="text-align: left"> </th>
+      <th>TF</th>
+      <th> </th>
+    </tr>
+    <tr>
+      <th style="text-align: center">順位</th>
+      <th style="text-align: left">単語</th>
+      <th style="text-align: left">スコア</th>
+      <th>単語</th>
+      <th>スコア</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">1</td>
+      <td style="text-align: left">店舗</td>
+      <td style="text-align: left">0.000829</td>
+      <td>口コミ</td>
+      <td>0.0344234079174</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">2</td>
+      <td style="text-align: left">清水</td>
+      <td style="text-align: left">0.000766</td>
+      <td>名</td>
+      <td>0.0249569707401</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">3</td>
+      <td style="text-align: left">蕎麦</td>
+      <td style="text-align: left">0.00076</td>
+      <td>店</td>
+      <td>0.0240963855422</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">4</td>
+      <td style="text-align: left">天ぷら</td>
+      <td style="text-align: left">0.000521</td>
+      <td>件</td>
+      <td>0.0163511187608</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">5</td>
+      <td style="text-align: left">うどん</td>
+      <td style="text-align: left">0.000492</td>
+      <td>点数</td>
+      <td>0.013769363167</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">6</td>
+      <td style="text-align: left">情報</td>
+      <td style="text-align: left">0.000431</td>
+      <td>位</td>
+      <td>0.012908777969</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">7</td>
+      <td style="text-align: left">茶漬け</td>
+      <td style="text-align: left">0.000357</td>
+      <td>店舗</td>
+      <td>0.0111876075731</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">8</td>
+      <td style="text-align: left">揚げ物</td>
+      <td style="text-align: left">0.000197</td>
+      <td>情報</td>
+      <td>0.0103270223752</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">9</td>
+      <td style="text-align: left">定食</td>
+      <td style="text-align: left">0.000157</td>
+      <td>ランキング</td>
+      <td>0.0103270223752</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">10</td>
+      <td style="text-align: left">食堂</td>
+      <td style="text-align: left">0.000157</td>
+      <td>蕎麦</td>
+      <td>0.00946643717728</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">11</td>
+      <td style="text-align: left">郷土料理</td>
+      <td style="text-align: left">0.000155</td>
+      <td>定食</td>
+      <td>0.00860585197935</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">12</td>
+      <td style="text-align: left">料理</td>
+      <td style="text-align: left">0.000122</td>
+      <td>清水</td>
+      <td>0.00860585197935</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">13</td>
+      <td style="text-align: left">魚介</td>
+      <td style="text-align: left">0.000122</td>
+      <td>クーポン</td>
+      <td>0.00860585197935</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">14</td>
+      <td style="text-align: left">丼</td>
+      <td style="text-align: left">0.00011</td>
+      <td>訪問</td>
+      <td>0.00774526678141</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">15</td>
+      <td style="text-align: left">重</td>
+      <td style="text-align: left">8.1e-05</td>
+      <td>食堂</td>
+      <td>0.00774526678141</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">16</td>
+      <td style="text-align: left">海鮮料理</td>
+      <td style="text-align: left">5.5e-05</td>
+      <td>天ぷら</td>
+      <td>0.00774526678141</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">17</td>
+      <td style="text-align: left">桜えび</td>
+      <td style="text-align: left">4.4e-05</td>
+      <td>桜えび</td>
+      <td>0.00774526678141</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">18</td>
+      <td style="text-align: left">詳細</td>
+      <td style="text-align: left">4.3e-05</td>
+      <td>料理</td>
+      <td>0.00774526678141</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">19</td>
+      <td style="text-align: left">青柳</td>
+      <td style="text-align: left">4.3e-05</td>
+      <td>特集</td>
+      <td>0.00774526678141</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">20</td>
+      <td style="text-align: left">穴子</td>
+      <td style="text-align: left">4.2e-05</td>
+      <td>無料</td>
+      <td>0.00688468158348</td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td>表3</td>
+      <td>提案法</td>
+      <td> </td>
+      <td>TF</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>順位</td>
+      <td>単語</td>
+      <td>スコア</td>
+      <td>単語</td>
+      <td>スコア</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>animal</td>
+      <td>0.023053</td>
+      <td>com</td>
+      <td>0.03412</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>tumblr.</td>
+      <td>0.015184</td>
+      <td>post</td>
+      <td>0.0315</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>catasters</td>
+      <td>0.014318</td>
+      <td>imgur</td>
+      <td>0.02887</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>thank</td>
+      <td>0.014265</td>
+      <td>view</td>
+      <td>0.02887</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>you</td>
+      <td>0.012764</td>
+      <td>on</td>
+      <td>0.02887</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>自然</td>
+      <td>0.005529</td>
+      <td>24時</td>
+      <td>0.01837</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>笑顔</td>
+      <td>0.005529</td>
+      <td>インターネット</td>
+      <td>0.01837</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>for</td>
+      <td>0.005331</td>
+      <td>ネコ</td>
+      <td>0.01837</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>reminding</td>
+      <td>0.004836</td>
+      <td>大好き!</td>
+      <td>0.01575</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>me</td>
+      <td>0.004675</td>
+      <td>twitter</td>
+      <td>0.01575</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>to</td>
+      <td>0.004503</td>
+      <td>記事</td>
+      <td>0.01575</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>wish</td>
+      <td>0.00446</td>
+      <td>crazy</td>
+      <td>0.01312</td>
+    </tr>
+    <tr>
+      <td>13</td>
+      <td>a-ha</td>
+      <td>0.004407</td>
+      <td>匹</td>
+      <td>0.0105</td>
+    </tr>
+    <tr>
+      <td>14</td>
+      <td>ppy</td>
+      <td>0.003951</td>
+      <td>つぶやき</td>
+      <td>0.0105</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>記事</td>
+      <td>0.0</td>
+      <td>一緒</td>
+      <td>0.0105</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>メニュー</td>
+      <td>0.0</td>
+      <td>動画</td>
+      <td>0.00787</td>
+    </tr>
+    <tr>
+      <td>17</td>
+      <td>シェア</td>
+      <td>0.0</td>
+      <td>シェア</td>
+      <td>0.00787</td>
+    </tr>
+    <tr>
+      <td>18</td>
+      <td>ネコ</td>
+      <td>0.0</td>
+      <td>http://</td>
+      <td>0.00787</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>アプリ</td>
+      <td>0.0</td>
+      <td>犬</td>
+      <td>0.00787</td>
+    </tr>
+    <tr>
+      <td>20</td>
+      <td>動物</td>
+      <td>0.0</td>
+      <td>フォロー</td>
+      <td>0.00787</td>
+    </tr>
+  </tbody>
+</table>
+
+<!--
+このアルゴリズムにおける教師データは高い重みがついて欲しいノード集合なので，単語への重み付けの場合**高い重みがついて欲しい単語集合**になります．
+これを$V^{*}$とします．
+
+ウェブページはヘッダーフッター，メニュー，広告など多くのノイズを含んでいます．
+最近では，広告配信業者がページの内容に応じて関連の高い広告を埋め込んでいたりするので，ウェブページの解析がより難しくなっているように思います．
+しかしながら，**どんなにノイズが多くても，タイトル（とディスクリプション）は信頼できる**と考えられます．
+というわけで，今回はタイトル（とディスクリプション）に含まれる単語集合を$V^{*}$$とします．
+もちろんウェブページだけでなく，一般の文書にはタイトルがあると思うので，大体適用できると思います．
+
+LNWを実行するには，$$V^{*}$$の他に，隣接行列$$\mathbf{A}$$が必要です．
+今回は，これを共起行列とします．**重要な単語と共起する単語は重要**といった具合です．
+これは，PageRankをテキストに応用したTextRankなんかと同じですね．
+まとめると，
+
+- $$V^{*}$$: タイトル（とディスクリプション）に出現する単語集合
+- $$\mathbf{A}$$: 共起行列
+
+とします．
+
+# 実験
+定性評価してみます．
+対象は，
+
+1. メインコンテンツがテキストのページ (<a href="http://gigazine.net/news/20160706-santa-susana-nuclear-disaster/" target="_blank">http://gigazine.net/news/20160706-santa-susana-nuclear-disaster/</a>)
+2. そうでないページ (
+
+1は例えばニュース記事などです．
+2は例えば商品紹介ページだったり，画像や動画メインのページです．
+
+
+|順位| 単語 |スコア|
+|:---|:-----------------:|:-----------|
+1 | アメリカ政府 |0.0108775415988|
+2 | 徹底的 |0.0103866765743|
+3 | 回避 |0.0102489698956|
+4 | 放射性物質 |0.00826735437213|
+5 | 表 |0.00688558477851|
+6 | カリフォルニア州 |0.00687599731351|
+7 | 完成 |0.00666602490429|
+8 | 地球外生命 |0.00666602490429|
+9 | 完全 |0.00662327332437|
+10| 探査 |0.00654949037057|
+11| fast |0.00654949037057|
+12| 電波望遠鏡 |0.00654949037057|
+13| 世界 |0.00654949037057|
+14| 1979年 |0.00639230509713|
+15| 危険 |0.00608159886266|
+16| 例 |0.00597026076084|
+17| 運用 |0.00586509783247|
+18| カリフォルニア大学 |0.00578271053574|
+19| 時点| 0.00554026259777|
+20| アクシデント| 0.00532353224794|
+
+図1: Gigazineへの適用結果<br/>
+
+
+
+# おわりに
+今回は，グラフノードへの重み付けアルゴリズムをウェブページに応用してみました．
+ウェブページの解析といったら，メインコンテンツ抽出がよく研究されています．
+画像や動画メインのページだと，メインとなるDOM要素を特定して，その中にある画像や動画を抽出する必要があります．
+今回の応用例は，DOM要素の単語に重みをつけて，その合計値などでスコアをつければメインコンテンツ抽出にも使えると思います．
+ちなみに，今回のアルゴリズムはDOM構造に依存していないので，同一ドメイン内で，評価やパラメータチューニングが簡単に行えることも強みだと思います．
+-->
+
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css">
+
+  <a href="https://twitter.com/intent/tweet?text=半教師付きページランクを用いたウェブページ中の単語への重み付け&url=http://nktmemoja.github.io/jekyll/update/2016/07/07/sspagerank-webpageanalysis.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
+  <a href="https://facebook.com/sharer.php?u=http://nktmemoja.github.io/jekyll/update/2016/07/07/sspagerank-webpageanalysis.html" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square"></i></a>
+  <a href="http://www.linkedin.com/shareArticle?mini=true&url=http://nktmemoja.github.io/jekyll/update/2016/07/07/sspagerank-webpageanalysis.html" rel="nofollow" target="_blank" title="Share on Linkedlin"><i class="fa fa-linkedin-square"></i></a>
+  <a href="https://plus.google.com/share?url=http://nktmemoja.github.io/jekyll/update/2016/07/07/sspagerank-webpageanalysis.html" rel="nofollow" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square"></i></a>
+
+
+
+    <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() {  // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        
+        s.src = '//nktmemo.disqus.com/embed.js';
+        
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">nktmemo_ja</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>nktmemo_ja</li>
+          <li><a href="mailto:h.tanaka36@gmail.com">h.tanaka36@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/nkt1546789"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">nkt1546789</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/nkt_dev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">nkt_dev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>nktmemo provides interesting articles about Machine Learning and NLP.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

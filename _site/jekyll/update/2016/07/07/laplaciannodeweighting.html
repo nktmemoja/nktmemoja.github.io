@@ -5,8 +5,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>ラプラス正則化を使った，半教師付きグラフノード重み付け</title>
-  <meta name="description" content="半教師付きの設定で，グラフノードに重み付けをつけるアルゴリズム (Laplacian Node Weighting)を考えてみました（名前適当だし，日本語でどう表すかが非常に難しい）．グラフのノードに重みをつける手法としては，PageRankが有名です．一つやりたいことがあって，最初PageRankを使っていたの...">
+  <title>ラプラス正則化を用いた半教師付きページランク</title>
+  <meta name="description" content="半教師付きの設定で，ページランクみたいにグラフのノードに重み付けをつけるアルゴリズム，半教師付きページランク (Semi-Supervised PageRank)を考えてみました．">
 
   <link rel="stylesheet" href="/css/main.css">
   <!--<link rel="stylesheet" href="/assets/css/pygments.css">-->
@@ -14,6 +14,10 @@
   <link rel="alternate" type="application/rss+xml" title="nktmemo_ja" href="http://nktmemoja.github.io/feed.xml">
   <script type="text/javascript"
     src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
 </script>
 
   <script>
@@ -72,17 +76,18 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">ラプラス正則化を使った，半教師付きグラフノード重み付け</h1>
+    <h1 class="post-title" itemprop="name headline">ラプラス正則化を用いた半教師付きページランク</h1>
     <p class="post-meta"><time datetime="2016-07-07T00:48:19+09:00" itemprop="datePublished">Jul 7, 2016</time></p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>半教師付きの設定で，グラフノードに重み付けをつけるアルゴリズム (Laplacian Node Weighting)を考えてみました（名前適当だし，日本語でどう表すかが非常に難しい）．
-グラフのノードに重みをつける手法としては，PageRankが有名です．
-一つやりたいことがあって，最初PageRankを使っていたのですが，教師的な情報を組み込むのが難しかったので，自分で考えることにしました．
-というのも，PageRankでは，すべてのグラフノードの重みを1に初期化します．
+    <p>半教師付きの設定で，ページランクみたいにグラフのノードに重み付けをつけるアルゴリズム，半教師付きページランク (Semi-Supervised PageRank)を考えてみました．</p>
+
+<p>ページランクは，グラフのノードに重みをつけるアルゴリズムです．
+一つやりたいことがあって，最初ページランクを使っていたのですが，教師的な情報を組み込むのが難しかったので，自分で考えることにしました．
+というのも，ページランクでは，すべてのグラフノードの重みを1に初期化します．
 単純にここに教師的な情報を組み込む，例えば数個のノードの重みを高くするなど，をやってみたのですが，最終的に出てくる解にあまり反映されなかったのです．
-なぜなのか，をいろいろ考えましたが，PageRankはノードの重みを繰り返し伝搬するので，初期値が大事というより，エッジが大事なんだと今は思っています（もう少しちゃんと考える必要あり）．</p>
+なぜなのか，をいろいろ考えましたが，ページランクはノードの重みを繰り返し伝搬するので，初期値が大事というより，エッジが大事なんだと今は思っています（もう少しちゃんと考える必要あり）．</p>
 
 <p>定式化していきましょう．
 グラフ<script type="math/tex">G=(V, E), V=\{1, \ldots, n\}, E \subseteq V \times V</script>を考えます．
@@ -112,8 +117,8 @@ u_i = \left\{\begin{array}{cc}
 max_{\mathbf{f}} \ \mathbf{f}^T \mathbf{u} - \alpha \|\mathbf{f}\|^2 - \beta \sum_{i,j=1}^n A_{ij}(f_i - f_j)^2
 \end{align*}</script>
 
-<p>ただし，第2項にl2正則を加えています．
-第3項がラプラス正則化です．
+<p>ただし，第2項にl-2正則化項を加えています．
+第3項がラプラス正則化項です．
 これの解は以下のように解析的に得られます．</p>
 
 <script type="math/tex; mode=display">\begin{align*}
@@ -126,7 +131,7 @@ max_{\mathbf{f}} \ \mathbf{f}^T \mathbf{u} - \alpha \|\mathbf{f}\|^2 - \beta \su
 
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css">
 
-  <a href="https://twitter.com/intent/tweet?text=ラプラス正則化を使った，半教師付きグラフノード重み付け&url=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
+  <a href="https://twitter.com/intent/tweet?text=ラプラス正則化を用いた半教師付きページランク&url=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
   <a href="https://facebook.com/sharer.php?u=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square"></i></a>
   <a href="http://www.linkedin.com/shareArticle?mini=true&url=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Linkedlin"><i class="fa fa-linkedin-square"></i></a>
   <a href="https://plus.google.com/share?url=http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html" rel="nofollow" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square"></i></a>

@@ -1,0 +1,64 @@
+<p>Semi-Supervised Node Weighting scheme for graphs and its application to term weighting for  webpages</p>
+
+<p>In this article, we propose semi-supervised node weighting scheme for graphs and apply it to term weighting for Webpages (HTML documents).</p>
+
+<h2 id="notation">Notation</h2>
+
+<h2 id="formulation">Formulation</h2>
+
+<h2 id="experiments">Experiments</h2>
+
+<p>半教師付き学習を用いたグラフ頂点への重み付け手法とウェブページ解析への応用</p>
+
+<p>半教師付き学習を用いたグラフ頂点へ重み付け手法を考えてみました．
+ここではそのアイデアと、ウェブページ (HTML文書) 解析への応用を紹介します．</p>
+
+<h1 id="section">動機</h1>
+<p>これをやろうと思った動機は，ウェブページ解析の難しさにあります．
+文書を解析する際に，文書中の単語に重みをつけるというのはよくある話だと思います．
+しかしながら，ウェブページは自身の内容とは関係のない，多くのノイズ（ヘッダーフッター，ナビゲーション，広告など）を含んでいます．
+個人的には50-90%がノイズだと思っています．
+このノイズのせいで，通常の文書解析用に設計された重み付け手法（例えばTFIDF）が機能しないことが少なくありません．
+そこで，今回はこの問題の解決を目指しました．
+結果的にウェブページ解析だけではなくて，他のことにも使えそうだったので，一般化したタイトルにしました．</p>
+
+<h1 id="section-1">定式化</h1>
+<p>基本的なアイデアは，<em>ウェブページのタイトルやディスクリプション中に現れる単語は重要だ</em>と仮定するところにあります．
+こうすることで，少量の高い重みを持つべき単語集合が得られます．
+さらに，<em>それらと似ている単語も重要だ</em>と仮定することで，全単語集合に対して重みをつけていきます．
+以下，これを一般化して，定式化していきます．</p>
+
+<p>データ点（単語）集合を<script type="math/tex">V = \{1, \ldots, n\}</script>，
+高い重みを持つべき点集合（タイトルとディスクリプションに出現する単語）を<script type="math/tex">V^{*} \subseteq V</script>，
+単語間の類似度行列を，<script type="math/tex">\boldsymbol{S}$とします．
+データ点</script>i<script type="math/tex">の重みを，</script>f_i<script type="math/tex">とすると，</script>i \in V^{*}<script type="math/tex">である</script>f_i$$が大きな値を取るのが望ましいです．
+これらを踏まえて，以下の問題を解くことにします．</p>
+
+<script type="math/tex; mode=display">\begin{align*}
+\max_{\boldsymbol{f}} = 
+\end{align*}</script>
+
+<p>半教師付きだけど、ウェブページからなら少量の教師データが自動的に与えられる、という感じですね。</p>
+
+<p>さて、定式化していきます。</p>
+
+<h1 id="section-2">実験</h1>
+<p>定性評価をしてみました。ウェブページは大きく分けて以下の二つに分類できると思われます。</p>
+
+<ol>
+  <li>メインコンテンツに多くの文字が含まれるページ (ニュース、コラムなど)</li>
+  <li>メインコンテンツにあまり文字が含まれないページ (画像、動画、構造化情報など)</li>
+</ol>
+
+<p>2の構造化情報は、例えば商品のページで、商品名、価格、性能などしかかかれていないものを指します。これらの代表として、以下の5つのページを選びました。</p>
+
+<ol>
+  <li>1</li>
+  <li>2</li>
+  <li>3</li>
+  <li>4</li>
+  <li>5</li>
+</ol>
+
+<p>これらのページに対して、高い重みがついた単語TOP20を見て、定性的に評価します。</p>
+
