@@ -6,12 +6,12 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 10 Jul 2016 22:27:52 +0900</pubDate>
-    <lastBuildDate>Sun, 10 Jul 2016 22:27:52 +0900</lastBuildDate>
+    <pubDate>Sun, 10 Jul 2016 22:57:17 +0900</pubDate>
+    <lastBuildDate>Sun, 10 Jul 2016 22:57:17 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
-        <title>半教師付きページランクを用いたウェブページからの教師なしメインコンテンツ抽出</title>
+        <title>半教師ありページランクを用いたウェブページからの教師なしメインコンテンツ抽出</title>
         <description>&lt;h2 id=&quot;section&quot;&gt;はじめに&lt;/h2&gt;
 &lt;p&gt;ウェブページ（HTML文書）はヘッダーフッダー，メニュー，広告など，自身の内容とは関係のない多くのノイズを含んでいます．
 これらのノイズはウェブページ解析を非常に難しくさせています．
@@ -170,7 +170,8 @@ Sunらはさらに抽出アルゴリズムも提案していますが，今回�
 &lt;p&gt;今回は，半教師付きページランクをウェブページ（HTML文書）のメインコンテンツ抽出に応用してみました．
 さらに，簡単ではありますが，dragnetと性能を比較し，その実用性を示しました．
 半教師付きページランクは初期重みを変えることで柔軟にアルゴリズムを設計できるところに強みがあると思います．
-パラメータも正則化パラメータのみで，&lt;/p&gt;
+パラメータも正則化パラメータのみです．
+正直テキスト一様重みでこの結果が出たのは驚きですが，とりあえずよしとします…．&lt;/p&gt;
 
 &lt;h2 id=&quot;section-4&quot;&gt;コード&lt;/h2&gt;
 &lt;p&gt;コードはgistに載せています．&lt;/p&gt;
