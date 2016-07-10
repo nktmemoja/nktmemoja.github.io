@@ -6,485 +6,313 @@
 </description>
     <link>http://nktmemoja.github.io/</link>
     <atom:link href="http://nktmemoja.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 10 Jul 2016 00:29:15 +0900</pubDate>
-    <lastBuildDate>Sun, 10 Jul 2016 00:29:15 +0900</lastBuildDate>
+    <pubDate>Sun, 10 Jul 2016 21:43:07 +0900</pubDate>
+    <lastBuildDate>Sun, 10 Jul 2016 21:43:07 +0900</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
-        <title></title>
-        <description>&lt;p&gt;Semi-Supervised Node Weighting scheme for graphs and its application to term weighting for  webpages&lt;/p&gt;
-
-&lt;p&gt;In this article, we propose semi-supervised node weighting scheme for graphs and apply it to term weighting for Webpages (HTML documents).&lt;/p&gt;
-
-&lt;h2 id=&quot;notation&quot;&gt;Notation&lt;/h2&gt;
-
-&lt;h2 id=&quot;formulation&quot;&gt;Formulation&lt;/h2&gt;
-
-&lt;h2 id=&quot;experiments&quot;&gt;Experiments&lt;/h2&gt;
-
-&lt;p&gt;半教師付き学習を用いたグラフ頂点への重み付け手法とウェブページ解析への応用&lt;/p&gt;
-
-&lt;p&gt;半教師付き学習を用いたグラフ頂点へ重み付け手法を考えてみました．
-ここではそのアイデアと、ウェブページ (HTML文書) 解析への応用を紹介します．&lt;/p&gt;
-
-&lt;h1 id=&quot;section&quot;&gt;動機&lt;/h1&gt;
-&lt;p&gt;これをやろうと思った動機は，ウェブページ解析の難しさにあります．
-文書を解析する際に，文書中の単語に重みをつけるというのはよくある話だと思います．
-しかしながら，ウェブページは自身の内容とは関係のない，多くのノイズ（ヘッダーフッター，ナビゲーション，広告など）を含んでいます．
-個人的には50-90%がノイズだと思っています．
-このノイズのせいで，通常の文書解析用に設計された重み付け手法（例えばTFIDF）が機能しないことが少なくありません．
-そこで，今回はこの問題の解決を目指しました．
-結果的にウェブページ解析だけではなくて，他のことにも使えそうだったので，一般化したタイトルにしました．&lt;/p&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;定式化&lt;/h1&gt;
-&lt;p&gt;基本的なアイデアは，&lt;em&gt;ウェブページのタイトルやディスクリプション中に現れる単語は重要だ&lt;/em&gt;と仮定するところにあります．
-こうすることで，少量の高い重みを持つべき単語集合が得られます．
-さらに，&lt;em&gt;それらと似ている単語も重要だ&lt;/em&gt;と仮定することで，全単語集合に対して重みをつけていきます．
-以下，これを一般化して，定式化していきます．&lt;/p&gt;
-
-&lt;p&gt;データ点（単語）集合を&lt;script type=&quot;math/tex&quot;&gt;V = \{1, \ldots, n\}&lt;/script&gt;，
-高い重みを持つべき点集合（タイトルとディスクリプションに出現する単語）を&lt;script type=&quot;math/tex&quot;&gt;V^{*} \subseteq V&lt;/script&gt;，
-単語間の類似度行列を，&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{S}$とします．
-データ点&lt;/script&gt;i&lt;script type=&quot;math/tex&quot;&gt;の重みを，&lt;/script&gt;f_i&lt;script type=&quot;math/tex&quot;&gt;とすると，&lt;/script&gt;i \in V^{*}&lt;script type=&quot;math/tex&quot;&gt;である&lt;/script&gt;f_i$$が大きな値を取るのが望ましいです．
-これらを踏まえて，以下の問題を解くことにします．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-\max_{\boldsymbol{f}} = 
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;半教師付きだけど、ウェブページからなら少量の教師データが自動的に与えられる、という感じですね。&lt;/p&gt;
-
-&lt;p&gt;さて、定式化していきます。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-2&quot;&gt;実験&lt;/h1&gt;
-&lt;p&gt;定性評価をしてみました。ウェブページは大きく分けて以下の二つに分類できると思われます。&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;メインコンテンツに多くの文字が含まれるページ (ニュース、コラムなど)&lt;/li&gt;
-  &lt;li&gt;メインコンテンツにあまり文字が含まれないページ (画像、動画、構造化情報など)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;2の構造化情報は、例えば商品のページで、商品名、価格、性能などしかかかれていないものを指します。これらの代表として、以下の5つのページを選びました。&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;1&lt;/li&gt;
-  &lt;li&gt;2&lt;/li&gt;
-  &lt;li&gt;3&lt;/li&gt;
-  &lt;li&gt;4&lt;/li&gt;
-  &lt;li&gt;5&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;これらのページに対して、高い重みがついた単語TOP20を見て、定性的に評価します。&lt;/p&gt;
-
-</description>
-        <pubDate>Sun, 10 Jul 2016 00:29:15 +0900</pubDate>
-        <link>http://nktmemoja.github.io/2016/07/10/laplacianweighting.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/2016/07/10/laplacianweighting.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Laplacian Node Weighting (LNW)を用いてHTMLから本文を抽出する</title>
+        <title>半教師付きページランクを用いたウェブページからの教師なしメインコンテンツ抽出</title>
         <description>&lt;h2 id=&quot;section&quot;&gt;はじめに&lt;/h2&gt;
-&lt;p&gt;前回&lt;/p&gt;
+&lt;p&gt;ウェブページ（HTML文書）はヘッダーフッダー，メニュー，広告など，自身の内容とは関係のない多くのノイズを含んでいます．
+これらのノイズはウェブページ解析を非常に難しくさせています．
+特に最近では，ページに関連した広告が貼られていたりするので，ウェブページ解析がさらに難しくなっているように思います．&lt;/p&gt;
+
+&lt;p&gt;このような問題は昔から研究されていて，HTMLからのメインコンテンツ抽出 (Main Content Extraction)とか，本文抽出とか呼ばれています．
+多くの既存手法は，DOMの構造を元にメインコンテンツに該当するDOM要素を特定します．
+そのために，入念にスコア関数を設計したり，教師データから学習させたりする試みがなされています．
+スコア関数や素性には，ほとんどと言っていいほどテキスト情報が使われます．
+よって，これらはニュース記事など，そのページのメインコンテンツがテキストである場合，十分な性能が期待できます．&lt;/p&gt;
+
+&lt;p&gt;しかしながら，ウェブページの中には，テキスト以外をメインコンテンツとするページもあります．
+例えば，何かのメタ情報のみを掲載しているページや，動画や画像メインのページなどです．
+このような場合，上記のような手法では，非常に少ないテキスト情報からメインコンテンツ部分を予測することになり，結果として性能の低下を生みます．
+今回は，テキスト以外をメインコンテンツとするページにもある程度適用できるようなメインコンテンツ抽出アルゴリズムの構築を目指します．&lt;/p&gt;
+
+&lt;h2 id=&quot;dom-pagerank-dom&quot;&gt;DOM PageRank: DOM要素への重み付け&lt;/h2&gt;
+&lt;p&gt;以前，&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://nktmemoja.github.io/jekyll/update/2016/07/06/laplaciannodeweighting.html&quot; target=&quot;_blank&quot;&gt;ラプラス正則化を使った，半教師付きグラフノード重み付け&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://nktmemoja.github.io/jekyll/update/2016/07/06/laplaciannodeweighting.html&quot; target=&quot;_blank&quot;&gt;ラプラス正則化を用いた半教師付きページランク&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;というのを紹介してみました．以下これをLNW (Laplacian node weighting)と呼びます．
-今回はこれを用いて，ウェブページ（HTML）から本文を抽出してみたいと思います．
-このタスクは，本文抽出とかメインコンテンツ抽出 (Main content extraction)とか呼ばれています．
-ウェブページは，自身のコンテンツだけでなく，ヘッダーフッター，メニュー，広告などのノイズも多く含んでいます．
-最近では，広告配信業者がページの内容に応じて関連の高い広告を埋め込んでいたりするので，ウェブページの解析がより難しくなっているように思います…．
-なので，ウェブページを解析するためには，これらを除去または，テキストへの重み付けが必要になります．&lt;/p&gt;
+&lt;p&gt;を紹介しました．
+半教師付きページランクを実行するには，隣接行列&lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;と初期重み&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;が必要です．
+教師データを&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;で表現すれば，その情報を活用できます．
+今回はこれをメインコンテンツ抽出に応用したアルゴリズム，DOM PageRankを提案します．この場合，DOMツリーをそのまま隣接行列として与えれば，あとは初期値をどう決めるかの問題になります．&lt;/p&gt;
 
-&lt;p&gt;テキストというのは，DOMツリー内のテキストノードを指します．
-HTMLはDOMツリーで表されます．
-DOMツリー内には，エレメントノードとテキストノードが存在します．
-エレメントノードとは，HTMLのタグに相当します．
-テキストノードは普通のテキストを指します．&lt;/p&gt;
+&lt;p&gt;具体的に定式化していきます．
+&lt;script type=&quot;math/tex&quot;&gt;G=(V, E)&lt;/script&gt;をDOMツリーの&lt;strong&gt;有向&lt;/strong&gt;グラフ表現とします．
+&lt;strong&gt;エッジの向きは，子供 -&amp;gt; 親とします&lt;/strong&gt;．
+つまり，&lt;script type=&quot;math/tex&quot;&gt;V&lt;/script&gt;がテキストノードを含むDOMの要素，&lt;script type=&quot;math/tex&quot;&gt;E&lt;/script&gt;がその間のエッジです．
+&lt;script type=&quot;math/tex&quot;&gt;E&lt;/script&gt;を隣接行列&lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;で表現します．ただし，&lt;/p&gt;
 
-&lt;p&gt;さて，LNWは半教師付き学習アルゴリズムですが，教師データが自動的に得られる場合があります．
-その一例が，ウェブページです．
-ウェブページは&lt;meta /&gt;内にタイトルやディスクリプション，キーワードなどの重要な情報を持っています．
-これにより，教師データがほぼ自動的に得られます．
-ウェブページでなくとも，論文だと，タイトル・アブストラクトなどが得られますし，大体のテキストに適用できるのではないかと思います．&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+A_{ij} =
+\left\{\begin{array}{ll}
+1 &amp; if \ (i,j) \in E \\
+0 &amp; otherwise
+\end{array}\right.
+\end{align*}. %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;まず，ステップ1でLNWを使って，テキストノードに重み付けをします．
-その後，その情報を元に単語に重みを付与していきます．&lt;/p&gt;
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;をどう決めるかによって，結果が変わってきます．
+基本的には，&lt;script type=&quot;math/tex&quot;&gt;u_i&lt;/script&gt;には&lt;script type=&quot;math/tex&quot;&gt;v_i&lt;/script&gt;が重要であればあるほど高い値を設定します．
+&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;の決定例を幾つか考えてみました．&lt;/p&gt;
 
-&lt;h3 id=&quot;lnw&quot;&gt;テキストノードへの重み付け (LNW使用)&lt;/h3&gt;
-&lt;p&gt;LNWは，隣接行列&lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;と，初期値&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;を必要としますので，これを定義します．
-まず，テキストノード内のテキストを文とみなしこれを重み付きグラフのノードだと考えます．
-そして，ノード間のエッジの重みを，ノード間のテキストの類似度とします．
-なので，&lt;script type=&quot;math/tex&quot;&gt;A_{ij}&lt;/script&gt;は，テキストノード&lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;のテキストと，テキストノード&lt;script type=&quot;math/tex&quot;&gt;j&lt;/script&gt;のテキストとの類似度になります．
-DOMツリーを対象のグラフとして直接使わないことに注意してください．
-次に&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;ですが，まず考えられるのが，タイトルに該当するテキストノードを1に，その他を0にするという方法です．
-これだとほとんどが0になってしまうので，タイトルとの類似度を&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;に設定し，少し情報を増やします．
-つまり，&lt;script type=&quot;math/tex&quot;&gt;u_i&lt;/script&gt;はタイトルと，テキストノード&lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;との類似度です．
-まとめると，まずタイトルは最重要であるとし，次にタイトルと似ているものは重要であるとします．
-これを表現しているのが，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;です．
-そして，各ノードは，内容が似ているノードとリンクすることにします．これを表現しているのが，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;となります．&lt;/p&gt;
+&lt;p&gt;DOMツリー内の重要な要素とは何でしょうか？
+とりあえず先人達と同じようにテキストノードは重要だと考えると，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;は以下のようになります（これをテキスト一様重みと呼びます）．&lt;/p&gt;
 
-&lt;h3 id=&quot;section-1&quot;&gt;単語への重み付け&lt;/h3&gt;
-&lt;p&gt;ステップ1でテキストノードの重要度を計算した後，単語への重み付けを実行します．
-今回採用するアイデアはシンプルで，&lt;strong&gt;重要なテキストノードに出現する単語は重要である&lt;/strong&gt;というものです．
-つまり，単語&lt;script type=&quot;math/tex&quot;&gt;v&lt;/script&gt;への重み&lt;script type=&quot;math/tex&quot;&gt;f(v)&lt;/script&gt;を以下で定義します．&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align}
+u_i =
+\left\{\begin{array}{ll}
+1 &amp; \text{if} \ v_i \ \text{is a text node} \\
+0 &amp; otherwise
+\end{array}\right.
+\end{align} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;基本的には，テキスト一様重みで良さそうですが，
+テキストの中には重要なものとそうでないものがあると考えられます．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://nktmemoja.github.io/jekyll/update/2016/07/07/sspagerank-webpageanalysis.html&quot; target=&quot;_blank&quot;&gt;半教師付きページランクを用いたウェブページ中の単語への重み付け&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;では，タイトルやディスクリプションと似たテキストは重要だと仮定しました．
+今回もその仮定を採用してみます．具体的には&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;を以下のように定義します（これをタイトル重みと呼びます）．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+u_i =
+\left\{\begin{array}{ll}
+(1-\beta) + \beta \left(sim(w_i, w_{title}) + sim(w_i, w_{desc})\right) &amp; \text{if} \ v_i \ \text{is a text node} \\
+0 &amp; otherwise
+\end{array}\right.
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;ただし， &lt;script type=&quot;math/tex&quot;&gt;w_i&lt;/script&gt;は&lt;script type=&quot;math/tex&quot;&gt;v_i&lt;/script&gt;が持つテキスト，&lt;script type=&quot;math/tex&quot;&gt;w_{title}&lt;/script&gt;はタイトル，&lt;script type=&quot;math/tex&quot;&gt;w_{desc}&lt;/script&gt;はディスクリプション，&lt;script type=&quot;math/tex&quot;&gt;\beta \geq 0&lt;/script&gt;はトレードオフパラメータです．&lt;/p&gt;
+
+&lt;p&gt;その他にも，画像や動画メインのページも考慮すると，&amp;lt;img&amp;gt;や&amp;lt;video&amp;gt;タグにも初期重みをいくらか与えることも考えられます．&lt;/p&gt;
+
+&lt;p&gt;さて，これで&lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;を元に，すべてのDOM要素&lt;script type=&quot;math/tex&quot;&gt;V = \{v_i\}_{i=1}^n&lt;/script&gt;に対して，重み&lt;script type=&quot;math/tex&quot;&gt;\{f_i\}_{i=1}^n&lt;/script&gt;が付きます．&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;メインコンテンツ抽出&lt;/h2&gt;
+&lt;p&gt;半教師付きページランクにより，すべてのDOM要素&lt;script type=&quot;math/tex&quot;&gt;V = \{v_i\}_{i=1}^n&lt;/script&gt;に対して，重み&lt;script type=&quot;math/tex&quot;&gt;\{f_i\}_{i=1}^n&lt;/script&gt;が付きます．
+次は，メインコンテンツ抽出にこのDOM要素への重みを活用します．
+ここはあまり深く考えず，包括的にメインコンテンツを抽出するために，Sunらによって提案されたDensitySumを用います．
+DensitySumでは，あるDOM要素&lt;script type=&quot;math/tex&quot;&gt;v_i&lt;/script&gt;のスコア&lt;script type=&quot;math/tex&quot;&gt;g_i&lt;/script&gt;を以下のように求めます．&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-f(v) = \sum_{t \in T(v)} w(t) c(v, t)
+g_i = \sum_{v_j \in Children(v_i)} f_j
 \end{align*}&lt;/script&gt;
 
-&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;T(v)&lt;/script&gt;は，単語&lt;script type=&quot;math/tex&quot;&gt;v&lt;/script&gt;が出現するテキストノード集合，&lt;script type=&quot;math/tex&quot;&gt;w(t)&lt;/script&gt;はステップ1で計算したテキストノード&lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt;への重み，
-&lt;script type=&quot;math/tex&quot;&gt;c(v, t)&lt;/script&gt;は，単語&lt;script type=&quot;math/tex&quot;&gt;v&lt;/script&gt;のテキストノード&lt;script type=&quot;math/tex&quot;&gt;t&lt;/script&gt;での出現回数です．&lt;/p&gt;
+&lt;p&gt;つまり，あるDOM要素のスコアは，その子要素の合計値であると定義します．
+Sunらはさらに抽出アルゴリズムも提案していますが，今回はシンプルにメインとなるDOM要素&lt;script type=&quot;math/tex&quot;&gt;\hat{v}&lt;/script&gt;を以下のように定義します．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\hat{v} = \text{argmax}_{i} \ g_i
+\end{align*}&lt;/script&gt;
 
 &lt;h2 id=&quot;section-2&quot;&gt;実験&lt;/h2&gt;
 &lt;p&gt;実験してみました．
-今回は結果をtf (term frequency)と比較します．
-本当はtfidfと比較したいのですが，idfがコーパス依存なので，tfだけと比較します．&lt;/p&gt;
+今回は，教師ありメインコンテンツ抽出アルゴリズムである，dragnetと比較してみます．&lt;/p&gt;
 
-&lt;p&gt;データは，ニュース記事とレビュー記事にします．ともにノイズが多いものを選びました．
-ノイズというのは，ヘッダーフッター，メニュー，広告などを指します．
-最近のウェブページはこのような多くのノイズを含んでいます．
-最近では，広告配信業者がページの内容に応じて関連の高い広告を埋め込んでいたりするので，ウェブページの解析がより難しくなっているように思います…．&lt;/p&gt;
-
-&lt;p&gt;話がそれましたが，以下の二つのURLをデータとします．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;ニュース記事: &lt;a href=&quot;http://gigazine.net/news/20160706-santa-susana-nuclear-disaster/&quot; target=&quot;_blank&quot;&gt;アメリカ初のメルトダウンで最大の原発事故にもかかわらず隠蔽された「サンタスザーナ野外実験所」での事故に見る危機対応の難しさ - GIGAZINE&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;レビュー記事: &lt;a href=&quot;http://tabelog.com/shizuoka/A2201/A220102/22000892/dtlrvwlst/37192867/?lid=unpickup_review&quot; target=&quot;_blank&quot;&gt;『生しらす！』by 0141 : 和食処 するが蕎 - 蒲原/そば [食べログ]&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;ニュース記事に対する結果を図1に示します．
-なお，タイトルに出現する単語は表示していません．&lt;/p&gt;
-
-&lt;center&gt;表1 &lt;/center&gt;
+&lt;p&gt;とりあえず画像メインのページとして，&lt;a href=&quot;http://curazy.com/archives/142844&quot; target=&quot;_blank&quot;&gt;癒されたい人集合！一生離れないと誓った「にこいちアニマル」に悶える12選 | CuRAZY [クレイジー]&lt;/a&gt;を選びました．抽出結果を以下の表に示します（今回はテキストで示しますが，実際にはDOM要素を取得できます）．
+なお&lt;script type=&quot;math/tex&quot;&gt;\alpha&lt;/script&gt;は正則化パラメータで，&lt;strong&gt;大体0.5にしとけば良さそうです&lt;/strong&gt;．&lt;/p&gt;
 
 &lt;table&gt;
   &lt;thead&gt;
     &lt;tr&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;順位&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;テキスト&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;スコア&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;手法&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;抽出したテキスト&lt;/th&gt;
     &lt;/tr&gt;
   &lt;/thead&gt;
   &lt;tbody&gt;
     &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;1&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.221384&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;屋外料理のデザートに、スモーキーで甘い「りんごのグリル」はいかが？ ｜ ライフハッカー［日本版］&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;DOM Page Rank (テキスト一様重み, &lt;script type=&quot;math/tex&quot;&gt;\alpha=0.5&lt;/script&gt;）&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Facebook でシェアする Twitter でシェアする LINE で送る ネコ部を フォローする クレイジーの最新記事 をお届けします &lt;font color=&quot;blue&quot;&gt;1. 窒息するギリギリまでギュッ View post on imgur.com 2. くっついてないと焦りだす View post on imgur.com 3. 夢の中でも二匹は一緒 http://bit.ly/16Yh5ll 4. ご主人が出かけると始まるダンスパーティー Boomer (Golden retriever) and Trigger (Lab) 5. ２匹にイタズラさせたら横に出る者はいない View post on imgur.com 6. 一緒にいると自然と笑顔に View post on imgur.com 7. 落ち込んだら片方が慰める View post on imgur.com 8. 溶けて１匹になっちゃいそう View post on imgur.com 9. どこにも行かないって約束！ http://catasters.tumblr.com/post/139548429975/thank-you-for-reminding-me-to-wish-you-a-happy 10. 愛が溢れ出ちゃってる View post on imgur.com 11. 他のワンコそっちのけ View post on imgur.com 12. 二人の間には誰も入れない View post on imgur.com Editor &lt;/font&gt;クレイジーピンク クレイジー特戦隊、唯一の女子隊員！ 最近Twitter始めました♡クレイジーガールなつぶやきしていくので、是非フォローしてください( ✧Д✧) 最近、習字道具を一式揃えました！ Twitter：https://twitter.com/curazypink クレイジーピンクの他の記事 local_offer 動物 ネコ大好き！ 仲良し 猫 犬 公園 桃 ドリンク 不運 この記事が気に入ったら いいね！しよう 最新記事をお届けします フォローしよう 友達に追加しよう&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;2&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.202427&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;屋外料理のデザートに、スモーキーで甘い「りんごのグリル」はいかが？&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;3&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.121461&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;ライフハッカー[日本版]&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;4&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.100682&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;私にとって、屋外でグリルといえば「肉」を即座に思い浮かべます。グリルでサイドメニューを作るという考えはほとんどなく、りんごをグリルするなど考えたこともないのですが、「Food52」は私のグリルの概念を変えるとっておきのアイデアをシェアしてくれました。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;5&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.091922&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;料理術&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;6&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.090498&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;しましたが、どういうわけかりんごを紹介したことはありません。りんごはBBQにぴったりで、とってもおいしいサイドディッシュまたはデザートになり得るのです。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;7&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.082355&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;ライフハッカーでもフルーツをグリルすることのメリットを紹介&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;8&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.057824&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;固い酸味のあるりんご（グラニースミスが最適です）の芯を抜き、半分に切って植物油かバターを表面に軽く塗ったら焼き目が付くまで中火で数分間グリルします。もっとフレーバーを加えるなら、事前にマリネするのも手です。（アイデアは下記のリンクを参照してください。）もしくはグリルする前に、ベーコンの油を塗るのもおすすめです。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;9&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.029545&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;山形県産 りんご ご家庭用 サンふじ 約5kg(生食可/約13玉-20玉入り/時期により品種変更)&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;10&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.001901&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;| Food 52&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;11&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;google+&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;12&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;Advertising&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;13&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;メディアジーンサイト&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;14&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;子育て&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;15&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;家電&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;16&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;ツール&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;17&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;文房具&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;18&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;住まい&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;19&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;お知らせ&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;20&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;0.0&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;健康&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;dragnet&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;レイジー特戦隊、唯一の女子隊員！ 最近Twitter始めました♡クレイジーガールなつぶやきしていくので、是非フォローしてください( ✧Д✧) Twitter：https://twitter.com/curazypink クレイジーピンクの他の記事&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;center&gt;表2&lt;/center&gt;
+&lt;p&gt;青字の部分がメインコンテンツです．DOM PageRankはメインコンテンツ前後の多少のノイズを含んではいるものの，うまく抽出できています．
+一方でdragnetは完全に抽出に失敗しています．&lt;/p&gt;
+
+&lt;p&gt;次に，さらにテキストの少ない店舗紹介ページ，&lt;a href=&quot;https://supermarket.geomedian.com/135498/&quot; target=&quot;_blank&quot;&gt;スーパーセンタートライアル宇部中央店｜全国スーパーマーケット・ディスカウントショップマップ&lt;/a&gt;に適用してミアmす．
+これに対する抽出結果を以下の表に示します．&lt;/p&gt;
 
 &lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;手法&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;抽出したテキスト&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
   &lt;tbody&gt;
     &lt;tr&gt;
-      &lt;td&gt;順位&lt;/td&gt;
-      &lt;td&gt;テキスト&lt;/td&gt;
-      &lt;td&gt;スコア&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;DOM PageRank (テキスト一様重み, &lt;script type=&quot;math/tex&quot;&gt;\alpha=0.5&lt;/script&gt;）&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;font color=&quot;blue&quot;&gt;所在地 山口県 宇部市 中央町3-16-20 最寄駅 宇部新川駅 から直線距離で513m 宇部新川駅周辺の店舗一覧 ＞ トライアル 店舗のジャンル 激安スーパー トライアル 備考 2016年7月13日オープン予定！ 宇部市のトライアル店舗一覧 宇部市の全店舗一覧 最終更新： 2016年7月8日&lt;/font&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;1&lt;/td&gt;
-      &lt;td&gt;0.098203&lt;/td&gt;
-      &lt;td&gt;統計だと、離婚率の低い結婚適齢期は「28～32歳」らしい｜ギズモード・ジャパン&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;2&lt;/td&gt;
-      &lt;td&gt;0.075638&lt;/td&gt;
-      &lt;td&gt;28～32歳までに結婚した夫婦が最も結婚生活が長く、離婚率が低い&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;3&lt;/td&gt;
-      &lt;td&gt;0.069549&lt;/td&gt;
-      &lt;td&gt;統計だと、離婚率の低い結婚適齢期は「28～32歳」らしい&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;4&lt;/td&gt;
-      &lt;td&gt;0.069549&lt;/td&gt;
-      &lt;td&gt;統計だと、離婚率の低い結婚適齢期は「28～32歳」らしい&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;5&lt;/td&gt;
-      &lt;td&gt;0.069549&lt;/td&gt;
-      &lt;td&gt;統計だと、離婚率の低い結婚適齢期は「28～32歳」らしい&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;6&lt;/td&gt;
-      &lt;td&gt;0.069549&lt;/td&gt;
-      &lt;td&gt;統計だと、離婚率の低い結婚適齢期は「28～32歳」らしい&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;7&lt;/td&gt;
-      &lt;td&gt;0.066137&lt;/td&gt;
-      &lt;td&gt;一般的には、結婚が遅い人ほど離婚率が低いと考えられていた&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;8&lt;/td&gt;
-      &lt;td&gt;0.046431&lt;/td&gt;
-      &lt;td&gt;ユタ大学で社会学を研究する&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;9&lt;/td&gt;
-      &lt;td&gt;0.046153&lt;/td&gt;
-      &lt;td&gt;Nick Wolfinger教授&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;10&lt;/td&gt;
-      &lt;td&gt;0.046067&lt;/td&gt;
-      &lt;td&gt;教授は、アメリカにおける初婚年齢と離婚率についてのデータを分析していた際、奇妙なグラフに気づいたそうです。よくみると、10代などの若い頃に結婚した人の離婚率は高いものの、その後減少していき、30代中盤頃から再度上昇。それ以降は、初婚年齢が40代中盤に向かうにつれ、どんどん上がっているのです。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;11&lt;/td&gt;
-      &lt;td&gt;0.043331&lt;/td&gt;
-      &lt;td&gt;大学研究&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;12&lt;/td&gt;
-      &lt;td&gt;0.04173&lt;/td&gt;
-      &lt;td&gt;」との研究結果を発表しました。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;13&lt;/td&gt;
-      &lt;td&gt;0.040952&lt;/td&gt;
-      &lt;td&gt;とのことですよ。教授、優しいな…。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;14&lt;/td&gt;
-      &lt;td&gt;0.034328&lt;/td&gt;
-      &lt;td&gt;Wolfinger教授は、それ以外にも20代後半から30代前半が結婚に適している理由があるといいます。いわく、それ以降になると、ひとりで暮らすにも十分な&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;15&lt;/td&gt;
-      &lt;td&gt;0.031018&lt;/td&gt;
-      &lt;td&gt;結婚は勢い、って本当なのかもしれませんね…。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;16&lt;/td&gt;
-      &lt;td&gt;0.028509&lt;/td&gt;
-      &lt;td&gt;ため、新たな発見となったとのこと。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;17&lt;/td&gt;
-      &lt;td&gt;0.020686&lt;/td&gt;
-      &lt;td&gt;なお、大分過ぎた模様。&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;18&lt;/td&gt;
-      &lt;td&gt;0.020686&lt;/td&gt;
-      &lt;td&gt;は、統計学的には「&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;19&lt;/td&gt;
-      &lt;td&gt;0.020409&lt;/td&gt;
-      &lt;td&gt;サイエンス&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;20&lt;/td&gt;
-      &lt;td&gt;0.009511&lt;/td&gt;
-      &lt;td&gt;このメールマガジンでは、テクノロジーやサイエンス、それに紐づくカルチャーの情報を発信するWebサイト、ギズモード・ジャパンからのさまざまな情報をお届けしていきます。&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;dragnet&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;font color=&quot;blue&quot;&gt;所在地 山口県 宇部市 中央町3-16-20 最寄駅 宇部新川駅周辺の店舗一覧 ＞ トライアル 店舗のジャンル 激安スーパー トライアル 備考 2016年7月13日オープン予定！ 宇部市のトライアル店舗一覧 宇部市の全店舗一覧 最終更新： 2016年7月8日&lt;/font&gt;&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;center&gt;
-$$
-  \begin{array}{ccc}
-  &amp;amp;\\LNW&amp;amp;&amp;amp;&amp;amp;TF&amp;amp;\\\hline\hline
-1&amp;amp;本体&amp;amp;0.00357727325233                    &amp;amp;投稿&amp;amp;0.0226666666667	 \\
-2&amp;amp;os x&amp;amp;0.00357727325233					   &amp;amp;件&amp;amp;0.0217777777778		 \\
-3&amp;amp;キーボードマウスモニタ&amp;amp;0.00351833385311  &amp;amp;imac&amp;amp;0.0213333333333	 \\
-4&amp;amp;server&amp;amp;0.00349771570308				   &amp;amp;点&amp;amp;0.0204444444444		 \\
-5&amp;amp;中古品&amp;amp;0.00346942400604				   &amp;amp;ssd&amp;amp;0.0133333333333		 \\
-6&amp;amp;config&amp;amp;0.00332368147584				   &amp;amp;満足度&amp;amp;0.0115555555556	 \\
-7&amp;amp;新着&amp;amp;0.00331818190656					   &amp;amp;k&amp;amp;0.0111111111111		 \\
-8&amp;amp;mg&amp;amp;0.00329978507541					   &amp;amp;hdd&amp;amp;0.0102222222222		 \\
-9&amp;amp;eq2&amp;amp;0.00327657575963					   &amp;amp;4k&amp;amp;0.00844444444444		 \\
-10&amp;amp;step&amp;amp;0.0032732266988					   &amp;amp;動画&amp;amp;0.008				 \\
-11&amp;amp;コストパフォーマンス&amp;amp;0.00325942990303   &amp;amp;m&amp;amp;0.008					 \\
-12&amp;amp;mc&amp;amp;0.0032043406235					   &amp;amp;dupont&amp;amp;0.008			 \\
-13&amp;amp;mgem&amp;amp;0.0032043406235					   &amp;amp;y&amp;amp;0.008					 \\
-14&amp;amp;mac pro&amp;amp;0.00319763504244				   &amp;amp;購入&amp;amp;0.00755555555556	 \\
-15&amp;amp;md&amp;amp;0.00318798286291					   &amp;amp;jesse&amp;amp;0.00666666666667	 \\
-16&amp;amp;検索&amp;amp;0.00315393001144				   &amp;amp;価格&amp;amp;0.00622222222222	 \\
-17&amp;amp;お知らせ&amp;amp;0.00315393001144			   &amp;amp;retina&amp;amp;0.00622222222222	 \\
-18&amp;amp;利用規約&amp;amp;0.00315393001144			   &amp;amp;製品&amp;amp;0.00533333333333	 \\
-19&amp;amp;a8&amp;amp;0.00308604905707					   &amp;amp;spec&amp;amp;0.00488888888889	 \\
-20&amp;amp;搭載&amp;amp;0.00307764323933				   &amp;amp;編集&amp;amp;0.00488888888889    \\
-\end{array}
-$$
+&lt;p&gt;両方ともメインコンテンツ抽出に成功していますが，DOM PageRankはより多くのコンテンツを抽出できています．&lt;/p&gt;
 
-&lt;/center&gt;
-&lt;center&gt;図2: ニュース記事への適用結果 (青=真の重要語)&lt;/center&gt;
-&lt;!--
-このアルゴリズムにおける教師データは高い重みがついて欲しいノード集合なので，単語への重み付けの場合**高い重みがついて欲しい単語集合**になります．
-これを$$V^{*}$$とします．
+&lt;h2 id=&quot;section-3&quot;&gt;おわりに&lt;/h2&gt;
+&lt;p&gt;今回は，半教師付きページランクをウェブページ（HTML文書）のメインコンテンツ抽出に応用してみました．
+さらに，簡単ではありますが，dragnetと性能を比較し，その実用性を示しました．
+半教師付きページランクは初期重みを変えることで柔軟にアルゴリズムを設計できるところに強みがあると思います．
+パラメータも正則化パラメータのみで，&lt;/p&gt;
 
-ウェブページはヘッダーフッター，メニュー，広告など多くのノイズを含んでいます．
-最近では，広告配信業者がページの内容に応じて関連の高い広告を埋め込んでいたりするので，ウェブページの解析がより難しくなっているように思います．
-しかしながら，**どんなにノイズが多くても，タイトル（とディスクリプション）は信頼できる**と考えられます．
-というわけで，今回はタイトル（とディスクリプション）に含まれる単語集合を$$V^{*}$$とします．
-もちろんウェブページだけでなく，一般の文書にはタイトルがあると思うので，大体適用できると思います．
+&lt;h2 id=&quot;section-4&quot;&gt;コード&lt;/h2&gt;
+&lt;p&gt;コードはgistに載せています．&lt;/p&gt;
 
-LNWを実行するには，$$V^{*}$$の他に，隣接行列$$\mathbf{A}$$が必要です．
-今回は，これを共起行列とします．**重要な単語と共起する単語は重要**といった具合です．
-これは，PageRankをテキストに応用したTextRankなんかと同じですね．
-まとめると，
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://gist.github.com/nkt1546789/dfc4f01dbf4aa8a9d32762e904865560&quot; target=&quot;_blank&quot;&gt;https://gist.github.com/nkt1546789/dfc4f01dbf4aa8a9d32762e904865560&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 
-- $$V^{*}$$: タイトル（とディスクリプション）に出現する単語集合
-- $$\mathbf{A}$$: 共起行列
+&lt;p&gt;一応ここにも貼っておきます．&lt;/p&gt;
 
-とします．
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy.linalg&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;la&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;bs4&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;scipy&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sparse&lt;/span&gt;
 
-# 実験
-定性評価してみます．
-対象は，
-
-1. メインコンテンツがテキストのページ (&lt;a href=&quot;http://gigazine.net/news/20160706-santa-susana-nuclear-disaster/&quot; target=&quot;_blank&quot;&gt;http://gigazine.net/news/20160706-santa-susana-nuclear-disaster/&lt;/a&gt;)
-2. そうでないページ (
-
-1は例えばニュース記事などです．
-2は例えば商品紹介ページだったり，画像や動画メインのページです．
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;dfs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;hasattr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;children&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;child&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;child&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;script&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;style&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;continue&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem2&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dfs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;child&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem2&lt;/span&gt;
 
 
-|順位| 単語 |スコア|
-|:---|:-----------------:|:-----------|
-1 | アメリカ政府 |0.0108775415988|
-2 | 徹底的 |0.0103866765743|
-3 | 回避 |0.0102489698956|
-4 | 放射性物質 |0.00826735437213|
-5 | 表 |0.00688558477851|
-6 | カリフォルニア州 |0.00687599731351|
-7 | 完成 |0.00666602490429|
-8 | 地球外生命 |0.00666602490429|
-9 | 完全 |0.00662327332437|
-10| 探査 |0.00654949037057|
-11| fast |0.00654949037057|
-12| 電波望遠鏡 |0.00654949037057|
-13| 世界 |0.00654949037057|
-14| 1979年 |0.00639230509713|
-15| 危険 |0.00608159886266|
-16| 例 |0.00597026076084|
-17| 運用 |0.00586509783247|
-18| カリフォルニア大学 |0.00578271053574|
-19| 時点| 0.00554026259777|
-20| アクシデント| 0.00532353224794|
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_text_elements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;isinstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bs4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NavigableString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bs4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Comment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bs4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Declaration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;elif&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;script&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;style&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;contents&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;text_elem&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_text_elements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;content&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;text_elem&lt;/span&gt;
 
-図1: Gigazineへの適用結果&lt;br/&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SSPageRank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;object&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;__init__&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;
 
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;diagflat&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;axis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;L&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;D&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;la&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pinv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;L&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;identity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;maximum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;asarray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ravel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;
 
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;fit_predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;
 
-# おわりに
-今回は，グラフノードへの重み付けアルゴリズムをウェブページに応用してみました．
-ウェブページの解析といったら，メインコンテンツ抽出がよく研究されています．
-画像や動画メインのページだと，メインとなるDOM要素を特定して，その中にある画像や動画を抽出する必要があります．
-今回の応用例は，DOM要素の単語に重みをつけて，その合計値などでスコアをつければメインコンテンツ抽出にも使えると思います．
-ちなみに，今回のアルゴリズムはDOM構造に依存していないので，同一ドメイン内で，評価やパラメータチューニングが簡単に行えることも強みだと思います．
---&gt;
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;DomPageRank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SSPageRank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;tags&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;h1&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;h2&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;h3&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;h4&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;h5&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;h6&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;p&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;div&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;table&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;map&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;section&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;article&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;ul&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bs4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BeautifulSoup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;lxml&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;elems&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dfs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# create directed adjacency matrix (child -&amp;gt; parent)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sparse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lil_matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elems&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elems&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;elem_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elems&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setdefault&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setdefault&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;parent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;hasattr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;children&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;continue&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;child&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;setdefault&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;child&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;id2elem&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;iteritems&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()}&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# create initial weight&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;shape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;mask&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_text_elements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)])&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;
+        &lt;span class=&quot;nb&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DomPageRank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# store variables&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;soup&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elems&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elems&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;id2elem&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id2elem&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;A&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;u&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;u&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ContentExtractor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DomPageRank&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;extract_element&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;nb&quot;&gt;super&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ContentExtractor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;target_elems&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elems&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;not&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ContentExtractor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;continue&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;score&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;hasattr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;children&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;child&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;child&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ContentExtractor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tags&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;score&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vocabulary&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;child&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]]&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;target_elems&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+        &lt;span class=&quot;c&quot;&gt;# extract top-1 element&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argmax&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scores&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;element&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;target_elems&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;element&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;extract_text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deliminator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;u&quot; &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;extract_element&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;deliminator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;get_text_elements&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;element&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;elem&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;strip&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;__name__&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&#39;__main__&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;codecs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;hashlib&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;requests&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;url_open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;loc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/tmp&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hashlib&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;md5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hexdigest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;.html&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;join&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;exists&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;codecs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;r&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;resp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;resp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;apparent_encoding&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;resp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;unicode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;errors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;ignore&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;fp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;codecs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;filename&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;w&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;fp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;fp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;argv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;url_open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;text&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ContentExtractor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;extract_text&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;text&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
 </description>
-        <pubDate>Sat, 09 Jul 2016 20:21:53 +0900</pubDate>
-        <link>http://nktmemoja.github.io/jekyll/update/2016/07/09/main-text-extraction.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/07/09/main-text-extraction.html</guid>
+        <pubDate>Sun, 10 Jul 2016 18:34:32 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/07/10/content-extraction-sspagerank.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/07/10/content-extraction-sspagerank.html</guid>
         
         
         <category>jekyll</category>
@@ -1239,351 +1067,6 @@ max_{\mathbf{f}} \ \mathbf{f}^T \mathbf{u} - \alpha \|\mathbf{f}\|^2 - \beta \su
       </item>
     
       <item>
-        <title>ラプラス正則化を使った，半教師付きグラフノード重み付け</title>
-        <description>&lt;p&gt;半教師付きの設定で，グラフノードに重み付けをつけるアルゴリズム (Laplacian Node Weighting)を考えてみました（名前適当だし，日本語でどう表すかが非常に難しい）．
-グラフのノードに重みをつける手法としては，PageRankが有名です．
-一つやりたいことがあって，最初PageRankを使っていたのですが，教師的な情報を組み込むのが難しかったので，自分で考えることにしました．
-というのも，PageRankでは，すべてのグラフノードの重みを1に初期化します．
-単純にここに教師的な情報を組み込む，例えば数個のノードの重みを高くするなど，をやってみたのですが，最終的に出てくる解にあまり反映されなかったのです．
-なぜなのか，をいろいろ考えましたが，PageRankはノードの重みを繰り返し伝搬するので，初期値が大事というより，エッジが大事なんだと今は思っています（もう少しちゃんと考える必要あり）．&lt;/p&gt;
-
-&lt;p&gt;定式化していきましょう．
-グラフ&lt;script type=&quot;math/tex&quot;&gt;G=(V, E), V=\{1, \ldots, n\}, E \subseteq V \times V&lt;/script&gt;を考えます．
-扱いやすいように，エッジは隣接行列 (Adjacency matrix) &lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;で表現することにします．
-&lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;をいろいろ変えることで，いろんなグラフが表現できますが，ここでは一般の行列にしときます．
-重み付けにおける教師データとは何か？という話になると思うのですが，ここでは，高い（低い）重みがついて欲しいノードの集合&lt;script type=&quot;math/tex&quot;&gt;V^{*} \subseteq V&lt;/script&gt;が与えられることにします．&lt;/p&gt;
-
-&lt;p&gt;さて，各ノードにおける重みを&lt;script type=&quot;math/tex&quot;&gt;\mathbf{f} = [f_1 \cdots f_n]&lt;/script&gt;と表すことにして，これを求めることがゴールになります．
-とりあえず，&lt;script type=&quot;math/tex&quot;&gt;V^{*}&lt;/script&gt;の要素に該当する重みを大きくしたいので，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u} = [u_1 \cdots u_n]&lt;/script&gt;を以下で定義します．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align*}
-u_i = \left\{\begin{array}{cc}
-1 &amp; if \ i \in V^{*} \\
-0 &amp; otherwise
-\end{array}\right.
-\end{align*} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;こうすると，&lt;script type=&quot;math/tex&quot;&gt;V^{*}&lt;/script&gt;のスコアの合計値を，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{f}^T \mathbf{u}&lt;/script&gt;と表すことができます．
-今，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{f}^T \mathbf{u}&lt;/script&gt;を最大化すれば良さそうですが，今回はラプラス正則化 (Laplacian Regularization) と呼ばれるものを加えます．
-これは，ノード間にエッジが存在する場合，それらのスコアを近づける，というアイデアです．
-ノード&lt;script type=&quot;math/tex&quot;&gt;i&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;j&lt;/script&gt;の間にエッジが存在する，すなわち&lt;script type=&quot;math/tex&quot;&gt;A_{ij}=1&lt;/script&gt;なら&lt;script type=&quot;math/tex&quot;&gt;(f_i - f_j)^2&lt;/script&gt;を最小化します．
-これは，&lt;script type=&quot;math/tex&quot;&gt;A_{ij}(f_i - f_j)^2&lt;/script&gt;と書けますね．これをすべてのノードに対してやります．
-以上を踏まえて，以下の問題を解きます．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-max_{\mathbf{f}} \ \mathbf{f}^T \mathbf{u} - \alpha \|\mathbf{f}\|^2 - \beta \sum_{i,j=1}^n A_{ij}(f_i - f_j)^2
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;ただし，第2項にl2正則を加えています．
-第3項がラプラス正則化です．
-これの解は以下のように解析的に得られます．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-\mathbf{f} = (\mathbf{L} + \gamma \mathbf{I}_n)^{-1} \mathbf{u}
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;\gamma=\frac{\alpha}{\beta}&lt;/script&gt;であり，これは通常の正則化パラメータと同じように事前に決めてやるものとします．
-これで，望ましい結果というのを，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{A}&lt;/script&gt;だけでなく，&lt;script type=&quot;math/tex&quot;&gt;\mathbf{u}&lt;/script&gt;でも表現できるようになりました．
-次回は，これをウェブページ解析に応用したいと思います．&lt;/p&gt;
-</description>
-        <pubDate>Thu, 07 Jul 2016 00:48:19 +0900</pubDate>
-        <link>http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/07/07/laplaciannodeweighting.html</guid>
-        
-        
-        <category>jekyll</category>
-        
-        <category>update</category>
-        
-      </item>
-    
-      <item>
-        <title>PageRankをいろいろな問題に適用してみた</title>
-        <description>&lt;h1 id=&quot;pagerank&quot;&gt;PageRank&lt;/h1&gt;
-&lt;p&gt;PageRankをいろいろな問題に適用してみた。ページランクはグラフが持つノードの重要度を決める一つの手法。そこにあるアイデアは、&lt;/p&gt;
-
-&lt;p&gt;iからjへのリンクをiがjに投票したとみなし、投票数の多いノードは重要度が高い、&lt;/p&gt;
-
-&lt;p&gt;というもの。さらに、これを何回か繰り返すことにより、投票数の多いノードの投票は重要だとみなされる。PageRankは、グラフで表現されているものなら何にでも適用できる。その際に重要なのは、エッジの定義だ。以下、実際の問題に適用して、その有用性を確認してみる。&lt;/p&gt;
-
-&lt;h1 id=&quot;section&quot;&gt;重要文抽出&lt;/h1&gt;
-&lt;p&gt;まずは、重要文抽出に適用してみる。重要文抽出は、文書の中から重要な文を抽出するタスクで、抽出型の文書要約に使われたりする。というわけで早速エッジを定義する。どんなエッジを投票と見なすかを考える。ここでは、&lt;/p&gt;
-
-&lt;p&gt;自分と似ている人に投票する、&lt;/p&gt;
-
-&lt;p&gt;ことにする。これは、グラフの隣接行列を類似度行列に置き換えればよい。&lt;/p&gt;
-
-&lt;p&gt;実験として、ウェブページに適用してみた。ウェブページから得られるテキストはノイズが多い (多分50-90%がノイズ)ので、ノイズに対するロバスト性を見るのにちょうどいい。それと、自分が今ウェブページの解析をやっているから、というのもある (ほんとはこれが理由…)。&lt;/p&gt;
-
-&lt;p&gt;ノイズが比較的少ないページとして、
-&lt;a href=&quot;http://gigazine.net/news/20160703-accueil-pancake/&quot; target=&quot;_blank&quot;&gt;Gigazine&lt;/a&gt;，
-を、ノイズが多いページとして、
-&lt;a href=&quot;http://navitokyo.com/0422-88-6480/&quot; target=&quot;_blank&quot;&gt;ナビ東京&lt;/a&gt;,
-を解析する。
-結果を図1, 2に示す．太字で書いているものは，僕が重要な文ではないと判断したものです．
-ノイズが少なければ結果は割と良好ですが，ノイズが多いと全然ダメでした．
-やはり，このままではウェブページには使えないみたいですね．&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;順位&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;スコア&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;文&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;1&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00902747389036&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;桃甘強鼻抜け風味ありパンケーキ桃チーズ受け止めるもっち食感食べ応えありデザートある昼ごはん多め食べ苦しくなり&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;2&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00803193072151&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;パンケーキ有名店カフェアクイーユ6月1日パンケーキ生地一新しもっちり軽い口当たり実現する商品&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;3&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00787933502747&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;ハチミツ垂らし食べチーズ塩分パンケーキ甘み引き立てるつのパンケーキ一線画し品サイズ食べ&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;4&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00737716414378&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;アクイーユいろいろパンケーキあっ目移りしディナー時間帯人気パンケーキ種類ミニサイズワンプレート集めスペシャルサンク税別円メニューあり&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;5&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00701471830488&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;濃厚チーズパンケーキボールなっパンケーキボール食べgigazine&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;6&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00693654280273&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;vrヘッドセットoculus riftハードウェアソフトウェアセットアップ手順まとめ&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;7&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00634492606882&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;マロンクリーム・バニラアイス・ホイップクリーム使っ和栗パンケーキ栗風味もっ濃厚好き注文し品&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;8&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00611990342212&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;桃レアチーズ風味豊かカフェアクイーユ桃レアチーズパンケーキ食べgigazine&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;9&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00598382318072&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;ジューシー果物たっぷりパンケーキ濃厚本格チョコレートフローズンドリンクチョコリスタタリーズ新作品試食レビューgigazine&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;10&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00553263508191&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;濃厚チョコパンケーキ堪能チョコレートマカダミアナッツパンケーキクア・アイナ食べgigazine&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;center&gt;図1: Gigazineへの適用結果&lt;/center&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;順位&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;スコア&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;文&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;1&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00640543982966&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;情報特派員上記情報調べ足し情報変わっお手数上変更申請情報変更さ&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;2&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00454314397947&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;基地あり子供横田基地飛行機アイドリング音聞こえいた事覚え上空かなり米軍飛行空域なっ基地確か多い厚木基地あり指定地区防音工事国部屋円記憶不確か部屋円上限不確か補助金出し守る必要違う捉えるアナタ&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;3&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00425414876572&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;女子ダイエット気する女子ダイエット向かわ儲け過食拒食社会的圧力女子与え儲ける連中仕組ん起きる病気社会圧力負ける綺麗痩せる圧力ビジネス健康気つけ美しダイエット気する世の中狂っ&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;4&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00367725642988&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;事業所店舗写真店舗情報変更足す出来&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;5&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00361554024684&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;事業所店舗紹介店舗情報変更足す出来&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;6&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00357788852299&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;店舗情報変更変更しいただけ&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;7&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00356348614849&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;地域癌発症差ある話ジェンダーある昭和54年倍増え高齢化原因言わ腑落ち長野県死亡低い早期治療効い&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;8&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00327617390065&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;情報表出is広域拡散しイスラムキリスト教対立激しくなり世界混乱様相見せ&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;9&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00326910285843&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;ストリートビュー関連情報古い有り修正し&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;10&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;0.00308015732774&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;strong&gt;メディア書い人間居るバイアス掛かっ真実見る虚構ある斜め見るニュースデタラメある思っ丁度いい鵜呑みする&lt;/strong&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;center&gt;図2: ナビ東京への適用結果&lt;/center&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;単語への重み付け&lt;/h1&gt;
-&lt;p&gt;次に、単語への重み付け問題に適用してみる。これはTextRankと呼ばれ、既に提案されている。ここでは、&lt;/p&gt;
-
-&lt;p&gt;自分の近くにいる (共起している) 単語に投票する、&lt;/p&gt;
-
-&lt;p&gt;こととする。これは隣接行列を共起行列で表現すれば良い。上の2ページに対する結果は以下のようになった。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-2&quot;&gt;おわりに&lt;/h1&gt;
-&lt;p&gt;PageRankを重要文抽出、単語への重み付け問題に適用してみた。結果はまずまず。&lt;/p&gt;
-
-&lt;p&gt;次は、ウェブページの解析に適用してみる。&lt;/p&gt;
-</description>
-        <pubDate>Sun, 03 Jul 2016 18:33:15 +0900</pubDate>
-        <link>http://nktmemoja.github.io/jekyll/update/2016/07/03/pagerank.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/07/03/pagerank.html</guid>
-        
-        
-        <category>jekyll</category>
-        
-        <category>update</category>
-        
-      </item>
-    
-      <item>
-        <title>グラフベースな文と単語への教師なし重み付けアルゴリズム</title>
-        <description>&lt;h1 id=&quot;section&quot;&gt;はじめに&lt;/h1&gt;
-&lt;p&gt;PageRankを応用して，グラフベースな教師なし文と単語への重み付けアルゴリズムを実装してみました．
-コードは，gistに置いてあります（３点セットです）．&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://gist.github.com/nkt1546789/f5a8f3c5bb4445d141fe7dd03a84bcd1&quot; target=&quot;_blank&quot;&gt;graphranker.py&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://gist.github.com/nkt1546789/7562a66aa7157377fa531f164495a3be&quot; target=&quot;_blank&quot;&gt;textrank.py&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://gist.github.com/nkt1546789/a53a145282fd3befb89e5618408f4cff&quot; target=&quot;_blank&quot;&gt;tokenrank.py&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;アルゴリズム&lt;/h1&gt;
-&lt;p&gt;アルゴリズムはTextRankと同じです．TextRankはPageRankと同じなので，PageRankですね．
-&lt;script type=&quot;math/tex&quot;&gt;N&lt;/script&gt;個のデータ点&lt;script type=&quot;math/tex&quot;&gt;V = \{1, \ldots, N\}&lt;/script&gt;に対する，隣接行列を&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{A} \in \mathbb{G}^{n \times n}&lt;/script&gt;とします．
-&lt;script type=&quot;math/tex&quot;&gt;V&lt;/script&gt;に対するPageRankを&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{f} = \boldsymbol{f}(V) = [f(1) \cdots f(n)]^T&lt;/script&gt;とおくと，&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{f}&lt;/script&gt;は以下で定義されます．&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-\boldsymbol{f} \leftarrow (1-d) + d \boldsymbol{A}^T \boldsymbol{f}
-\end{align*}&lt;/script&gt;
-
-&lt;p&gt;ちなみに，
-# 実験&lt;/p&gt;
-
-&lt;p&gt;以下，ウェブページに適用して，定性評価をしてみます．
-とりあえず対象は，&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;メインコンテンツ内の文章が多いウェブページ
-&lt;a href=&quot;http://www.lifehacker.jp/2016/07/160702_grilledapple.html&quot; target=&quot;_blank&quot;&gt;http://www.lifehacker.jp/2016/07/160702_grilledapple.html&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;メインコンテンツ内の文章が少ないページ
-&lt;a href=&quot;http://navitokyo.com/0422-88-6480/&quot; target=&quot;_blank&quot;&gt;http://navitokyo.com/0422-88-6480/&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;にしようと思います．予想としては1はうまく行くけど2はダメといったところでしょうか．&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;構造を持っている (DOM)&lt;/li&gt;
-  &lt;li&gt;内容のほとんどがノイズ&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;1について。ウェブページ、つまりHTMLで書かれた文書は、DOMと呼ばれる構造を持っています。重み付けを行う際に、この構造を利用したほうが、より良い結果が得られると予想できます。&lt;/p&gt;
-
-&lt;p&gt;2について。ウェブページはサイドバー、ヘッダーフッター、広告など、自身の内容と関係のないコンテンツを多く含んでいます。ウェブページによりますが、ひどいと80%がノイズなんてケースもあります。このような状況だと、言語処理でよく使われる、&lt;strong&gt;頻度&lt;/strong&gt;が意味をなさなくなります。&lt;/p&gt;
-
-&lt;p&gt;1,2を緩和するために、ウェブページから本文を抽出する、本文抽出 (Main contents extraction)が盛んに研究されています。本文抽出の多くの手法はDOMの構造を利用しています。教師なしと教師あり両方提案されています。本文抽出を使って、単語への重み付けを行う場合は、本文抽出をして、本文部分に強い重みをつける、という処理が考えられます。&lt;/p&gt;
-
-&lt;p&gt;本文抽出とWeightressはここに違いがあります。Weightressは本文抽出を経ずに直接単語へ重み付けを行います。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-2&quot;&gt;アルゴリズム&lt;/h1&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;WS(v_i) = (1-d) + d \sum_{v_j \in In(v_i)} \frac{w_{ji}}{\sum_{v_k \in Out(v_j)} w_{jk}} WS(v_j)&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;w_{ij} = sim(b_i, b_j)&lt;/script&gt;
-
-&lt;h1 id=&quot;section-3&quot;&gt;実験&lt;/h1&gt;
-&lt;p&gt;Weightressをデータに適用し、その評価を行う。単語重み付けの正解データとはなにかを定義するのは難しいが、「ページに対して、高い重みを持つべき単語集合」を用意すれば、それなりの評価はできそうだ。そのような(ページ、単語集合)ペアを、\( \{(x_i, Y_i)\}_{i=1}^n \) とする。&lt;/p&gt;
-</description>
-        <pubDate>Sun, 03 Jul 2016 13:02:53 +0900</pubDate>
-        <link>http://nktmemoja.github.io/jekyll/update/2016/07/03/weightressexample.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/07/03/weightressexample.html</guid>
-        
-        
-        <category>jekyll</category>
-        
-        <category>update</category>
-        
-      </item>
-    
-      <item>
-        <title>Topic model</title>
-        <description>&lt;h1 id=&quot;section&quot;&gt;はじめに&lt;/h1&gt;
-&lt;p&gt;トピックモデル (Topic model) と戯れてみる。今はgensimとかあって実装しなくても使えるからかなり敷居は低いと思われる。といってもただWikipediaに適用するだけじゃ芸がないので、いろいろ実用性とかも考えながら行こうと思う。今回はとりあえず以下の3点を目指す。&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;理論的な理解&lt;/li&gt;
-  &lt;li&gt;gensimの出力の理解&lt;/li&gt;
-  &lt;li&gt;応用先を絞り出す&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;まずは理論的な理解から。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;理論的な理解&lt;/h1&gt;
-&lt;p&gt;記法:&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;&lt;/p&gt;
-
-&lt;p&gt;トピックモデルは以下の生成過程を仮定する。&lt;/p&gt;
-
-&lt;h1 id=&quot;gensim&quot;&gt;gensimの出力の解釈&lt;/h1&gt;
-
-&lt;h1 id=&quot;section-2&quot;&gt;応用先&lt;/h1&gt;
-
-&lt;script type=&quot;text/javascript&quot; async=&quot;&quot; src=&quot;https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML&quot;&gt;
-&lt;/script&gt;
-
-</description>
-        <pubDate>Sun, 03 Jul 2016 13:00:42 +0900</pubDate>
-        <link>http://nktmemoja.github.io/jekyll/update/2016/07/03/topicmodel.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/07/03/topicmodel.html</guid>
-        
-        
-        <category>jekyll</category>
-        
-        <category>update</category>
-        
-      </item>
-    
-      <item>
         <title>Topic Modelの最尤推定の解の導出</title>
         <description>&lt;p&gt;&lt;a href=&quot;http://www.amazon.co.jp/gp/product/4061529048/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=7399&amp;amp;creativeASIN=4061529048&amp;amp;linkCode=as2&amp;amp;tag=nettodesyuu00-22&quot;&gt;トピックモデル (機械学習プロフェッショナルシリーズ)&lt;/a&gt;&lt;img src=&quot;http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&amp;amp;l=as2&amp;amp;o=9&amp;amp;a=4061529048&quot; width=&quot;1&quot; height=&quot;1&quot; border=&quot;0&quot; alt=&quot;&quot; style=&quot;border:none !important; margin:0px !important;&quot; /&gt;の3.4章の解の導出です．LaTeX書くのが面倒なので画像で．．．笑&lt;/p&gt;
 
@@ -1602,62 +1085,603 @@ max_{\mathbf{f}} \ \mathbf{f}^T \mathbf{u} - \alpha \|\mathbf{f}\|^2 - \beta \su
       </item>
     
       <item>
-        <title>クラスタリング評価指標V-Measureについて勉強してみた</title>
-        <description>&lt;h1 id=&quot;v-measure&quot;&gt;1. V-Measure&lt;/h1&gt;
-&lt;hr /&gt;
+        <title>Adjusted Rand Index (ARI) について勉強してみた</title>
+        <description>&lt;p&gt;クラスタリングの性能評価でよくAdjusted Rand Index (ARI) が使われます．
+僕もよく使っていますが，お恥ずかしながらよく知らずに使っていました．
+というのも，Rand Index (RI) は理解できるのですが，ARIのAdjustedの意味がよくわかりませんでした．
+というわけで，勉強してみました．&lt;/p&gt;
 
-&lt;p&gt;最近会社でクラスタリングを使っています．
-僕は今までクラスタリングの評価指標には&lt;a href=&quot;http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html&quot; target=&quot;_blank&quot;&gt;ARI&lt;/a&gt;を使っていたのですが，もう古いみたいですね．
-そこで，今回，V-Measure (Rosenberg 2007) というのを見つけたので勉強してみました．&lt;/p&gt;
+&lt;p&gt;まず，クラスタリングは，サンプル&lt;script type=&quot;math/tex&quot;&gt;S = \{o_i\}_{i=1}^n&lt;/script&gt;を&lt;script type=&quot;math/tex&quot;&gt;k (1 \leq k \leq n)&lt;/script&gt;個の互いに素なグループに分けることを目的とします．
+この記事では，真のクラスタリング結果と，クラスタリングアルゴリズムの結果が似ているかどうかを測ることを目的とします．
+なお，ここでは，クラスタリングの結果をクラスタラベルで表現することにします．&lt;/p&gt;
 
-&lt;p&gt;クラスタリングの評価のポイントは，大きく分けて以下の2つになるみたいです．&lt;/p&gt;
+&lt;p&gt;さて，&lt;script type=&quot;math/tex&quot;&gt;S&lt;/script&gt;に対する，
+真のクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{\ell}=[\ell_1 \cdots \ell_n], \ell_i \in \{1, \ldots, k\} \forall i=1, \ldots, n&lt;/script&gt;，
+クラスタリングアルゴリズムによるクラスタラベルを&lt;script type=&quot;math/tex&quot;&gt;\hat{ \boldsymbol{\ell}}=[\hat{\ell}_1 \cdots \hat{\ell}_n], \hat{\ell}_i \in \{1, \ldots, \hat{k}\} \forall i=1, \ldots, n&lt;/script&gt;とします．
+クラスタリングの結果は，分類のようにラベルで考えるのではなく，ラベルのペアで考えます．
+つまり，「このサンプルとこのサンプルは同じクラスタに属するか否か」で性能を評価します．
+というわけで，&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{\ell}&lt;/script&gt;と &lt;script type=&quot;math/tex&quot;&gt;\hat{\boldsymbol{\ell}}&lt;/script&gt;を以下のように表現し直します．&lt;/p&gt;
 
-&lt;ul&gt;
-  &lt;li&gt;Completeness: 同じクラスタに属するべきものが，同じクラスタに属している&lt;/li&gt;
-  &lt;li&gt;Homogeneity: 異なるクラスタに属するべきものが，異なるクラスタに属している&lt;/li&gt;
-&lt;/ul&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\mathcal{X} &amp;= \{I(\ell_i = \ell_j) | (i,j) \in C(n, 2)\} = \{x_i\}_{i=1}^m\\
+\mathcal{Y} &amp;= \{I(\hat{\ell}_i = \hat{\ell}_j) | (i,j) \in C(n, 2)\} = \{y_i\}_{i=1}^m
+\end{align*} %]]&gt;&lt;/script&gt;
 
-&lt;p&gt;そしてこれらは，一般に再現率と適合率のように，トレードオフの関係にあります．
-例えば，全てのデータ点を1つのクラスタに入れてしまえば，Completeness=1ですが，Homogeneity=0です．
-反対に，全てのデータ点を異なるクラスタに入れると，Homogeneity=1ですが，Completeness=0です．&lt;/p&gt;
-
-&lt;p&gt;良いクラスタリングは，応用先によって違うと思うのですが，だいたいこれらのバランスを変えるだけで表現できそうな気がします．
-というわけで，これらの重み付き調和平均をとって，&lt;script type=&quot;math/tex&quot;&gt;V_\beta&lt;/script&gt;-Measureは以下で定義されます．&lt;/p&gt;
+&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;m={}_n C _2&lt;/script&gt;．
+さて，ここで，Rand Indexの定義を見てみます．
+正規化されていないRand Indexは次式で定義されます（自己流です）．&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
-V_\beta = \frac{(1+\beta)*h*c}{(\beta*h)+c}
+RI(x, y) = \sum_{i=1}^m I(x_i=y_i)
 \end{align*}&lt;/script&gt;
 
-&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;c&lt;/script&gt;はcompleteness, &lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt;はhomogeneity, &lt;script type=&quot;math/tex&quot;&gt;\beta&lt;/script&gt;はcompletenessへの重みです．
-&lt;script type=&quot;math/tex&quot;&gt;\beta &gt; 1&lt;/script&gt;の時，completenessをより重要視した評価になります．
-&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
-\beta &lt; 1 %]]&gt;&lt;/script&gt;の時，homogeneityをより重要視した評価になります．
-とても使いやすそうですね．&lt;/p&gt;
+&lt;p&gt;ただし，&lt;script type=&quot;math/tex&quot;&gt;I&lt;/script&gt;は指示関数で，&lt;script type=&quot;math/tex&quot;&gt;I(true) = 1, I(false) = 0&lt;/script&gt;です．
+この式は，&lt;script type=&quot;math/tex&quot;&gt;x_i=y_i&lt;/script&gt; の数を表しており，二つのクラスタリングがどのくらい似ているかを表しています．&lt;/p&gt;
 
-&lt;p&gt;ここからは，CompletenessやHomogeneityの定義を見ていくことにします．&lt;/p&gt;
+&lt;p&gt;よくRIの欠点として，「二つのクラスタリングに相関がなくても，高い値をとってしまう」という説明がなされます．
+これの意味は，「適当（ランダム）にクラスタリングしても高い値をとってしまう」ということだと思います．
+&lt;script type=&quot;math/tex&quot;&gt;x_i = 0&lt;/script&gt;となる&lt;script type=&quot;math/tex&quot;&gt;\mathcal{X}&lt;/script&gt;内の要素数が，&lt;script type=&quot;math/tex&quot;&gt;x_i = 1&lt;/script&gt;となる要素数に比べて圧倒的に多いので，
+例えば「全てを異なるクラスタに分ける」というクラスタリングを行うと，&lt;script type=&quot;math/tex&quot;&gt;y_i = 0&lt;/script&gt;となり，RIの値が高くなってしまいます．
+これは，分類問題において，クラスバランスが偏った状態で精度を使うのが適切ではない理由に似ています．&lt;/p&gt;
 
-&lt;h1 id=&quot;completeness&quot;&gt;2. Completeness&lt;/h1&gt;
-&lt;hr /&gt;
-&lt;p&gt;割と論文の記法に沿いたいですが，あまり好きでない部分があるので適宜変えます．
-今，&lt;script type=&quot;math/tex&quot;&gt;N&lt;/script&gt;個のデータ&lt;script type=&quot;math/tex&quot;&gt;D=\{1, \ldots, N\}&lt;/script&gt;があるとします．
-真のクラスタ集合を&lt;script type=&quot;math/tex&quot;&gt;C=\{c_i|c_i \subseteq D\}_{i=1}^m&lt;/script&gt;，ただし&lt;script type=&quot;math/tex&quot;&gt;c_i \cap c_j = \{\} \ \forall i,j&lt;/script&gt;とします．
-同様に，あるクラスタ集合（例えばクラスタリングアルゴリズムによる出力）を&lt;script type=&quot;math/tex&quot;&gt;K=\{k_i|k_i \subseteq D\}_{i=1}^n&lt;/script&gt;，ただし&lt;script type=&quot;math/tex&quot;&gt;k_i \cap k_j = \{\} \ \forall i,j&lt;/script&gt;とします．&lt;/p&gt;
+&lt;p&gt;このような問題を解決しようと提案されたのがARIです．
+ARIでは，適当に行われたであろうクラスタリングにペナルティを与えます．
+どのようなペナルティが適切でしょうか？
+ARIでは，ペナルティ＝「適当にクラスタリングした時のRIの値」と考えます．
+以下このペナルティを求めていきます．&lt;/p&gt;
 
-&lt;p&gt;completenessは，「同じクラスタに属するべきものが，同じクラスタに属している」度合いを表すと定義しました．
-そう考えると，例えば，&lt;script type=&quot;math/tex&quot;&gt;c_i&lt;/script&gt;の要素全てが&lt;script type=&quot;math/tex&quot;&gt;k_j&lt;/script&gt;に属していると，&lt;script type=&quot;math/tex&quot;&gt;c_i&lt;/script&gt;に対するcompletenessは最大ですよね．
-反対に，&lt;/p&gt;
+&lt;p&gt;まず，二つのデータ&lt;script type=&quot;math/tex&quot;&gt;\mathcal{X}, \mathcal{Y}&lt;/script&gt;がぞれぞれ独立に同一の分布&lt;script type=&quot;math/tex&quot;&gt;p(x), p(y)&lt;/script&gt;から生成されたと仮定します：&lt;/p&gt;
 
-&lt;h1 id=&quot;homogeneity&quot;&gt;3. Homogeneity&lt;/h1&gt;
-&lt;hr /&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\mathcal{X} \stackrel{i.i.d.}{\sim} p(x)\\
+\mathcal{Y} \stackrel{i.i.d.}{\sim} p(y)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;p(x)&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;p(y)&lt;/script&gt;はそれぞれ確率変数&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;の従う分布に対応する確率密度関数を表します．
+まず，上で定義したペナルティ中の「適当にクラスタリングした時」というのを，「&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;が独立な時」と定義します．
+そうすると，求めるペナルティは「&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;が独立な時のRIの値」となり，具体的になりました．
+そのようなペナルティは，以下で求められます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]
+&amp;= \mathbb{E}_{(x,y) \sim p(x,y)}\left[ \sum_{i=1}^m I(x_i=y_i) \right] \\
+&amp;= \sum_{x=0}^1 \sum_{y=0}^1 \sum_{i=1}^m I(x_i=y_i) p(x, y) \\
+&amp;= \sum_{i=1}^m \left( p(x=1, y=1) + p(x=0, y=0) \right) \\
+&amp;= m \left( p(x=1, y=1) + p(x=0, y=0) \right) \\
+&amp;= m \left( p(x=1)p(y=1) + p(x=0)p(y=0) \right)
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;最後の変形は&lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;の独立性を使いました．
+&lt;script type=&quot;math/tex&quot;&gt;p(x=0), p(x=1), p(y=0), p(y=1)&lt;/script&gt;は未知なので，データから推定してやらねばなりません．
+ここでは，以下のように，最尤推定で求めることにしましょう．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+p(x=1) &amp;= \frac{1}{m} \sum_{i=1}^m x_i, \ p(x=0) = 1 - p(x=1) \\
+p(y=1) &amp;= \frac{1}{m} \sum_{i=1}^m y_i, \ p(y=0) = 1 - p(y=1)
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;無事上で定義したペナルティをもとめることができました．
+RIから求めたペナルティを引けば，ARIの完成になります：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+ARI(x, y) = \sum_{i=1}^m I(x_i=y_i) - \mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;通常，RIは以下のように，0から1の値をとるように正規化して使われます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+normalized RI(x, y) = \frac{1}{m} \sum_{i=1}^m I(x_i=y_i)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;なので，正規化したARIは以下のようになります．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+normalized ARI(x, y) = \frac{\sum_{i=1}^m I(x_i=y_i) - \mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]}{m-\mathbb{E}_{(x,y) \sim p(x,y)}\left[RI\right]} 
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;Wikipediaの定義式なんかと一致するのを示したほうが良かったですね…．
+時間があれば追記しておきます．
+なお，具体例は以下のページが参考になります．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://y-uti.hatenablog.jp/entry/2014/01/19/133936&quot; target=&quot;_blank&quot;&gt;http://y-uti.hatenablog.jp/entry/2014/01/19/133936&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 </description>
-        <pubDate>Sun, 05 Jun 2016 15:33:17 +0900</pubDate>
-        <link>http://nktmemoja.github.io/jekyll/update/2016/06/05/vmeasure.html</link>
-        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/06/05/vmeasure.html</guid>
+        <pubDate>Tue, 24 May 2016 19:46:44 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/05/24/ari.html</guid>
         
         
         <category>jekyll</category>
         
         <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>ソフトマージンSVMのヒンジ損失最小化学習としての解釈とその実装</title>
+        <description>&lt;p&gt;前回，&lt;a href=&quot;http://nktmemoja.github.io/jekyll/update/2016/01/07/hardmarginsvmformulation.html&quot;&gt;ハードマージンSVMの定式化&lt;/a&gt;について書いたので，
+今回はソフトマージンSVMの定式化をしようと思います．
+さらに，それをヒンジ損失最小化学習として解釈できることを示し，
+最後に確率的勾配法を使って実装したいと思います．&lt;/p&gt;
+
+&lt;p&gt;さて，ハードマージンSVMの最適化問題は以下で与えられます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\min_{\boldsymbol{w},b} &amp;\ \|\boldsymbol{w}\|^2 \\
+s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots,n
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;しかし，与えられたデータに対して，この制約を満たす超平面が存在しない場合，実行可能領域が空集合となり，この最適化問題が解を持たなくなってしまいます．
+そこで，制約を緩和するために，全てのサンプルに対して&lt;script type=&quot;math/tex&quot;&gt;\xi_i \geq 0&lt;/script&gt;を導入し，最適化問題を以下のように書き換えます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\min_{\boldsymbol{w},b,\{\xi_i\}_{i=1}^n} &amp;\ \|\boldsymbol{w}\|^2 + C \sum_{i=1}^n \xi_i\\
+s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1-\xi_i \ \forall i=1,\ldots,n\\
+&amp;\ \xi_i \geq 0 \ \forall i=1,\ldots,n
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;これは，訓練データでの誤識別をある程度許容することに相当します．
+我々のゴールは汎化能力の獲得，つまり，未知のデータに対する誤識別率を最小化することなので，訓練データを全て正しく識別する必要はありません．
+さらに，訓練データに完全にフィットさせることは，汎化能力の低下を引き起こす原因にもなります．そのような意味でも，制約の緩和は有用です．&lt;/p&gt;
+
+&lt;p&gt;この最適化問題では，&lt;script type=&quot;math/tex&quot;&gt;\xi_i&gt;0&lt;/script&gt;の時，&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{x}_i&lt;/script&gt;の誤識別を許容します．
+さらに，&lt;script type=&quot;math/tex&quot;&gt;\xi_i&lt;/script&gt;は小さい方が望ましいので，目的関数に加えて同時に最小化します．
+&lt;script type=&quot;math/tex&quot;&gt;C&lt;/script&gt;は識別率をコントロールするハイパーパラメータです．&lt;/p&gt;
+
+&lt;p&gt;さて，ここで，&lt;script type=&quot;math/tex&quot;&gt;\xi_i&lt;/script&gt;を以下のように定義すると，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\xi_i = \max\{0,1-y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b)\}
+\end{align*},&lt;/script&gt;
+
+&lt;p&gt;上の最適化問題は，以下のように書き換えられます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\min_{\boldsymbol{w},b} \ \sum_{i=1}^n \max\{0,1-y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b)\} + \lambda \|\boldsymbol{w}\|^2
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;ここで，&lt;script type=&quot;math/tex&quot;&gt;\max\{0,1-y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b)\}&lt;/script&gt;を損失関数とみると，経験リスク最小化学習になっていることがわかります．損失関数&lt;script type=&quot;math/tex&quot;&gt;\ell_{hinge}(t) = \max\{0,1-t\}&lt;/script&gt;はヒンジ損失と呼ばれています．&lt;/p&gt;
+
+&lt;p&gt;ここから実装について，書きたいと思います．
+&lt;a rel=&quot;nofollow&quot; href=&quot;http://www.amazon.co.jp/gp/product/406152903X/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=7399&amp;amp;creativeASIN=406152903X&amp;amp;linkCode=as2&amp;amp;tag=nettodesyuu00-22&quot; target=&quot;_blank&quot;&gt;オンライン機械学習 (機械学習プロフェッショナルシリーズ)&lt;/a&gt;&lt;img src=&quot;http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&amp;amp;l=as2&amp;amp;o=9&amp;amp;a=406152903X&quot; width=&quot;1&quot; height=&quot;1&quot; border=&quot;0&quot; alt=&quot;&quot; style=&quot;border:none !important; margin:0px !important;&quot; /&gt;を参考にしています．
+SVMは二次計画法で解くこともできますが，今回は確率的勾配法（正確にはIncremental Gradient Method）を使って解きたいと思います．
+&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{x} \in \mathbb{R}^{d+1}&lt;/script&gt; として，簡単のために &lt;script type=&quot;math/tex&quot;&gt;x_1 = 1&lt;/script&gt;とします．すると，切片&lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt;が&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}&lt;/script&gt;に吸収され，上の最適化問題は，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\min_{\boldsymbol{w},b} \ \sum_{i=1}^n \max\{0,1-y_i\boldsymbol{w}^T \boldsymbol{x}_i\} + \lambda \|\boldsymbol{w}\|^2
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;と書けます．
+確率的勾配法では，適当にサンプル&lt;script type=&quot;math/tex&quot;&gt;(\boldsymbol{x}_i,y_i)&lt;/script&gt;を一つ取り出して，それに対応する目的関数，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+J_i(\boldsymbol{w}) = \max\{0,1-y_i\boldsymbol{w}^T \boldsymbol{x}_i\} + \lambda \|\boldsymbol{w}\|^2
+\end{align*},&lt;/script&gt;
+
+&lt;p&gt;の勾配を求めます．その勾配&lt;script type=&quot;math/tex&quot;&gt;\nabla J_i(\boldsymbol{w})&lt;/script&gt;を用いて，パラメータを&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w} \leftarrow \boldsymbol{w} - \eta\nabla J_i(\boldsymbol{w})&lt;/script&gt;と更新します．これを収束まで繰り返します．&lt;/p&gt;
+
+&lt;p&gt;しかし，ヒンジ損失は&lt;script type=&quot;math/tex&quot;&gt;1-y_i\boldsymbol{w}^T \boldsymbol{x}_i = 0&lt;/script&gt;を満たす点で微分不可能なため，劣勾配を考えます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\nabla J_i(\boldsymbol{w}) = \left\{
+\begin{array}{ll}
+-y_i\boldsymbol{x}_i + 2 \lambda \boldsymbol{w} &amp; (1-y_i\boldsymbol{w}^T \boldsymbol{x}_i \geq 0) \\
+2 \lambda \boldsymbol{w} &amp; otherwise
+\end{array}\right.
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;これを踏まえると，アルゴリズムは以下のようになります．&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;ランダムに&lt;script type=&quot;math/tex&quot;&gt;(\boldsymbol{x}_i,y_i) \in \{(\boldsymbol{x}_i,y_i)\}_{i=1}^n&lt;/script&gt;を取り出す．&lt;/li&gt;
+  &lt;li&gt;以下のように&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}&lt;/script&gt;を更新 (&lt;script type=&quot;math/tex&quot;&gt;\eta&lt;/script&gt;はステップサイズ)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\boldsymbol{w} \leftarrow
+\boldsymbol{w} - \eta\left(2 \lambda \boldsymbol{w} + 
+\left\{
+\begin{array}{ll}
+-y_i\boldsymbol{x}_i &amp; (1-y_i\boldsymbol{w}^T \boldsymbol{x}_i \geq 0) \\
+0 &amp; otherwise
+\end{array}\right.\right)
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;実装してみました．
+&lt;script src=&quot;https://gist.github.com/nktmemoja/15c7120a873f6195ee86.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+
+&lt;p&gt;結果は以下のようになりました．
+&lt;img src=&quot;/assets/softmarginsvm_demo.png&quot; alt=&quot;softmarginsvm_demo.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;なお，以下に書いたように，実装においてはステップサイズの決定が非常に難しいです．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;[http://nktmemoja.github.io/jekyll/update/2016/01/10/gradient-method.html]&quot;&gt;勾配法で目的関数値は単調に減少していくのか？&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;実際に使用する時は，scikit-learnのsklearn.linear_model.SGDClassifierを使うのが賢明でしょう．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html&quot; target=&quot;_blank&quot;&gt;http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.SGDClassifier.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;今回はソフトマージンSVMを定式化し，確率的勾配法を用いて実装してみた．
+とりあえず簡単な人工データでうまく動くことを確認した．
+この実装は実用に耐えうるものではないので，簡単なデモだと思ってください^^．
+読んでいただき，ありがとうございました．&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 11 Jan 2016 12:43:59 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/01/11/softmarginsvm.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/01/11/softmarginsvm.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>勾配法で目的関数値は単調に減少していくのか？</title>
+        <description>&lt;p&gt;目的関数&lt;script type=&quot;math/tex&quot;&gt;f: \mathbb{R}^d \rightarrow \mathbb{R}&lt;/script&gt;の最小化を考えましょう．
+勾配法では，以下のようにパラメータ&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{x}&lt;/script&gt;を更新していきます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\boldsymbol{x}_{k+1} = x_k - h_k \nabla f(\boldsymbol{x}_k), \ k=0,1,\ldots
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;h_k &gt; 0&lt;/script&gt;はステップサイズ．&lt;/p&gt;
+
+&lt;p&gt;1ステップ分の更新を考えましょう．
+&lt;script type=&quot;math/tex&quot;&gt;y = \boldsymbol{x} - h_k \nabla f(\boldsymbol{x})&lt;/script&gt;とすると，我々が示したいのは，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+f(\boldsymbol{y}) \leq f(\boldsymbol{x})
+\end{align*}.&lt;/script&gt;
+
+&lt;p&gt;これだけではなにも議論できないので，これからは目的関数はリプシッツ連続 (Lipschitz continuous) だとします．
+ではまずリプシッツ連続の定義から始めましょう．&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;Q \subseteq \mathbb{R}^d, L&gt;0&lt;/script&gt;に対して，集合&lt;script type=&quot;math/tex&quot;&gt;C^{k,p}_L(Q)&lt;/script&gt;を以下の性質を有する集合とします．&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;f \in C^{k,p}_L(Q)&lt;/script&gt; はk回微分可能で連続&lt;/li&gt;
+  &lt;li&gt;&lt;script type=&quot;math/tex&quot;&gt;f^{(p)}&lt;/script&gt;を&lt;script type=&quot;math/tex&quot;&gt;f&lt;/script&gt;のp階微分とすると，
+&lt;script type=&quot;math/tex&quot;&gt;\|f^{(p)}(\boldsymbol{x}) - f^{(p)}(\boldsymbol{y})\|_2 \leq L\|\boldsymbol{x}-\boldsymbol{y}\|_2 \ \forall \boldsymbol{x},\boldsymbol{y} \in Q&lt;/script&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;この時&lt;script type=&quot;math/tex&quot;&gt;f\in C^{k,p}_L(Q)&lt;/script&gt;はリプシッツ連続であるという．&lt;/p&gt;
+
+&lt;p&gt;今，目的関数が&lt;script type=&quot;math/tex&quot;&gt;f \in C^{1,1}_L(\mathbb{R}^d)&lt;/script&gt;だとしましょう．この時，以下が成立します．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+|f(\boldsymbol{y})-f(\boldsymbol{x})-\langle f&#39;(\boldsymbol{x}),\boldsymbol{y}-\boldsymbol{x} \rangle| \leq \frac{L}{2}\|\boldsymbol{y}-\boldsymbol{x}\|_2^2 \ \cdots (1)
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;さて，再び勾配法による一回分の更新を考えましょう．
+&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{y}=\boldsymbol{x}-h\nabla f(\boldsymbol{x})&lt;/script&gt;とすると，(1)より，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+f(\boldsymbol{y}) &amp;\leq f(\boldsymbol{x}) + \langle \nabla f(\boldsymbol{x}), \boldsymbol{y}-\boldsymbol{x} \rangle + \frac{L}{2}\|\boldsymbol{y}-\boldsymbol{x}\|^2_2 \\
+&amp;= f(\boldsymbol{x}) - h\left(1 - \frac{h}{2}L\right)\|\nabla f(\boldsymbol{x})\|^2_2
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;したがって，&lt;script type=&quot;math/tex&quot;&gt;h\left(1 - \frac{h}{2}L\right) \geq 0&lt;/script&gt;，つまり，&lt;script type=&quot;math/tex&quot;&gt;h \leq \frac{2}{L}&lt;/script&gt;であれば，&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{y}) \leq f(\boldsymbol{x})&lt;/script&gt;が言えます．
+つまり，当たり前かもしれませんが，勾配法によって関数が単調に減少するかはステップサイズの決め方に依存するということです．
+ここから，ステップサイズの決め方がいかに重要かがわかりますね．&lt;/p&gt;
+
+&lt;p&gt;問題なのは&lt;script type=&quot;math/tex&quot;&gt;L&lt;/script&gt;がわからないということです．
+もっともナイーブなステップサイズの決定方法は&lt;script type=&quot;math/tex&quot;&gt;h_k = h \ \forall k=0,1,\ldots&lt;/script&gt;として，適当に&lt;script type=&quot;math/tex&quot;&gt;h&gt;0&lt;/script&gt;を決めてやることですが，これだと必ずしも&lt;script type=&quot;math/tex&quot;&gt;h \leq \frac{2}{L}&lt;/script&gt;となっている保証はありません．そこで，なんらかの工夫が必要です．&lt;/p&gt;
+
+&lt;p&gt;基本的には，更新の際に，&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{y}) \leq f(\boldsymbol{x})&lt;/script&gt;となる&lt;script type=&quot;math/tex&quot;&gt;h&gt;0&lt;/script&gt;を選べば良いわけですが，どうやったら良いのでしょうか？
+適当に&lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt;を決めましょう．この時，&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{y}) &gt; f(\boldsymbol{x})&lt;/script&gt;となってしまったとします．
+この時の戦略は，&lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt;を大きくするか，小さくするかです．どうしたらいいでしょう？&lt;/p&gt;
+
+&lt;p&gt;もしも，更新によって関数値が増加してしまう時，つまり&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{y})&gt;f(\boldsymbol{x})&lt;/script&gt;の時，ステップサイズが&lt;script type=&quot;math/tex&quot;&gt;h&gt;\frac{2}{L}&lt;/script&gt;となっていることがわかります．ここから，&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{y}) \leq f(\boldsymbol{x})&lt;/script&gt;となるまで&lt;script type=&quot;math/tex&quot;&gt;h&lt;/script&gt;を小さくしていけば良いことがわかります．
+これは，更新によって，局所解または最適解を通り過ぎてしまったので，通り過ぎない程度に引き戻すことに相当します．
+こんな感じでステップサイズを決めれば，一応目的関数は単調に減少していきます．&lt;/p&gt;
+
+&lt;p&gt;まとめると，勾配法を使う際に最低限考えなければならないことは，&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{x}_{k+1}) \leq f(\boldsymbol{x}_k)&lt;/script&gt;となるように更新することで，これはステップサイズの決定に委ねられる．ステップサイズは，&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{x}_{k+1}) \leq f(\boldsymbol{x}_k)&lt;/script&gt;を満たすように決めれば良いが，もしこれが満たされない場合はステップサイズを小さくしていけば良い．&lt;/p&gt;
+
+&lt;p&gt;こんな感じですかね．実際は，ステップサイズの決め方にもGoldstein-Armijo ruleとか，いろいろあるのでそれを使えばいいんですけどね．&lt;/p&gt;
+</description>
+        <pubDate>Mon, 11 Jan 2016 06:20:07 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/01/11/gradient-method.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/01/11/gradient-method.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>ハードマージンSupport Vector Machine (SVM)の定式化</title>
+        <description>&lt;p&gt;&lt;a rel=&quot;nofollow&quot; href=&quot;http://www.amazon.co.jp/gp/product/4061529064/ref=as_li_ss_tl?ie=UTF8&amp;amp;camp=247&amp;amp;creative=7399&amp;amp;creativeASIN=4061529064&amp;amp;linkCode=as2&amp;amp;tag=nettodesyuu00-22&quot; target=&quot;_blank&quot;&gt;サポートベクトルマシン (機械学習プロフェッショナルシリーズ)&lt;/a&gt;&lt;img src=&quot;http://ir-jp.amazon-adsystem.com/e/ir?t=nettodesyuu00-22&amp;amp;l=as2&amp;amp;o=9&amp;amp;a=4061529064&quot; width=&quot;1&quot; height=&quot;1&quot; border=&quot;0&quot; alt=&quot;&quot; style=&quot;border:none !important; margin:0px !important;&quot; /&gt;
+を読んでいます．
+SVMについて，わかっている気になっていましたが，わかっていませんでした．
+意外と奥が深いですね．というわけでその整理の意味も込めてのポスト．&lt;/p&gt;
+
+&lt;p&gt;この記事ではハードマージンSVMを考えます．
+ハードマージンSVMでは，与えられたデータは線形分離可能であると仮定します．
+つまり，超平面&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{x})=\boldsymbol{w}^T \boldsymbol{x} + b&lt;/script&gt;で，与えられた訓練データがミスなく分離できることを仮定します．
+このような超平面は複数存在すると考えられますが，
+SVMでは，「マージンを最大化する超平面を求める」，というのはよくある説明ですね．&lt;/p&gt;
+
+&lt;p&gt;ではまず，マージンの定義から入りましょう．
+今，訓練データ&lt;script type=&quot;math/tex&quot;&gt;\{(\boldsymbol{x}_i,y_i)\}_{i=1}^n, \boldsymbol{x}_i \in \mathbb{R}^d, y_i \in \{-1,1\} \ \forall i=1, \ldots, n&lt;/script&gt;が与えられているとします．
+マージンを，
+超平面&lt;script type=&quot;math/tex&quot;&gt;f(\boldsymbol{x})=\boldsymbol{w}^T \boldsymbol{x} + b&lt;/script&gt;からもっとも近いサンプルまでの距離と定義します．
+つまり，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+i^{*} = \mathop{\rm arg\,min}\limits_{1 \leq i \leq n} \ \frac{|\boldsymbol{w}^T \boldsymbol{x}_i + b|}{\|\boldsymbol{w}\|}
+= \mathop{\rm arg\,min}\limits_{1 \leq i \leq n} \ |\boldsymbol{w}^T \boldsymbol{x}_i + b|
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;と定義すると，マージンは&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align*}
+\frac{|\boldsymbol{w}^T \boldsymbol{x}_{i^{*}} + b|}{\|\boldsymbol{w}\|}
+\end{align*}&lt;/script&gt;
+
+&lt;p&gt;と表すことができます．
+全ての訓練データを正しく分類しつつ，このマージンを最大化したいので，以下の最適化問題を解きます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\max_{\boldsymbol{w},b} &amp;\ \frac{|\boldsymbol{w}^T \boldsymbol{x}_{i^{*}} + b|}{\|\boldsymbol{w}\|} \\
+s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) &gt; 0 \ \forall i=1,\ldots ,n
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;分子が邪魔なので，これを以下のように書き換えます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\max_{\boldsymbol{w},b} &amp;\ \frac{1}{\|\boldsymbol{w}\|} \\
+s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) &gt; 0 \ \forall i=1,\ldots ,n \\
+&amp;\ |\boldsymbol{w}^T \boldsymbol{x}_{i^{*}} + b |=1
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;二つの制約条件を一つにまとめると，以下のようになります．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\max_{\boldsymbol{w},b} &amp;\ \frac{1}{\|\boldsymbol{w}\|} \\
+s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots ,n \\
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;個人的にはここの変形が一番きつかったですね…．
+なので軽く補足しときます．
+以下の制約を書き換えていきます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align}
+ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) &gt; 0 \ \forall i=1,\ldots ,n \ \cdots (1) \\
+ |\boldsymbol{w}^T \boldsymbol{x}_{i^{*}} + b |=1 \ \cdots (2)
+\end{align}&lt;/script&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;i^{*}&lt;/script&gt;の定義から，(2)は以下のように書き換えられます．&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align}
+\ |\boldsymbol{w}^T \boldsymbol{x}_{i} + b| \geq 1  \ \forall i=1,\ldots ,n \ \cdots (2&#39;)
+\end{align}&lt;/script&gt;
+
+&lt;p&gt;ここで，(1)と(2’)を合体させたいのですが，
+&lt;script type=&quot;math/tex&quot;&gt;y_i(\boldsymbol{w}^T \boldsymbol{x}_{i} + b) = |\boldsymbol{w}^T \boldsymbol{x}_{i} + b|&lt;/script&gt;
+を示すことができれば良さそうです．
+ここで，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) = \left\{
+\begin{array}
+\boldsymbol{w}^T \boldsymbol{x}_i + b &amp; (y_i=1) \\
+-(\boldsymbol{w}^T \boldsymbol{x}_i + b) &amp; (y_i=-1)
+\end{array}
+\right.
+\end{align*}, %]]&gt;&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+|\boldsymbol{w}^T \boldsymbol{x}_i + b| = \left\{
+\begin{array}
+\boldsymbol{w}^T \boldsymbol{x}_i + b &amp; (\boldsymbol{w}^T \boldsymbol{x}_i + b \geq 0) \\
+-(\boldsymbol{w}^T \boldsymbol{x}_i + b) &amp; (\boldsymbol{w}^T \boldsymbol{x}_i + b &lt; 0)
+\end{array}
+\right.
+\end{align*}, %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;ですが，(1)より，&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}^T \boldsymbol{x}_i + b \geq 0&lt;/script&gt; は成り立たず，この文脈では必ず
+&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}^T \boldsymbol{x}_i + b &gt; 0&lt;/script&gt;となります．&lt;/p&gt;
+
+&lt;p&gt;なので，&lt;script type=&quot;math/tex&quot;&gt;y_i=1 \Leftrightarrow \boldsymbol{w}^T \boldsymbol{x}_i + b &gt; 0&lt;/script&gt;と
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+y_i=-1 \Leftrightarrow \boldsymbol{w}^T \boldsymbol{x}_i + b &lt; 0 %]]&gt;&lt;/script&gt;を示すことにします．
+すごく簡単すぎて示す必要もないかもしれませんが…．&lt;/p&gt;
+
+&lt;p&gt;&lt;script type=&quot;math/tex&quot;&gt;y_i=1&lt;/script&gt;の時，(1)より，&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}^T \boldsymbol{x}_i + b &gt; 0&lt;/script&gt;．
+&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}^T \boldsymbol{x}_i + b &gt; 0&lt;/script&gt;の時，(1)と&lt;script type=&quot;math/tex&quot;&gt;y_i \in \{-1,1\}&lt;/script&gt;より，&lt;script type=&quot;math/tex&quot;&gt;y_i=1&lt;/script&gt;．
+&lt;script type=&quot;math/tex&quot;&gt;% &lt;![CDATA[
+y_i=-1 \Leftrightarrow \boldsymbol{w}^T \boldsymbol{x}_i + b &lt; 0 %]]&gt;&lt;/script&gt;も同様．&lt;/p&gt;
+
+&lt;p&gt;よって，
+&lt;script type=&quot;math/tex&quot;&gt;y_i(\boldsymbol{w}^T \boldsymbol{x}_{i} + b) = |\boldsymbol{w}^T \boldsymbol{x}_{i} + b|&lt;/script&gt;．&lt;/p&gt;
+
+&lt;p&gt;そういうわけで，(2’)は，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{align}
+\ y_i(\boldsymbol{w}^T \boldsymbol{x}_{i} + b) \geq 1  \ \forall i=1,\ldots ,n \ \cdots (2&#39;&#39;)
+\end{align}&lt;/script&gt;
+
+&lt;p&gt;これで，(1)と(2’‘)を合体できますね．
+最後に最大化と最小化を書き換えて，ノルムを2乗すれば，よく見るハードマージンSVMの最適化問題の完成です：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
+\begin{align*}
+\min_{\boldsymbol{w},b} &amp;\ \|\boldsymbol{w}\|^2 \\
+s.t. &amp;\ y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots ,n 
+\end{align*} %]]&gt;&lt;/script&gt;
+
+&lt;p&gt;ここで，与えられたデータに対して，制約&lt;script type=&quot;math/tex&quot;&gt;y_i(\boldsymbol{w}^T \boldsymbol{x}_i + b) \geq 1 \ \forall i=1,\ldots ,n&lt;/script&gt;を満たす&lt;script type=&quot;math/tex&quot;&gt;\boldsymbol{w}&lt;/script&gt;と&lt;script type=&quot;math/tex&quot;&gt;b&lt;/script&gt;が存在しないかもしれません．
+というより，現実問題ではそのような場合がほとんどだと考えられます．
+そこで，ソフトマージンの考え方が出てきます．
+これについてはまた後日書けたらと思います．&lt;/p&gt;
+</description>
+        <pubDate>Fri, 08 Jan 2016 00:30:29 +0900</pubDate>
+        <link>http://nktmemoja.github.io/jekyll/update/2016/01/08/hardmarginsvmformulation.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/jekyll/update/2016/01/08/hardmarginsvmformulation.html</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>update</category>
+        
+      </item>
+    
+      <item>
+        <title>正例とラベル無しデータからの学習 (PU classification)</title>
+        <description>&lt;p&gt;通常の2値分類問題では，正例と負例が与えられています． しかし扱う問題によっては，このようなデータを用意するのが困難な時があります． 例えば，抽出型のタスクです． 抽出型のタスクでは，抽出したい対象を正例と考えます． この場合の負例は「正例以外のデータ」と定義するほかありません． しかし，集めた正例に対し，それ以外のデータを負例と定義してしまうと， それ以外のデータに含まれる正例も負例として扱ってしまいます．&lt;/p&gt;
+
+&lt;p&gt;このように負例を定義するのが難しい場合には，正例とラベルなしデータから学習する枠組み，PU classificationが有用です． PU classificationについては，Elkan and Noto 2008を参照していただければと思うのですが，少しだけ解説しておきます． 3つの確率変数&lt;script type=&quot;math/tex&quot;&gt;x,y,s&lt;/script&gt;を考えます．ここで，&lt;script type=&quot;math/tex&quot;&gt;x \in \mathbb{R}, y \in \{-1,1\}, s \in \{0,1\}&lt;/script&gt;だとします． &lt;script type=&quot;math/tex&quot;&gt;x&lt;/script&gt;は入力，&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;はクラスラベル，そして&lt;script type=&quot;math/tex&quot;&gt;s&lt;/script&gt;はデータがラベリングされるかどうかを表しています． 我々が欲しいのは，
+&lt;script type=&quot;math/tex&quot;&gt;p(y|x)&lt;/script&gt;
+ですが，PU classificationでは&lt;script type=&quot;math/tex&quot;&gt;y&lt;/script&gt;は観測することができません． 我々のゴールは，&lt;script type=&quot;math/tex&quot;&gt;\{(x_i,s_i)\}_{i=1}^n&lt;/script&gt;から
+&lt;script type=&quot;math/tex&quot;&gt;p(y|x)&lt;/script&gt;
+を学習することです． 結果からいうと，2つの仮定をおくことで，&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(y=1|x) = \frac{p(s=1|x)}{p(s=1|y=1)}&lt;/script&gt;
+
+&lt;p&gt;と表せます．
+&lt;script type=&quot;math/tex&quot;&gt;p(s=1|x)&lt;/script&gt;
+は与えられたデータから推定できます． そして，
+&lt;script type=&quot;math/tex&quot;&gt;p(s=1|y=1)&lt;/script&gt;
+は開発データから推定できます． 詳しくはElkan and Noto 2008の2章にまとめられています． 今回はElkan and Noto 2008の手法を用いてPU classificationを行っていきます．&lt;/p&gt;
+
+&lt;p&gt;では，以下のような正解データを考えましょう． &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-true_labeled.png&quot; alt=&quot;true_labeled.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;このデータに対して，実際に与えられるのは以下のようなデータです． &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-pu_data.png&quot; alt=&quot;pu_data.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;このデータに対して，まずは通常のロジスティック回帰を適用してみます． なお，今回は負例が多いので，交差確認法には正例側のF値を用います． 結果は以下のようになりました． &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-result_of_tradclf1.png&quot; alt=&quot;result_of_tradclf.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;ご覧のように，全て負例だと予測してしまいました． 次に，PU classificationを適用してみます． &lt;img src=&quot;http://nktmemo.files.wordpress.com/2015/10/wpid-result_of_puclassification.png&quot; alt=&quot;result_of_puclassification.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;正例とラベルなしデータから，うまく分類境界を学習できていることがわかります．&lt;/p&gt;
+
+&lt;p&gt;デモ用のコードは以下に載せておきますのでぜひ試してみてください． ちなみに，非線形な分類境界を表現するための&lt;a href=&quot;https://gist.github.com/nkt1546789/e41199340f7a42c515be&quot; title=&quot;rbfmodel_wrapper.py&quot;&gt;rbfmodel_wrapper.py&lt;/a&gt; と PU Classificationのための&lt;a href=&quot;https://gist.github.com/nkt1546789/9fbbf2f450779bde60c3&quot; title=&quot;puwrapper.py&quot;&gt;puwrapper.py&lt;/a&gt; も合わせてDLしてください．&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://gist.github.com/nkt1546789/e9421f06ea3a62bfbb8c&quot; title=&quot;https://gist.github.com/nkt1546789/e9421f06ea3a62bfbb8c&quot;&gt;https://gist.github.com/nkt1546789/e9421f06ea3a62bfbb8c&lt;/a&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 29 Oct 2015 21:47:00 +0900</pubDate>
+        <link>http://nktmemoja.github.io/machine%20learning/2015/10/29/29214700.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/2015/10/29/29214700.html</guid>
+        
+        <category>Machine Learning</category>
+        
+        <category>PU classification</category>
+        
+        
+        <category>Machine Learning</category>
+        
+      </item>
+    
+      <item>
+        <title>Word2Vecを使った単語間関係分類</title>
+        <description>&lt;p&gt;単語間には様々な関係があります． 今回は，単語間の関係をWord2Vecで学習させようと思います． Word2Vecにはアナロジーを捉えられるという話があります． あの有名な，king - man + woman = queen というやつですね． これは，king - man = queen - womanとも書けます． つまり，2語間の差が関係を表しており， この例だと，kingとmanの関係とqueenとwomanの関係が同じであると捉えることができます．&lt;/p&gt;
+
+&lt;p&gt;さて，Word2Vecで学習したベクトル表現を使うと，差ベクトルがうまいこと関係を表すと書きましたが， 必ずしもそうなっているとは限りません． 加えて，ユーザが扱いたい関係とWord2Vecで学習した関係が一致しているとも限りません． そこで，今回も例のごとく教師あり学習を使います． ユーザは教師データを通して，扱いたい関係をアルゴリズムに伝えることができます．&lt;/p&gt;
+
+&lt;p&gt;最初からあまり多くの関係を対象にするのはしんどいので，今回はis-a, has-a関係のみに着目します． これは，僕の理解では，柔道 is-a スポーツ，スポーツ has-a 柔道みたいなものだと思っています． まずは&lt;a href=&quot;https://gist.github.com/nkt1546789/a3b3a4c166fc1c0486a1&quot; title=&quot;training data&quot;&gt;training data&lt;/a&gt;を用意します． is-aとhas-aは反対の関係になっていると思うので，has-aのデータだけ用意します． この中には (スポーツ，野球)というhas-a関係を表す順序対がリストで格納されています． リスト内の順序対に対して差ベクトルを計算し，一つのデータとして扱います．&lt;/p&gt;
+
+&lt;p&gt;コードは以下のようになりました．&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;training&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;gensim.models&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Word2Vec&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;numpy&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;np&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn.linear_model&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;LogisticRegressionCV&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Word2Vec&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/path/to/your/w2v_model&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;training&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;model&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+	&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;random&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;permutation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.7&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;idx&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ntr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;Xtr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;ytr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;itr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;Xte&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;X&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;yte&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LogisticRegressionCV&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Xtr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ytr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;ypred&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;clf&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;predict&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Xte&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sklearn&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;metrics&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;metrics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;accuracy_score&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;yte&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ypred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# &amp;amp;gt;&amp;amp;gt;&amp;amp;gt; 0.99502487562189057&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;今回は厳密な実験はせずに，簡単に性能を見てみました． テストデータに対して，99%の精度を出すことができました． 以下簡単なテストデータへの予測例です．&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;enumerate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ite&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ypred&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;has-a&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+	&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;w1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;is-a&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;w2&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# results:&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;ブルーベリー&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;果物&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;動物&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;モルモット&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;動物&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ワタボウシタマリン&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;登山&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;ロデオ&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;動物&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ユーラシアカワウソ&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;フリーダイビング&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;競馬&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;is&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt;
+&lt;span class=&quot;err&quot;&gt;スポーツ&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;ゴルフ&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;いかがでしょうか？うまく狙った関係が分類できていると思います． とりあえずはうまくいきました！これで成功です！ これがどこまで実用に耐えられるかはやってみないとわかりませんが．&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 27 Oct 2015 20:57:00 +0900</pubDate>
+        <link>http://nktmemoja.github.io/machine%20learning/2015/10/27/27205700.html</link>
+        <guid isPermaLink="true">http://nktmemoja.github.io/machine%20learning/2015/10/27/27205700.html</guid>
+        
+        <category>Machine Learning</category>
+        
+        <category>NLP</category>
+        
+        <category>python</category>
+        
+        
+        <category>Machine Learning</category>
         
       </item>
     

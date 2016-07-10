@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>半教師付きページランクを用いたウェブページからの教師なしメインコンテンツ抽出</title>
+  <meta name="description" content="はじめにウェブページ（HTML文書）はヘッダーフッダー，メニュー，広告など，自身の内容とは関係のない多くのノイズを含んでいます．これらのノイズはウェブページ解析を非常に難しくさせています．特に最近では，ページに関連した広告が貼られていたりするので，ウェブページ解析がさらに難しくなっているように思います．">
+
+  <link rel="stylesheet" href="/css/main.css">
+  <!--<link rel="stylesheet" href="/assets/css/pygments.css">-->
+  <link rel="canonical" href="http://nktmemoja.github.io/jekyll/update/2016/07/10/content-extraction-sspagerank.html">
+  <link rel="alternate" type="application/rss+xml" title="nktmemo_ja" href="http://nktmemoja.github.io/feed.xml">
+  <script type="text/javascript"
+    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({ TeX: { extensions: ["color.js"] }});
+</script>
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-47154979-4', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/">nktmemo_ja</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">半教師付きページランクを用いたウェブページからの教師なしメインコンテンツ抽出</h1>
+    <p class="post-meta"><time datetime="2016-07-10T18:34:32+09:00" itemprop="datePublished">Jul 10, 2016</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h2 id="section">はじめに</h2>
+<p>ウェブページ（HTML文書）はヘッダーフッダー，メニュー，広告など，自身の内容とは関係のない多くのノイズを含んでいます．
+これらのノイズはウェブページ解析を非常に難しくさせています．
+特に最近では，ページに関連した広告が貼られていたりするので，ウェブページ解析がさらに難しくなっているように思います．</p>
+
+<p>このような問題は昔から研究されていて，HTMLからのメインコンテンツ抽出 (Main Content Extraction)とか，本文抽出とか呼ばれています．
+多くの既存手法は，DOMの構造を元にメインコンテンツに該当するDOM要素を特定します．
+そのために，入念にスコア関数を設計したり，教師データから学習させたりする試みがなされています．
+スコア関数や素性には，ほとんどと言っていいほどテキスト情報が使われます．
+よって，これらはニュース記事など，そのページのメインコンテンツがテキストである場合，十分な性能が期待できます．</p>
+
+<p>しかしながら，ウェブページの中には，テキスト以外をメインコンテンツとするページもあります．
+例えば，何かのメタ情報のみを掲載しているページや，動画や画像メインのページなどです．
+このような場合，上記のような手法では，非常に少ないテキスト情報からメインコンテンツ部分を予測することになり，結果として性能の低下を生みます．
+今回は，テキスト以外をメインコンテンツとするページにもある程度適用できるようなメインコンテンツ抽出アルゴリズムの構築を目指します．</p>
+
+<h2 id="dom-pagerank-dom">DOM PageRank: DOM要素への重み付け</h2>
+<p>以前，</p>
+
+<ul>
+  <li><a href="http://nktmemoja.github.io/jekyll/update/2016/07/06/laplaciannodeweighting.html" target="_blank">ラプラス正則化を用いた半教師付きページランク</a></li>
+</ul>
+
+<p>を紹介しました．
+半教師付きページランクを実行するには，隣接行列<script type="math/tex">\mathbf{A}</script>と初期重み<script type="math/tex">\mathbf{u}</script>が必要です．
+教師データを<script type="math/tex">\mathbf{u}</script>で表現すれば，その情報を活用できます．
+今回はこれをメインコンテンツ抽出に応用したアルゴリズム，DOM PageRankを提案します．この場合，DOMツリーをそのまま隣接行列として与えれば，あとは初期値をどう決めるかの問題になります．</p>
+
+<p>具体的に定式化していきます．
+<script type="math/tex">G=(V, E)</script>をDOMツリーの<strong>有向</strong>グラフ表現とします．
+<strong>エッジの向きは，子供 -&gt; 親とします</strong>．
+つまり，<script type="math/tex">V</script>がテキストノードを含むDOMの要素，<script type="math/tex">E</script>がその間のエッジです．
+<script type="math/tex">E</script>を隣接行列<script type="math/tex">\mathbf{A}</script>で表現します．ただし，</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align*}
+A_{ij} =
+\left\{\begin{array}{ll}
+1 & if \ (i,j) \in E \\
+0 & otherwise
+\end{array}\right.
+\end{align*}. %]]></script>
+
+<p><script type="math/tex">\mathbf{u}</script>をどう決めるかによって，結果が変わってきます．
+基本的には，<script type="math/tex">u_i</script>には<script type="math/tex">v_i</script>が重要であればあるほど高い値を設定します．
+<script type="math/tex">\mathbf{u}</script>の決定例を幾つか考えてみました．</p>
+
+<p>DOMツリー内の重要な要素とは何でしょうか？
+とりあえず先人達と同じようにテキストノードは重要だと考えると，<script type="math/tex">\mathbf{u}</script>は以下のようになります（これをテキスト一様重みと呼びます）．</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align}
+u_i =
+\left\{\begin{array}{ll}
+1 & \text{if} \ v_i \ \text{is a text node} \\
+0 & otherwise
+\end{array}\right.
+\end{align} %]]></script>
+
+<p>基本的には，テキスト一様重みで良さそうですが，
+テキストの中には重要なものとそうでないものがあると考えられます．</p>
+
+<ul>
+  <li><a href="http://nktmemoja.github.io/jekyll/update/2016/07/07/sspagerank-webpageanalysis.html" target="_blank">半教師付きページランクを用いたウェブページ中の単語への重み付け</a></li>
+</ul>
+
+<p>では，タイトルやディスクリプションと似たテキストは重要だと仮定しました．
+今回もその仮定を採用してみます．具体的には<script type="math/tex">\mathbf{u}</script>を以下のように定義します（これをタイトル重みと呼びます）．</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align*}
+u_i =
+\left\{\begin{array}{ll}
+(1-\beta) + \beta \left(sim(w_i, w_{title}) + sim(w_i, w_{desc})\right) & \text{if} \ v_i \ \text{is a text node} \\
+0 & otherwise
+\end{array}\right.
+\end{align*} %]]></script>
+
+<p>ただし， <script type="math/tex">w_i</script>は<script type="math/tex">v_i</script>が持つテキスト，<script type="math/tex">w_{title}</script>はタイトル，<script type="math/tex">w_{desc}</script>はディスクリプション，<script type="math/tex">\beta \geq 0</script>はトレードオフパラメータです．</p>
+
+<p>その他にも，画像や動画メインのページも考慮すると，&lt;img&gt;や&lt;video&gt;タグにも初期重みをいくらか与えることも考えられます．</p>
+
+<p>さて，これで<script type="math/tex">\mathbf{A}</script>と<script type="math/tex">\mathbf{u}</script>を元に，すべてのDOM要素<script type="math/tex">V = \{v_i\}_{i=1}^n</script>に対して，重み<script type="math/tex">\{f_i\}_{i=1}^n</script>が付きます．</p>
+
+<h2 id="section-1">メインコンテンツ抽出</h2>
+<p>半教師付きページランクにより，すべてのDOM要素<script type="math/tex">V = \{v_i\}_{i=1}^n</script>に対して，重み<script type="math/tex">\{f_i\}_{i=1}^n</script>が付きます．
+次は，メインコンテンツ抽出にこのDOM要素への重みを活用します．
+ここはあまり深く考えず，包括的にメインコンテンツを抽出するために，Sunらによって提案されたDensitySumを用います．
+DensitySumでは，あるDOM要素<script type="math/tex">v_i</script>のスコア<script type="math/tex">g_i</script>を以下のように求めます．</p>
+
+<script type="math/tex; mode=display">\begin{align*}
+g_i = \sum_{v_j \in Children(v_i)} f_j
+\end{align*}</script>
+
+<p>つまり，あるDOM要素のスコアは，その子要素の合計値であると定義します．
+Sunらはさらに抽出アルゴリズムも提案していますが，今回はシンプルにメインとなるDOM要素<script type="math/tex">\hat{v}</script>を以下のように定義します．</p>
+
+<script type="math/tex; mode=display">\begin{align*}
+\hat{v} = \text{argmax}_{i} \ g_i
+\end{align*}</script>
+
+<h2 id="section-2">実験</h2>
+<p>実験してみました．
+今回は，教師ありメインコンテンツ抽出アルゴリズムである，dragnetと比較してみます．</p>
+
+<p>とりあえず画像メインのページとして，<a href="http://curazy.com/archives/142844" target="_blank">癒されたい人集合！一生離れないと誓った「にこいちアニマル」に悶える12選 | CuRAZY [クレイジー]</a>を選びました．抽出結果を以下の表に示します（今回はテキストで示しますが，実際にはDOM要素を取得できます）．
+なお<script type="math/tex">\alpha</script>は正則化パラメータで，<strong>大体0.5にしとけば良さそうです</strong>．</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">手法</th>
+      <th style="text-align: left">抽出したテキスト</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">DOM Page Rank (テキスト一様重み, <script type="math/tex">\alpha=0.5</script>）</td>
+      <td style="text-align: left">Facebook でシェアする Twitter でシェアする LINE で送る ネコ部を フォローする クレイジーの最新記事 をお届けします <font color="blue">1. 窒息するギリギリまでギュッ View post on imgur.com 2. くっついてないと焦りだす View post on imgur.com 3. 夢の中でも二匹は一緒 http://bit.ly/16Yh5ll 4. ご主人が出かけると始まるダンスパーティー Boomer (Golden retriever) and Trigger (Lab) 5. ２匹にイタズラさせたら横に出る者はいない View post on imgur.com 6. 一緒にいると自然と笑顔に View post on imgur.com 7. 落ち込んだら片方が慰める View post on imgur.com 8. 溶けて１匹になっちゃいそう View post on imgur.com 9. どこにも行かないって約束！ http://catasters.tumblr.com/post/139548429975/thank-you-for-reminding-me-to-wish-you-a-happy 10. 愛が溢れ出ちゃってる View post on imgur.com 11. 他のワンコそっちのけ View post on imgur.com 12. 二人の間には誰も入れない View post on imgur.com Editor </font>クレイジーピンク クレイジー特戦隊、唯一の女子隊員！ 最近Twitter始めました♡クレイジーガールなつぶやきしていくので、是非フォローしてください( ✧Д✧) 最近、習字道具を一式揃えました！ Twitter：https://twitter.com/curazypink クレイジーピンクの他の記事 local_offer 動物 ネコ大好き！ 仲良し 猫 犬 公園 桃 ドリンク 不運 この記事が気に入ったら いいね！しよう 最新記事をお届けします フォローしよう 友達に追加しよう</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">dragnet</td>
+      <td style="text-align: left">レイジー特戦隊、唯一の女子隊員！ 最近Twitter始めました♡クレイジーガールなつぶやきしていくので、是非フォローしてください( ✧Д✧) Twitter：https://twitter.com/curazypink クレイジーピンクの他の記事</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>青字の部分がメインコンテンツです．DOM PageRankはメインコンテンツ前後の多少のノイズを含んではいるものの，うまく抽出できています．
+一方でdragnetは完全に抽出に失敗しています．</p>
+
+<p>次に，さらにテキストの少ない店舗紹介ページ，<a href="https://supermarket.geomedian.com/135498/" target="_blank">スーパーセンタートライアル宇部中央店｜全国スーパーマーケット・ディスカウントショップマップ</a>に適用してミアmす．
+これに対する抽出結果を以下の表に示します．</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">手法</th>
+      <th style="text-align: left">抽出したテキスト</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">DOM PageRank (テキスト一様重み, <script type="math/tex">\alpha=0.5</script>）</td>
+      <td style="text-align: left"><font color="blue">所在地 山口県 宇部市 中央町3-16-20 最寄駅 宇部新川駅 から直線距離で513m 宇部新川駅周辺の店舗一覧 ＞ トライアル 店舗のジャンル 激安スーパー トライアル 備考 2016年7月13日オープン予定！ 宇部市のトライアル店舗一覧 宇部市の全店舗一覧 最終更新： 2016年7月8日</font></td>
+    </tr>
+    <tr>
+      <td style="text-align: center">dragnet</td>
+      <td style="text-align: left"><font color="blue">所在地 山口県 宇部市 中央町3-16-20 最寄駅 宇部新川駅周辺の店舗一覧 ＞ トライアル 店舗のジャンル 激安スーパー トライアル 備考 2016年7月13日オープン予定！ 宇部市のトライアル店舗一覧 宇部市の全店舗一覧 最終更新： 2016年7月8日</font></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>両方ともメインコンテンツ抽出に成功していますが，DOM PageRankはより多くのコンテンツを抽出できています．</p>
+
+<h2 id="section-3">おわりに</h2>
+<p>今回は，半教師付きページランクをウェブページ（HTML文書）のメインコンテンツ抽出に応用してみました．
+さらに，簡単ではありますが，dragnetと性能を比較し，その実用性を示しました．
+半教師付きページランクは初期重みを変えることで柔軟にアルゴリズムを設計できるところに強みがあると思います．
+パラメータも正則化パラメータのみで，</p>
+
+<h2 id="section-4">コード</h2>
+<p>コードはgistに載せています．</p>
+
+<ul>
+  <li><a href="https://gist.github.com/nkt1546789/dfc4f01dbf4aa8a9d32762e904865560" target="_blank">https://gist.github.com/nkt1546789/dfc4f01dbf4aa8a9d32762e904865560</a></li>
+</ul>
+
+<p>一応ここにも貼っておきます．</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.linalg</span> <span class="kn">as</span> <span class="nn">la</span>
+<span class="kn">import</span> <span class="nn">bs4</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">sparse</span>
+
+<span class="k">def</span> <span class="nf">dfs</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
+    <span class="k">yield</span> <span class="n">elem</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s">"children"</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s">"script"</span><span class="p">,</span> <span class="s">"style"</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">elem2</span> <span class="ow">in</span> <span class="n">dfs</span><span class="p">(</span><span class="n">child</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">elem2</span>
+
+
+<span class="k">def</span> <span class="nf">get_text_elements</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">bs4</span><span class="o">.</span><span class="n">NavigableString</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">bs4</span><span class="o">.</span><span class="n">Comment</span><span class="p">,</span> <span class="n">bs4</span><span class="o">.</span><span class="n">Declaration</span><span class="p">)</span> <span class="ow">and</span> <span class="n">elem</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">elem</span>
+    <span class="k">elif</span> <span class="n">elem</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">'script'</span><span class="p">,</span> <span class="s">'style'</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">contents</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">text_elem</span> <span class="ow">in</span> <span class="n">get_text_elements</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">text_elem</span>
+
+<span class="k">class</span> <span class="nc">SSPageRank</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="n">alpha</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diagflat</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">D</span> <span class="o">-</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">la</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">L</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">fit_predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span>
+
+<span class="k">class</span> <span class="nc">DomPageRank</span><span class="p">(</span><span class="n">SSPageRank</span><span class="p">):</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s">'h1'</span><span class="p">,</span> <span class="s">'h2'</span><span class="p">,</span> <span class="s">'h3'</span><span class="p">,</span> <span class="s">'h4'</span><span class="p">,</span> <span class="s">'h5'</span><span class="p">,</span> <span class="s">'h6'</span><span class="p">,</span> <span class="s">'p'</span><span class="p">,</span> <span class="s">'div'</span><span class="p">,</span> <span class="s">'table'</span><span class="p">,</span> <span class="s">'map'</span><span class="p">,</span> <span class="s">'section'</span><span class="p">,</span> <span class="s">'article'</span><span class="p">,</span> <span class="s">'ul'</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="p">):</span>
+        <span class="n">soup</span> <span class="o">=</span> <span class="n">bs4</span><span class="o">.</span><span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s">"lxml"</span><span class="p">)</span>
+        <span class="n">elems</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dfs</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">body</span><span class="p">))</span>
+
+        <span class="c"># create directed adjacency matrix (child -&gt; parent)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">sparse</span><span class="o">.</span><span class="n">lil_matrix</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">elems</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">elems</span><span class="p">)))</span>
+        <span class="n">vocabulary</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">elem_id</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">elems</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">vocabulary</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocabulary</span><span class="p">))</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">vocabulary</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocabulary</span><span class="p">))</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s">"children"</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">vocabulary</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">vocabulary</span><span class="p">))</span>
+                <span class="n">A</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">id2elem</span> <span class="o">=</span> <span class="p">{</span><span class="n">value</span><span class="p">:</span> <span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">vocabulary</span><span class="o">.</span><span class="n">iteritems</span><span class="p">()}</span>
+
+        <span class="c"># create initial weight</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">vocabulary</span><span class="p">[</span><span class="n">elem</span><span class="p">]</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">get_text_elements</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">body</span><span class="p">)])</span>
+        <span class="n">u</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DomPageRank</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span>
+
+        <span class="c"># store variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">soup</span> <span class="o">=</span> <span class="n">soup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elems</span> <span class="o">=</span> <span class="n">elems</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vocabulary</span> <span class="o">=</span> <span class="n">vocabulary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id2elem</span> <span class="o">=</span> <span class="n">id2elem</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">u</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<span class="k">class</span> <span class="nc">ContentExtractor</span><span class="p">(</span><span class="n">DomPageRank</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">extract_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ContentExtractor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">target_elems</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">elems</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ContentExtractor</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vocabulary</span><span class="p">[</span><span class="n">elem</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="s">"children"</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">elem</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">ContentExtractor</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+                        <span class="n">score</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">vocabulary</span><span class="p">[</span><span class="n">child</span><span class="p">]]</span>
+            <span class="n">target_elems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+            <span class="n">scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+        <span class="c"># extract top-1 element</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">target_elems</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">element</span>
+
+    <span class="k">def</span> <span class="nf">extract_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">deliminator</span><span class="o">=</span><span class="s">u" "</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extract_element</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">deliminator</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">get_text_elements</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">element</span><span class="p">)</span> <span class="k">if</span> <span class="n">elem</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">codecs</span><span class="o">,</span> <span class="nn">hashlib</span><span class="o">,</span> <span class="nn">requests</span>
+    <span class="k">def</span> <span class="nf">url_open</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s">"/tmp"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span> <span class="o">+</span> <span class="s">".html"</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">loc</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">"r"</span><span class="p">,</span> <span class="s">"utf-8"</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">encoding</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">resp</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">apparent_encoding</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s">"ignore"</span><span class="p">)</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">"w"</span><span class="p">,</span> <span class="s">"utf-8"</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">html</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="n">url_open</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">ContentExtractor</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">extract_text</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+    <span class="k">print</span> <span class="n">text</span></code></pre></figure>
+
+
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css">
+
+  <a href="https://twitter.com/intent/tweet?text=半教師付きページランクを用いたウェブページからの教師なしメインコンテンツ抽出&url=http://nktmemoja.github.io/jekyll/update/2016/07/10/content-extraction-sspagerank.html" rel="nofollow" target="_blank" title="Share on Twitter"><i class="fa fa-twitter-square"></i></a>
+  <a href="https://facebook.com/sharer.php?u=http://nktmemoja.github.io/jekyll/update/2016/07/10/content-extraction-sspagerank.html" rel="nofollow" target="_blank" title="Share on Facebook"><i class="fa fa-facebook-square"></i></a>
+  <a href="http://www.linkedin.com/shareArticle?mini=true&url=http://nktmemoja.github.io/jekyll/update/2016/07/10/content-extraction-sspagerank.html" rel="nofollow" target="_blank" title="Share on Linkedlin"><i class="fa fa-linkedin-square"></i></a>
+  <a href="https://plus.google.com/share?url=http://nktmemoja.github.io/jekyll/update/2016/07/10/content-extraction-sspagerank.html" rel="nofollow" target="_blank" title="Share on Google+"><i class="fa fa-google-plus-square"></i></a>
+
+
+
+    <div id="disqus_thread"></div>
+<script>
+    /**
+     *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+     */
+    /*
+    var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() {  // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        
+        s.src = '//nktmemo.disqus.com/embed.js';
+        
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">nktmemo_ja</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>nktmemo_ja</li>
+          <li><a href="mailto:h.tanaka36@gmail.com">h.tanaka36@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/nkt1546789"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">nkt1546789</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/nkt_dev"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">nkt_dev</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>nktmemo provides interesting articles about Machine Learning and NLP.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

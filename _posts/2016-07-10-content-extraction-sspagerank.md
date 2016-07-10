@@ -1,0 +1,278 @@
+---
+layout: post
+title:  "半教師付きページランクを用いたウェブページからの教師なしメインコンテンツ抽出"
+date: 2016-07-10 18:34:32 +0900
+categories: jekyll update
+---
+
+## はじめに
+ウェブページ（HTML文書）はヘッダーフッダー，メニュー，広告など，自身の内容とは関係のない多くのノイズを含んでいます．
+これらのノイズはウェブページ解析を非常に難しくさせています．
+特に最近では，ページに関連した広告が貼られていたりするので，ウェブページ解析がさらに難しくなっているように思います．
+
+このような問題は昔から研究されていて，HTMLからのメインコンテンツ抽出 (Main Content Extraction)とか，本文抽出とか呼ばれています．
+多くの既存手法は，DOMの構造を元にメインコンテンツに該当するDOM要素を特定します．
+そのために，入念にスコア関数を設計したり，教師データから学習させたりする試みがなされています．
+スコア関数や素性には，ほとんどと言っていいほどテキスト情報が使われます．
+よって，これらはニュース記事など，そのページのメインコンテンツがテキストである場合，十分な性能が期待できます．
+
+しかしながら，ウェブページの中には，テキスト以外をメインコンテンツとするページもあります．
+例えば，何かのメタ情報のみを掲載しているページや，動画や画像メインのページなどです．
+このような場合，上記のような手法では，非常に少ないテキスト情報からメインコンテンツ部分を予測することになり，結果として性能の低下を生みます．
+今回は，テキスト以外をメインコンテンツとするページにもある程度適用できるようなメインコンテンツ抽出アルゴリズムの構築を目指します．
+
+## DOM PageRank: DOM要素への重み付け
+以前，
+
+- <a href="http://nktmemoja.github.io/jekyll/update/2016/07/06/laplaciannodeweighting.html" target="_blank">ラプラス正則化を用いた半教師付きページランク</a>
+
+を紹介しました．
+半教師付きページランクを実行するには，隣接行列$$\mathbf{A}$$と初期重み$$\mathbf{u}$$が必要です．
+教師データを$$\mathbf{u}$$で表現すれば，その情報を活用できます．
+今回はこれをメインコンテンツ抽出に応用したアルゴリズム，DOM PageRankを提案します．この場合，DOMツリーをそのまま隣接行列として与えれば，あとは初期値をどう決めるかの問題になります．
+
+具体的に定式化していきます．
+$$G=(V, E)$$をDOMツリーの**有向**グラフ表現とします．
+**エッジの向きは，子供 -> 親とします**．
+つまり，$$V$$がテキストノードを含むDOMの要素，$$E$$がその間のエッジです．
+$$E$$を隣接行列$$\mathbf{A}$$で表現します．ただし，
+
+$$
+\begin{align*}
+A_{ij} =
+\left\{\begin{array}{ll}
+1 & if \ (i,j) \in E \\
+0 & otherwise
+\end{array}\right.
+\end{align*}.
+$$
+
+$$\mathbf{u}$$をどう決めるかによって，結果が変わってきます．
+基本的には，$$u_i$$には$$v_i$$が重要であればあるほど高い値を設定します．
+$$\mathbf{u}$$の決定例を幾つか考えてみました．
+
+DOMツリー内の重要な要素とは何でしょうか？
+とりあえず先人達と同じようにテキストノードは重要だと考えると，$$\mathbf{u}$$は以下のようになります（これをテキスト一様重みと呼びます）．
+
+$$
+\begin{align}
+u_i =
+\left\{\begin{array}{ll}
+1 & \text{if} \ v_i \ \text{is a text node} \\
+0 & otherwise
+\end{array}\right.
+\end{align}
+$$
+
+基本的には，テキスト一様重みで良さそうですが，
+テキストの中には重要なものとそうでないものがあると考えられます．
+
+- <a href="http://nktmemoja.github.io/jekyll/update/2016/07/07/sspagerank-webpageanalysis.html" target="_blank">半教師付きページランクを用いたウェブページ中の単語への重み付け</a>
+
+では，タイトルやディスクリプションと似たテキストは重要だと仮定しました．
+今回もその仮定を採用してみます．具体的には$$\mathbf{u}$$を以下のように定義します（これをタイトル重みと呼びます）．
+
+$$
+\begin{align*}
+u_i =
+\left\{\begin{array}{ll}
+(1-\beta) + \beta \left(sim(w_i, w_{title}) + sim(w_i, w_{desc})\right) & \text{if} \ v_i \ \text{is a text node} \\
+0 & otherwise
+\end{array}\right.
+\end{align*}
+$$
+
+ただし， $$w_i$$は$$v_i$$が持つテキスト，$$w_{title}$$はタイトル，$$w_{desc}$$はディスクリプション，$$\beta \geq 0$$はトレードオフパラメータです．
+
+その他にも，画像や動画メインのページも考慮すると，\<img\>や\<video\>タグにも初期重みをいくらか与えることも考えられます．
+
+さて，これで$$\mathbf{A}$$と$$\mathbf{u}$$を元に，すべてのDOM要素$$V = \{v_i\}_{i=1}^n$$に対して，重み$$\{f_i\}_{i=1}^n$$が付きます．
+
+## メインコンテンツ抽出
+半教師付きページランクにより，すべてのDOM要素$$V = \{v_i\}_{i=1}^n$$に対して，重み$$\{f_i\}_{i=1}^n$$が付きます．
+次は，メインコンテンツ抽出にこのDOM要素への重みを活用します．
+ここはあまり深く考えず，包括的にメインコンテンツを抽出するために，Sunらによって提案されたDensitySumを用います．
+DensitySumでは，あるDOM要素$$v_i$$のスコア$$g_i$$を以下のように求めます．
+
+$$
+\begin{align*}
+g_i = \sum_{v_j \in Children(v_i)} f_j
+\end{align*}
+$$
+
+つまり，あるDOM要素のスコアは，その子要素の合計値であると定義します．
+Sunらはさらに抽出アルゴリズムも提案していますが，今回はシンプルにメインとなるDOM要素$$\hat{v}$$を以下のように定義します．
+
+$$
+\begin{align*}
+\hat{v} = \text{argmax}_{i} \ g_i
+\end{align*}
+$$
+
+## 実験
+実験してみました．
+今回は，教師ありメインコンテンツ抽出アルゴリズムである，dragnetと比較してみます．
+
+とりあえず画像メインのページとして，<a href="http://curazy.com/archives/142844" target="_blank">癒されたい人集合！一生離れないと誓った「にこいちアニマル」に悶える12選 | CuRAZY [クレイジー]</a>を選びました．抽出結果を以下の表に示します（今回はテキストで示しますが，実際にはDOM要素を取得できます）．
+なお$$\alpha$$は正則化パラメータで，**大体0.5にしとけば良さそうです**．
+
+|手法|抽出したテキスト|
+|:-:|:--|
+|DOM Page Rank (テキスト一様重み, $$\alpha=0.5$$）|Facebook でシェアする Twitter でシェアする LINE で送る ネコ部を フォローする クレイジーの最新記事 をお届けします <font color="blue">1. 窒息するギリギリまでギュッ View post on imgur.com 2. くっついてないと焦りだす View post on imgur.com 3. 夢の中でも二匹は一緒 http://bit.ly/16Yh5ll 4. ご主人が出かけると始まるダンスパーティー Boomer (Golden retriever) and Trigger (Lab) 5. ２匹にイタズラさせたら横に出る者はいない View post on imgur.com 6. 一緒にいると自然と笑顔に View post on imgur.com 7. 落ち込んだら片方が慰める View post on imgur.com 8. 溶けて１匹になっちゃいそう View post on imgur.com 9. どこにも行かないって約束！ http://catasters.tumblr.com/post/139548429975/thank-you-for-reminding-me-to-wish-you-a-happy 10. 愛が溢れ出ちゃってる View post on imgur.com 11. 他のワンコそっちのけ View post on imgur.com 12. 二人の間には誰も入れない View post on imgur.com Editor </font>クレイジーピンク クレイジー特戦隊、唯一の女子隊員！ 最近Twitter始めました♡クレイジーガールなつぶやきしていくので、是非フォローしてください( ✧Д✧) 最近、習字道具を一式揃えました！ Twitter：https://twitter.com/curazypink クレイジーピンクの他の記事 local_offer 動物 ネコ大好き！ 仲良し 猫 犬 公園 桃 ドリンク 不運 この記事が気に入ったら いいね！しよう 最新記事をお届けします フォローしよう 友達に追加しよう|
+|dragnet|レイジー特戦隊、唯一の女子隊員！ 最近Twitter始めました♡クレイジーガールなつぶやきしていくので、是非フォローしてください( ✧Д✧) Twitter：https://twitter.com/curazypink クレイジーピンクの他の記事|
+
+青字の部分がメインコンテンツです．DOM PageRankはメインコンテンツ前後の多少のノイズを含んではいるものの，うまく抽出できています．
+一方でdragnetは完全に抽出に失敗しています．
+
+次に，さらにテキストの少ない店舗紹介ページ，<a href="https://supermarket.geomedian.com/135498/" target="_blank">スーパーセンタートライアル宇部中央店｜全国スーパーマーケット・ディスカウントショップマップ</a>に適用してミアmす．
+これに対する抽出結果を以下の表に示します．
+
+|手法|抽出したテキスト|
+|:-:|:--|
+|DOM PageRank (テキスト一様重み, $$\alpha=0.5$$）|<font color="blue">所在地 山口県 宇部市 中央町3-16-20 最寄駅 宇部新川駅 から直線距離で513m 宇部新川駅周辺の店舗一覧 ＞ トライアル 店舗のジャンル 激安スーパー トライアル 備考 2016年7月13日オープン予定！ 宇部市のトライアル店舗一覧 宇部市の全店舗一覧 最終更新： 2016年7月8日</font>|
+|dragnet|<font color="blue">所在地 山口県 宇部市 中央町3-16-20 最寄駅 宇部新川駅周辺の店舗一覧 ＞ トライアル 店舗のジャンル 激安スーパー トライアル 備考 2016年7月13日オープン予定！ 宇部市のトライアル店舗一覧 宇部市の全店舗一覧 最終更新： 2016年7月8日</font>|
+
+両方ともメインコンテンツ抽出に成功していますが，DOM PageRankはより多くのコンテンツを抽出できています．
+
+## おわりに
+今回は，半教師付きページランクをウェブページ（HTML文書）のメインコンテンツ抽出に応用してみました．
+さらに，簡単ではありますが，dragnetと性能を比較し，その実用性を示しました．
+半教師付きページランクは初期重みを変えることで柔軟にアルゴリズムを設計できるところに強みがあると思います．
+パラメータも正則化パラメータのみで，
+
+## コード
+コードはgistに載せています．
+
+- <a href="https://gist.github.com/nkt1546789/dfc4f01dbf4aa8a9d32762e904865560" target="_blank">https://gist.github.com/nkt1546789/dfc4f01dbf4aa8a9d32762e904865560</a>
+
+一応ここにも貼っておきます．
+
+{% highlight python %}
+import numpy as np
+import numpy.linalg as la
+import bs4
+from scipy import sparse
+
+def dfs(elem):
+    yield elem
+    if hasattr(elem, "children"):
+        for child in elem.children:
+            if child.name in ("script", "style"):
+                continue
+            for elem2 in dfs(child):
+                yield elem2
+
+
+def get_text_elements(elem):
+    if isinstance(elem, bs4.NavigableString):
+        if type(elem) not in (bs4.Comment, bs4.Declaration) and elem.strip():
+            yield elem
+    elif elem.name not in ('script', 'style'):
+        for content in elem.contents:
+            for text_elem in get_text_elements(content):
+                yield text_elem
+
+class SSPageRank(object):
+    def __init__(self, alpha=1.0):
+        self.alpha = alpha
+
+    def fit(self, A, u):
+        n = A.shape[0]
+        D = np.diagflat(A.sum(axis=1))
+        L = D - A
+        self.f = la.pinv(L+self.alpha*np.identity(n)).dot(u)
+        self.f = np.maximum(0.0, self.f)
+        self.f = np.asarray(self.f).ravel()
+        return self
+
+    def fit_predict(self, A, u):
+        self.fit(A, u)
+        return self.f
+
+class DomPageRank(SSPageRank):
+    tags = set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'div', 'table', 'map', 'section', 'article', 'ul'])
+
+    def fit(self, html):
+        soup = bs4.BeautifulSoup(html, "lxml")
+        elems = list(dfs(soup.body))
+
+        # create directed adjacency matrix (child -> parent)
+        A = sparse.lil_matrix((len(elems), len(elems)))
+        vocabulary = {}
+        elem_id = 0
+        for elem in elems:
+            i = vocabulary.setdefault(elem, len(vocabulary))
+            j = vocabulary.setdefault(elem.parent, len(vocabulary))
+            A[i,j] = 1
+            if not hasattr(elem, "children"):
+                continue
+            for child in elem.children:
+                j = vocabulary.setdefault(child, len(vocabulary))
+                A[j,i] = 1
+        id2elem = {value: key for key, value in vocabulary.iteritems()}
+
+        # create initial weight
+        u = np.zeros(A.shape[0])
+        mask = np.array([vocabulary[elem] for elem in get_text_elements(soup.body)])
+        u[mask] = 1.0
+        super(DomPageRank, self).fit(A, u)
+
+        # store variables
+        self.soup = soup
+        self.elems = elems
+        self.vocabulary = vocabulary
+        self.id2elem = id2elem
+        self.A = A
+        self.u = u
+        return self
+
+class ContentExtractor(DomPageRank):
+    def extract_element(self, html):
+        super(ContentExtractor, self).fit(html)
+        scores = []
+        target_elems = []
+        for elem in self.elems:
+            if elem.name not in ContentExtractor.tags:
+                continue
+            score = self.f[self.vocabulary[elem]]
+            if hasattr(elem, "children"):
+                for child in elem.children:
+                    if child.name in ContentExtractor.tags:
+                        score += self.f[self.vocabulary[child]]
+            target_elems.append(elem)
+            scores.append(score)
+
+        # extract top-1 element
+        i = np.argmax(scores)
+        self.element = target_elems[i]
+        return self.element
+
+    def extract_text(self, html, deliminator=u" "):
+        self.extract_element(html)
+        self.text = deliminator.join(elem.string.strip() for elem in get_text_elements(self.element) if elem.string.strip())
+        return self.text
+
+if __name__ == '__main__':
+    import os, sys, codecs, hashlib, requests
+    def url_open(url, loc="/tmp", encoding=None):
+        filename = hashlib.md5(url).hexdigest() + ".html"
+        filename = os.path.join(loc, filename)
+        if os.path.exists(filename):
+            html = codecs.open(filename, "r", "utf-8").read()
+        else:
+            resp = requests.get(url)
+            if encoding is None:
+                resp.encoding = resp.apparent_encoding
+                html = resp.text
+            else:
+                html = unicode(html, encoding, errors="ignore")
+            fp = codecs.open(filename, "w", "utf-8")
+            fp.write(html)
+            fp.close()
+        return html
+
+    url = sys.argv[1]
+    html = url_open(url)
+    text = ContentExtractor(alpha=0.5).extract_text(html)
+    print text
+{% endhighlight %}
