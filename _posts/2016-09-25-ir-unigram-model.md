@@ -55,6 +55,7 @@ L(\boldsymbol{\Phi}, \boldsymbol{\theta}, \boldsymbol{\alpha}, \beta)
 $$
 
 最適解は以下の条件を満たす．
+
 $$
 \begin{align}
 \frac{\partial L}{\partial \phi_{dw}} = 0 &\Rightarrow \phi_{dw} = - \frac{N_{dw}}{\alpha_d} \\
@@ -65,11 +66,13 @@ $$
 $$
 
 よって，
+
 $$
 \begin{align*}
 p(w|d) = \frac{N_{dw}}{N_d}
 \end{align*}
 $$
+
 となり，これはTerm Frequency (TF)に一致する．
 なお，今回は，$$p(w|d)$$のみに関心があったので，$$\boldsymbol{\theta}$$については省略する．
 
