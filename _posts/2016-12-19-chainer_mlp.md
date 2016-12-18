@@ -53,16 +53,17 @@ class MLP(Chain):
 
 $$
 \begin{align*}
-\boldsymbol{u}^{(1)} &= \boldsymbol{W}^{(1)} \boldsymbol{x} \\
+\boldsymbol{u}^{(1)} &= \boldsymbol{W}^{(1)} \boldsymbol{x} + \boldsymbol{b}^{(1)}\\
 \boldsymbol{z}^{(1)}_j &= relu_j(\boldsymbol{u}^{(1)}) = \max\{0, u^{(1)}_j\} \\
-\boldsymbol{u}^{(2)} &= \boldsymbol{W}^{(2)} \boldsymbol{z}^{(1)} \\
+\boldsymbol{u}^{(2)} &= \boldsymbol{W}^{(2)} \boldsymbol{z}^{(1)}  + \boldsymbol{b}^{(2)} \\
 \boldsymbol{z}^{(2)}_j &= relu_j(\boldsymbol{u}^{(2)}) = \max\{0, u^{(2)}_j\} \\
-\boldsymbol{y} &= \boldsymbol{z}^{(2)}
+\boldsymbol{u}^{(3)} &= \boldsymbol{W}^{(3)} \boldsymbol{z}^{(2)}  + \boldsymbol{b}^{(3)}\\
+\boldsymbol{y} &= softmax(\boldsymbol{u}^{(3)})
 \end{align*}
 $$
 
-出力層の活性化関数にソフトマックス関数ではなく，恒等写像を用いているのは，損失関数に交差エントロピーを用いるためである．
-これは，このモデルを食わせるClassifier内部に実装があります (Tutorial抜粋)．
+コード中で，出力層の活性化関数にソフトマックス関数ではなく，恒等写像を用いているのは，損失関数に交差エントロピーを用いるためである．
+これは，このモデルを食わせるClassifier内部に実装がある (Tutorial抜粋)．
 
 {% highlight python %}
 class Classifier(Chain):
