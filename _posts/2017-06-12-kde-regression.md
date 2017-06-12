@@ -43,6 +43,7 @@ $$
 ちなみに，この手法だと分散$$\sigma^2(x) = \mathbb{E}_{y \sim p(y|x)}\left[(y - \mu(x))\right]$$も計算できるので，それも合わせてプロットしてみた．
 みればわかるように，サンプルが少なくて推定結果が曖昧なところでは分散が高くなっている．
 
-
 ![kde_regression]({{nktmemo.github.io}}/assets/kde_regression.png)
 
+今回は密度推定を用いた回帰というのを紹介してみた．
+これを使えば，実は，Baysian Optimizationぽいことができるので，次はそれについて書きたいと思う．
